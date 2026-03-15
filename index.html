@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chef · 智能食谱生成器</title>
+  <!-- PayPal SDK (生产环境) 启用订阅功能 -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&currency=USD&vault=true&intent=subscription"></script>
+  <!-- 外部样式 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="nav">
+    <div class="container nav-inner">
+      <div class="logo" id="logoText" onclick="showPage('page-home')">
+        <img src="images/logo-120x40.png" alt="AI Chef" style="height: 32px; vertical-align: middle;">
+      </div>
+      <div class="nav-right">
+        <div class="lang-selector">
+          <div class="lang-btn" id="currentLang">English ▼</div>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-option" data-lang="en">English</div>
+            <div class="lang-option" data-lang="es">Español</div>
+            <div class="lang-option" data-lang="fr">Français</div>
+            <div class="lang-option" data-lang="de">Deutsch</div>
+            <div class="lang-option" data-lang="it">Italiano</div>
+            <div class="lang-option" data-lang="pt">Português</div>
+            <div class="lang-option" data-lang="zh-CN">简体中文</div>
+          </div>
+        </div>
+        <button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
+        <button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 首页 -->
+  <div class="page active" id="page-home">
+    <div class="container">
+      <div class="hero">
+        <h1 id="heroTitle">AI Chef</h1>
+        <p id="heroSubtitle">Global Cuisines · Smart Pairing</p>
+        <div class="hero-actions">
+          <button class="btn btn-outline" style="background:#fff;color:#2563eb" id="btnTryFree" onclick="showPage('page-generator')">Try Free</button>
+          <button class="btn btn-primary" id="btnSubscribe" onclick="showPage('page-subscribe')">Subscribe Now</button>
+        </div>
+      </div>
+      <h2 class="section-title" id="sectionFeatures">Features</h2>
+      <div class="grid">
+        <div class="card feature-card"><div class="feature-icon">🍽️</div><div class="feature-title" id="feat1">18 Cuisines</div><div class="feature-sub" id="feat1Sub">Global flavors</div></div>
+        <div class="card feature-card"><div class="feature-icon">🥗</div><div class="feature-title" id="feat2">AI Assistant</div><div class="feature-sub" id="feat2Sub">Interactive Q&A</div></div>
+        <div class="card feature-card"><div class="feature-icon">📊</div><div class="feature-title" id="feat3">Nutrition</div><div class="feature-sub" id="feat3Sub">Healthy Weight</div></div>
+        <div class="card feature-card"><div class="feature-icon">👶</div><div class="feature-title" id="feat4">Baby Safe</div><div class="feature-sub" id="feat4Sub">No salt/sugar</div></div>
+        <div class="card feature-card"><div class="feature-icon">🤰</div><div class="feature-title" id="feat5">Pregnancy</div><div class="feature-sub" id="feat5Sub">Mom friendly</div></div>
+        <div class="card feature-card"><div class="feature-icon">🎥</div><div class="feature-title" id="feat6">Video Guides</div><div class="feature-sub" id="feat6Sub">Step-by-step</div></div>
+      </div>
+      <h2 class="section-title" id="sectionSubscribe">Subscription Plans</h2>
+      <div class="grid-2">
+        <div class="card clickable" id="goPay" onclick="showPage('page-subscribe')"><div class="feature-icon">💳</div><div class="feature-title" id="subText">Subscribe</div><div class="feature-sub" id="subSub">Unlock full access</div></div>
+        <div class="card clickable" id="goFamily" onclick="showPage('page-subscribe')"><div class="feature-icon">👪</div><div class="feature-title" id="familyText">Family Share</div><div class="feature-sub" id="familySub">Multi-User Plan</div></div>
+      </div>
+      <div class="footer-links">
+        <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 生成器页 -->
+  <div class="page" id="page-generator">
+    <div class="container">
+      <div class="card">
+        <div class="generator-header">
+          <h2 id="genTitle">AI Recipe Generator</h2>
+          <button class="add-home-btn" id="addToHomeBtn" onclick="addToHome()">📱 Add</button>
+          <div class="nav-history">
+            <button class="history-btn" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>← Prev</button>
+            <button class="history-btn" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>Next →</button>
+          </div>
+        </div>
+        <div id="limitInfo"></div>
+        <label style="font-size:14px;margin-bottom:6px;display:block" id="genMealType">Category</label>
+        <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="mealType">
+          <option value="standard" id="optStandard">Standard</option>
+          <option value="baby" id="optBaby">Baby</option>
+          <option value="pregnancy" id="optPregnancy">Pregnancy</option>
+        </select>
+        <label style="font-size:14px;margin-bottom:6px;display:block" id="genCuisine">Cuisine</label>
+        <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="cuisine"></select>
+        <label style="font-size:14px;margin-bottom:6px;display:block" id="genDishName">What to eat?</label>
+        <input id="dishName" placeholder="e.g. chicken, tomato" maxlength="100" style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0">
+        <div class="small-note" id="dishNameHint">You can enter one or more ingredients.</div>
+        <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
+      </div>
+      <div class="card">
+        <div id="recipeResult" class="recipe-result">Please generate a recipe first</div>
+      </div>
+      <div class="card">
+        <h4 style="margin:0 0 8px;font-size:14px" id="aiAssistTitle">AI Assistant</h4>
+        <div class="qa-box">
+          <div class="qa-history" id="qaHistory"></div>
+          <input class="qa-input" id="qaInput" placeholder="Ask about this recipe..." disabled>
+          <button class="btn btn-primary" style="width:100%" id="askBtn" onclick="askQuestion()" disabled>Ask</button>
+          <div class="small-note" id="qaLimitNote"></div>
+        </div>
+        <button class="btn btn-video" id="openVideoBtn" onclick="showVideo()">🎬 Watch Video Guides</button>
+        <div id="videoContainer" class="video-container" style="display: none; margin-top:12px;">
+          <iframe id="videoFrame" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 登录/注册页 -->
+  <div class="page" id="page-login-register">
+    <div class="container">
+      <div class="auth-card">
+        <div class="tabs">
+          <div class="tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
+          <div class="tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
+        </div>
+        <div id="loginForm">
+          <input type="email" class="auth-input" id="loginEmail" placeholder="Email">
+          <input type="password" class="auth-input" id="loginPassword" placeholder="Password">
+          <div style="text-align:right;"><span class="edit-btn" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span></div>
+          <button class="auth-btn primary" id="btnLoginSubmit" onclick="login()">Login</button>
+          <div class="auth-footer"><span id="noAccount">Don't have an account?</span> <span class="auth-link" id="switchToRegister" onclick="switchAuthTab('register')">Sign Up</span></div>
+        </div>
+        <div id="registerForm" style="display:none;">
+          <input type="email" class="auth-input" id="registerEmail" placeholder="Email">
+          <input type="password" class="auth-input" id="registerPassword" placeholder="Password">
+          <input type="password" class="auth-input" id="registerConfirmPwd" placeholder="Confirm Password">
+          <div class="small-note" id="registerNote">Please use a valid email to avoid account loss.</div>
+          <button class="auth-btn primary" id="btnRegisterSubmit" onclick="register()">Sign Up</button>
+          <div class="auth-footer"><span id="haveAccount">Already have an account?</span> <span class="auth-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span></div>
+        </div>
+      </div>
+      <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
+    </div>
+  </div>
+
+  <!-- 个人信息页 -->
+  <div class="page" id="page-profile">
+    <div class="container">
+      <div class="auth-card">
+        <div class="profile-section">
+          <div class="profile-label" id="profileNicknameLabel">Nickname</div>
+          <div class="profile-value"><span id="profileNickname">Foodie123</span><button class="edit-btn" id="editNicknameBtn" onclick="showNicknameModal()">Edit</button></div>
+          <div class="profile-label" style="margin-top:16px;" id="profileEmailLabel">Email</div>
+          <div class="profile-value"><span id="profileEmail">user@example.com</span><button class="edit-btn" id="editEmailBtn" onclick="showEmailModal()">Change</button></div>
+          <div class="profile-label" style="margin-top:16px;" id="profilePlanLabel">Plan</div><div class="profile-value" id="profilePlan">Free</div>
+          <div class="profile-label" style="margin-top:16px;" id="profileJoinedLabel">Joined</div>
+          <div class="profile-value" id="profileJoined"></div>
+        </div>
+        <div class="asset-block" style="margin-top:24px;">
+          <div class="profile-row">
+            <span class="asset-title" id="profileSubTitle">My Subscription</span>
+            <span id="subStatus">Free</span>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:4px;">
+            <span class="badge" id="subExpiry"></span>
+          </div>
+          <div id="familyArea" style="display:none; margin-top:16px;">
+            <div class="invite-box">
+              <div id="inviteCodeTitle">Invite Code</div>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <input type="text" id="inviteCodeInput" placeholder="Enter code" class="auth-input" style="margin-bottom:0;">
+                <button class="btn btn-primary" onclick="bindInvite()">Join</button>
+              </div>
+              <div id="ownerInviteCode" style="margin-top:8px; font-weight:500;"></div>
+            </div>
+          </div>
+          <button class="btn btn-outline" style="width:100%; margin-top:16px;" id="goSubscribeBtn" onclick="showPage('page-subscribe')">Change Plan</button>
+        </div>
+        <button class="btn btn-outline" style="width:100%; margin-top:24px;" id="logoutBtn" onclick="logout()">Logout</button>
+      </div>
+      <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
+    </div>
+  </div>
+
+  <!-- 订阅支付页 -->
+  <div class="page" id="page-subscribe">
+    <div class="container">
+      <h2 class="section-title" style="font-size:20px;" id="sectionSubTitle">Choose your plan</h2>
+      <div class="subscribe-plans">
+        <div class="plan-card">
+          <div class="plan-name" id="planStarterName">Starter</div>
+          <div class="plan-price" id="planStarterPrice">$4.99<small>/month</small></div>
+          <div class="plan-desc" id="planStarterDesc">• 10 recipes per day • 10 AI questions per recipe • Personal use only</div>
+          <div id="paypal-starter-container" class="paypal-button-container" data-plan-id="P-1U5765718B789804NNG3MBWQ"></div>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name" id="planProName">Pro <span style="background:#ffd966; padding:2px 8px; border-radius:12px; font-size:12px;">Most Popular</span></div>
+          <div class="plan-price" id="planProPrice">$9.99<small>/month</small></div>
+          <div class="plan-desc" id="planProDesc">• 30 recipes per day • 10 AI questions per recipe • Full features unlocked</div>
+          <div id="paypal-pro-container" class="paypal-button-container" data-plan-id="P-5P885108R60234815NG3MEPY"></div>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name" id="planPremiumName">Premium <span style="font-size:12px; color:#2563eb;">(Shared)</span></div>
+          <div class="plan-price" id="planPremiumPrice">$19.99<small>/month</small></div>
+          <div class="plan-desc" id="planPremiumDesc">• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation</div>
+          <div id="paypal-premium-container" class="paypal-button-container" data-plan-id="P-1880277264176022RNG3MFRA"></div>
+        </div>
+      </div>
+      <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
+    </div>
+  </div>
+
+  <!-- 法律页 -->
+  <div class="page" id="page-legal">
+    <div class="container">
+      <div class="card legal-card">
+        <div class="legal-content">
+          <div id="legal-privacy-content" class="legal-section">
+            <h1 id="legalPrivacyTitle">Privacy Policy</h1>
+            <p id="legalEffDate">Effective date: 2025-01-01</p>
+            <h2 id="legalPrivacyCollect">1. Information We Collect</h2><p id="legalPrivacy1">AI Chef is a client-side application. We do not collect, store, or transmit any personal information.</p>
+            <h2 id="legalPrivacyUse">2. Information Use</h2><p id="legalPrivacy2">All recipe generation runs locally on your device.</p>
+            <h2 id="legalPrivacySecurity">3. Data Security</h2><p id="legalPrivacy3">No data collected = no risk of breach.</p>
+            <h2 id="legalPrivacyChanges">4. Policy Changes</h2><p id="legalPrivacy4">We may update this policy. Changes will be posted here.</p>
+            <h2 id="legalPrivacyContact">5. Contact Us</h2><p id="legalPrivacy5">Contact us if you have questions.</p>
+          </div>
+          <div id="legal-terms-content" class="legal-section" style="display:none;">
+            <h1 id="legalTermsTitle">Terms of Service</h1>
+            <p id="legalTermEffDate">Effective Date: 2025-01-01</p>
+            <h2 id="legalTermsLicense">1. License</h2><p id="legalTerms1">For personal, non-commercial use only.</p>
+            <h2 id="legalTermsDisclaimer">2. Disclaimer</h2><p id="legalTerms2">Recipes are AI-generated and for reference only.</p>
+            <h2 id="legalTermsLimitations">3. Limitation of Liability</h2><p id="legalTerms3">We are not liable for any damages.</p>
+            <h2 id="legalTermsModifications">4. Modifications</h2><p id="legalTerms4">We may modify these terms at any time.</p>
+            <h2 id="legalTermsLaw">5. Governing Law</h2><p id="legalTerms5">Governing law: your jurisdiction.</p>
+            <h2 id="legalTermsSubRules">6. Subscription Rules</h2>
+            <p id="legalTermsSub1">6.1 Subscribers have access upon login.</p><p id="legalTermsSub2">6.2 Three subscription types: Starter, Pro, Premium.</p><p id="legalTermsSub3">6.3 Orders must be activated within 24 hours by logging in.</p><p id="legalTermsSub4">6.4 Each recipe generation grants 10 AI questions for that session.</p><p id="legalTermsSub5">6.5 Family share is available only for Premium (up to 3 people).</p><p id="legalTermsSub6">6.6 Auto-renewal is enabled by default; manage via PayPal.</p><p id="legalTermsSub7">6.7 No refunds after payment.</p><p id="legalTermsSub8">6.8 Use a valid email; we are not responsible for account loss due to fake emails.</p><p id="legalTermsSub9">6.9 Recipes and answers are AI-generated by DeepSeek and for reference only.</p><p id="legalTermsSub10">6.10 We reserve the right of final interpretation.</p>
+          </div>
+        </div>
+        <div class="legal-tabs">
+          <div class="legal-tab active" data-tab="privacy" onclick="switchLegalTab('privacy')">Privacy Policy</div>
+          <div class="legal-tab" data-tab="terms" onclick="switchLegalTab('terms')">Terms of Service</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗 -->
+  <div class="modal-overlay" id="forgotModal"><div class="modal-card"><h3 id="forgotTitle">Reset Password</h3><input class="auth-input" placeholder="Email" id="forgotEmail"><input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwd"><div class="small-note" id="forgotNote">Password cannot be recovered if forgotten. Please remember it.</div><div class="modal-actions"><button class="btn btn-outline" id="cancelForgot" onclick="closeModal('forgotModal')">Cancel</button><button class="btn btn-primary" id="resetPwdBtn" onclick="resetPassword()">Reset</button></div></div></div>
+  <div class="modal-overlay" id="nicknameModal"><div class="modal-card"><h3 id="nicknameTitle">Change Nickname</h3><input class="auth-input" id="newNicknameInput" maxlength="10" placeholder="New nickname"><div class="modal-actions"><button class="btn btn-outline" id="cancelNickname" onclick="closeModal('nicknameModal')">Cancel</button><button class="btn btn-primary" id="saveNicknameBtn" onclick="saveNickname()">Save</button></div></div></div>
+  <div class="modal-overlay" id="emailModal"><div class="modal-card"><h3 id="emailTitle">Change Email</h3><input class="auth-input" id="newEmailInput" placeholder="New Email"><div class="small-note">Please use a valid email for account recovery.</div><div class="modal-actions"><button class="btn btn-outline" id="cancelEmail" onclick="closeModal('emailModal')">Cancel</button><button class="btn btn-primary" id="saveEmailBtn" onclick="saveEmail()">Save</button></div></div></div>
+  <div class="modal-overlay" id="successModal"><div class="modal-card"><div style="font-size:48px;">✅</div><h3 id="successTitle">Success</h3><p id="successMsg"></p><button class="btn btn-primary" id="closeSuccessBtn" onclick="closeModal('successModal')">OK</button></div></div>
+
+  <!-- 外部脚本 -->
+  <script src="script.js"></script>
+</body>
+</html>
