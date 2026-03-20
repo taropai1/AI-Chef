@@ -1,6 +1,6 @@
 // ==================== 全局配置 ====================
 const DEEPSEEK_API = "https://api.taropai.com/v1/chat/completions";
-const BACKEND_URL = "https://auth.taropai.com";   // 您的认证与数据后端
+const BACKEND_URL = "https://auth.taropai.com";
 const LANGS = ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh-CN'];
 const CUISINES = ["American","Italian","Mexican","French","Spanish","German","Mediterranean","Middle Eastern","Chinese Home Cooking","Chinese Cantonese Cuisine","Chinese Sichuan Cuisine","Chinese Hunan Cuisine","Chinese Huaiyang Cuisine","Chinese Northern Cuisine","Japanese Cuisine","Thai Cuisine","Korean cuisine","Indian Cuisine"];
 const CUISINE_MAP_ZH = {
@@ -11,8 +11,13 @@ const CUISINE_MAP_ZH = {
 };
 const PLANS = { free: { dailyLimit: 3, qPerRecipe: 0 }, starter: { dailyLimit: 10, qPerRecipe: 10 }, pro: { dailyLimit: 30, qPerRecipe: 10 }, premium: { dailyLimit: 200, qPerRecipe: 10 } };
 
-let currentLang = localStorage.getItem('aiChefLang') || (navigator.language.startsWith('zh') ? 'zh-CN' : 'en');
-if (!LANGS.includes(currentLang)) currentLang = 'en';
+// 语言检测：默认英文，除非 localStorage 中有记录或浏览器语言为中文
+let currentLang = localStorage.getItem('aiChefLang');
+if (!currentLang) {
+  const browserLang = navigator.language.split('-')[0];
+  currentLang = LANGS.includes(browserLang) ? browserLang : 'en';
+  localStorage.setItem('aiChefLang', currentLang);
+}
 let deviceId = null;
 let userData = null;
 let recipeHistory = [], historyIndex = -1;
@@ -20,245 +25,12 @@ let recipeHistory = [], historyIndex = -1;
 // ==================== 多语言翻译 ====================
 const translations = {
   en: { 
-    heroSubtitle:'Global Cuisines · Smart Pairing', 
-    sectionFeatures:'Features', 
-    feat1:'18 Cuisines', feat1Sub:'Global flavors', 
-    feat2:'AI Assistant', feat2Sub:'Interactive Q&A', 
-    feat3:'Nutrition', feat3Sub:'Healthy Weight', 
-    feat4:'Baby Safe', feat4Sub:'No salt/sugar', 
-    feat5:'Pregnancy', feat5Sub:'Mom friendly', 
-    feat6:'Video Guides', feat6Sub:'Step-by-step', 
-    sectionSubscribe:'Subscription Plans', 
-    subText:'Subscribe', subSub:'Unlock full access', 
-    familyText:'Family Share', familySub:'Multi-User Plan', 
-    legalLink:'Privacy/Terms', 
-    genTitle:'AI Recipe Generator', 
-    genMealType:'Category', 
-    genCuisine:'Cuisine', 
-    genDishName:'What to eat?', 
-    optStandard:'Standard', 
-    optBaby:'Baby', 
-    optPregnancy:'Pregnancy', 
-    generate:'Generate Recipe', 
-    generating:'Generating...', 
-    aiAssistTitle:'AI Assistant', 
-    enterQuestion:'Ask about this recipe...', 
-    ask:'Ask', 
-    dishNameHint:'You can enter one or more ingredients.', 
-    watchVideo:'Watch Video Guides', 
-    addToHome:'Add', 
-    freeLimitInfo:'Free trial: {{used}}/3 ({{plan}})', 
-    starterInfo:'Starter: {{used}}/10 | Q left: {{qLeft}}', 
-    proInfo:'Pro: {{used}}/30 | Q left: {{qLeft}}', 
-    premiumInfo:'Premium: {{used}}/200 | Q left: {{qLeft}}', 
-    alertNoPermission:'Your free trial has expired. Subscribe to continue.', 
-    alertDailyLimit:'Daily limit reached. Please upgrade or try tomorrow.', 
-    alertNoPoints:'Insufficient quota.', 
-    alertCooldown:'Too fast, please wait.', 
-    alertMonthlyCost:'Monthly limit reached.', 
-    alertNoRecipe:'Generate a recipe first.', 
-    alertQTooLong:'Question too long.', 
-    alertInvalidFood:'Please enter a valid food name.', 
-    paymentSuccess:'Subscription activated!', 
-    q:'Q', a:'A', 
-    qLimitReached:'You’ve reached the 10-question limit for this recipe.', 
-    starterName:'Starter', 
-    proName:'Pro', 
-    premiumName:'Premium', 
-    starterDesc:'• 10 recipes per day • 10 AI questions per recipe • Personal use only', 
-    proDesc:'• 30 recipes per day • 10 AI questions per recipe • Full features unlocked', 
-    premiumDesc:'• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation', 
-    finePrint:'By subscribing you agree to our ', 
-    loginTitle:'Login', 
-    registerTitle:'Sign Up', 
-    email:'Email', 
-    password:'Password', 
-    confirmPwd:'Confirm Password', 
-    forgot:'Forgot password?', 
-    noAccount:"Don't have an account?", 
-    signUp:'Sign Up', 
-    signIn:'Login', 
-    haveAccount:'Already have an account?', 
-    registerNote:'Please use a valid email to avoid account loss.', 
-    forgotTitle:'Reset Password', 
-    forgotNote:'Password cannot be recovered if forgotten. Please remember it.', 
-    cancel:'Cancel', 
-    reset:'Reset', 
-    profileNickname:'Nickname', 
-    profileEmail:'Email', 
-    profilePlan:'Plan', 
-    profileJoined:'Joined', 
-    logout:'Logout', 
-    profileSub:'My Subscription', 
-    subStatus:'Status', 
-    subExpiry:'Expires', 
-    inviteCodeTitle:'Your Invite Code', 
-    joinFamily:'Join', 
-    nicknameTitle:'Change Nickname', 
-    emailTitle:'Change Email', 
-    legalPrivacyTitle:'Privacy Policy', 
-    legalEffDate:'Effective date: 2025-01-01', 
-    legalPrivacyCollect:'1. Information We Collect', 
-    legalPrivacy1:'AI Chef is a client-side application. We do not collect, store, or transmit any personal information.', 
-    legalPrivacyUse:'2. Information Use', 
-    legalPrivacy2:'All recipe generation runs locally on your device.', 
-    legalPrivacySecurity:'3. Data Security', 
-    legalPrivacy3:'No data collected = no risk of breach.', 
-    legalPrivacyChanges:'4. Policy Changes', 
-    legalPrivacy4:'We may update this policy. Changes will be posted here.', 
-    legalPrivacyContact:'5. Contact Us', 
-    legalPrivacy5:'Contact us if you have questions.', 
-    legalTermsTitle:'Terms of Service', 
-    legalTermEffDate:'Effective Date: 2025-01-01', 
-    legalTermsLicense:'1. License', 
-    legalTerms1:'For personal, non-commercial use only.', 
-    legalTermsDisclaimer:'2. Disclaimer', 
-    legalTerms2:'Recipes are AI-generated and for reference only.', 
-    legalTermsLimitations:'3. Limitation of Liability', 
-    legalTerms3:'We are not liable for any damages.', 
-    legalTermsModifications:'4. Modifications', 
-    legalTerms4:'We may modify these terms at any time.', 
-    legalTermsLaw:'5. Governing Law', 
-    legalTerms5:'Governing law: your jurisdiction.', 
-    legalTermsSubRules:'6. Subscription Rules', 
-    legalTermsSub1:'6.1 Subscribers have access upon login.', 
-    legalTermsSub2:'6.2 Three subscription types: Starter, Pro, Premium.', 
-    legalTermsSub3:'6.3 Orders must be activated within 24 hours by logging in.', 
-    legalTermsSub4:'6.4 Each recipe generation grants 10 AI questions for that session.', 
-    legalTermsSub5:'6.5 Family share is available only for Premium (up to 3 people).', 
-    legalTermsSub6:'6.6 Auto-renewal is enabled by default; manage via PayPal.', 
-    legalTermsSub7:'6.7 No refunds after payment.', 
-    legalTermsSub8:'6.8 Use a valid email; we are not responsible for account loss due to fake emails.', 
-    legalTermsSub9:'6.9 Recipes and answers are AI-generated by DeepSeek and for reference only.', 
-    legalTermsSub10:'6.10 We reserve the right of final interpretation.', 
-    success:'Success', 
-    ok:'OK', 
-    personalizedGreeting:'Dear {{name}}, your delicious recipe is ready. Enjoy your meal! 🌹', 
-    save:'Save', 
-    edit:'Edit', 
-    change:'Change' 
+    heroSubtitle:'Global Cuisines · Smart Pairing', sectionFeatures:'Features', feat1:'18 Cuisines', feat1Sub:'Global flavors', feat2:'AI Assistant', feat2Sub:'Interactive Q&A', feat3:'Nutrition', feat3Sub:'Healthy Weight', feat4:'Baby Safe', feat4Sub:'No salt/sugar', feat5:'Pregnancy', feat5Sub:'Mom friendly', feat6:'Video Guides', feat6Sub:'Step-by-step', sectionSubscribe:'Subscription Plans', subText:'Subscribe', subSub:'Unlock full access', familyText:'Family Share', familySub:'Multi-User Plan', legalLink:'Privacy/Terms', genTitle:'AI Recipe Generator', genMealType:'Category', genCuisine:'Cuisine', genDishName:'What to eat?', optStandard:'Standard', optBaby:'Baby', optPregnancy:'Pregnancy', generate:'Generate Recipe', generating:'Generating...', aiAssistTitle:'AI Assistant', enterQuestion:'Ask about this recipe...', ask:'Ask', dishNameHint:'You can enter one or more ingredients.', watchVideo:'Watch Video Guides', addToHome:'Add', freeLimitInfo:'Free trial: {{used}}/3 ({{plan}})', starterInfo:'Starter: {{used}}/10 | Q left: {{qLeft}}', proInfo:'Pro: {{used}}/30 | Q left: {{qLeft}}', premiumInfo:'Premium: {{used}}/200 | Q left: {{qLeft}}', alertNoPermission:'Your free trial has expired. Subscribe to continue.', alertDailyLimit:'Daily limit reached. Please upgrade or try tomorrow.', alertNoPoints:'Insufficient quota.', alertCooldown:'Too fast, please wait.', alertMonthlyCost:'Monthly limit reached.', alertNoRecipe:'Generate a recipe first.', alertQTooLong:'Question too long.', alertInvalidFood:'Please enter a valid food name.', paymentSuccess:'Subscription activated!', q:'Q', a:'A', qLimitReached:'You’ve reached the 10-question limit for this recipe.', starterName:'Starter', proName:'Pro', premiumName:'Premium', starterDesc:'• 10 recipes per day • 10 AI questions per recipe • Personal use only', proDesc:'• 30 recipes per day • 10 AI questions per recipe • Full features unlocked', premiumDesc:'• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation', finePrint:'By subscribing you agree to our ', loginTitle:'Login', registerTitle:'Sign Up', email:'Email', password:'Password', confirmPwd:'Confirm Password', forgot:'Forgot password?', noAccount:"Don't have an account?", signUp:'Sign Up', signIn:'Login', haveAccount:'Already have an account?', registerNote:'Please use a valid email to avoid account loss.', forgotTitle:'Reset Password', forgotNote:'Password cannot be recovered if forgotten. Please remember it.', cancel:'Cancel', reset:'Reset', profileNickname:'Nickname', profileEmail:'Email', profilePlan:'Plan', profileJoined:'Joined', logout:'Logout', profileSub:'My Subscription', subStatus:'Status', subExpiry:'Expires', inviteCodeTitle:'Your Invite Code', joinFamily:'Join', nicknameTitle:'Change Nickname', emailTitle:'Change Email', legalPrivacyTitle:'Privacy Policy', legalEffDate:'Effective date: 2025-01-01', legalPrivacyCollect:'1. Information We Collect', legalPrivacy1:'AI Chef is a client-side application. We do not collect, store, or transmit any personal information.', legalPrivacyUse:'2. Information Use', legalPrivacy2:'All recipe generation runs locally on your device.', legalPrivacySecurity:'3. Data Security', legalPrivacy3:'No data collected = no risk of breach.', legalPrivacyChanges:'4. Policy Changes', legalPrivacy4:'We may update this policy. Changes will be posted here.', legalPrivacyContact:'5. Contact Us', legalPrivacy5:'Contact us if you have questions.', legalTermsTitle:'Terms of Service', legalTermEffDate:'Effective Date: 2025-01-01', legalTermsLicense:'1. License', legalTerms1:'For personal, non-commercial use only.', legalTermsDisclaimer:'2. Disclaimer', legalTerms2:'Recipes are AI-generated and for reference only.', legalTermsLimitations:'3. Limitation of Liability', legalTerms3:'We are not liable for any damages.', legalTermsModifications:'4. Modifications', legalTerms4:'We may modify these terms at any time.', legalTermsLaw:'5. Governing Law', legalTerms5:'Governing law: your jurisdiction.', legalTermsSubRules:'6. Subscription Rules', legalTermsSub1:'6.1 Subscribers have access upon login.', legalTermsSub2:'6.2 Three subscription types: Starter, Pro, Premium.', legalTermsSub3:'6.3 Orders must be activated within 24 hours by logging in.', legalTermsSub4:'6.4 Each recipe generation grants 10 AI questions for that session.', legalTermsSub5:'6.5 Family share is available only for Premium (up to 3 people).', legalTermsSub6:'6.6 Auto-renewal is enabled by default; manage via PayPal.', legalTermsSub7:'6.7 No refunds after payment.', legalTermsSub8:'6.8 Use a valid email; we are not responsible for account loss due to fake emails.', legalTermsSub9:'6.9 Recipes and answers are AI-generated by DeepSeek and for reference only.', legalTermsSub10:'6.10 We reserve the right of final interpretation.', success:'Success', ok:'OK', personalizedGreeting:'Dear {{name}}, your delicious recipe is ready. Enjoy your meal! 🌹', save:'Save', edit:'Edit', change:'Change' 
   },
   'zh-CN': { 
-    heroSubtitle:'全球菜系 · 智能搭配', 
-    sectionFeatures:'功能特点', 
-    feat1:'18种菜系', feat1Sub:'世界风味', 
-    feat2:'AI助手', feat2Sub:'对话式解答', 
-    feat3:'营养分析', feat3Sub:'健康参考', 
-    feat4:'婴儿安全', feat4Sub:'无盐无糖', 
-    feat5:'孕期', feat5Sub:'母婴友好', 
-    feat6:'视频指南', feat6Sub:'分步教学', 
-    sectionSubscribe:'订阅套餐', 
-    subText:'订阅', subSub:'解锁全部功能', 
-    familyText:'家庭共享', familySub:'多账号共享套餐', 
-    legalLink:'隐私/服务', 
-    genTitle:'AI菜谱生成器', 
-    genMealType:'分类', 
-    genCuisine:'菜系', 
-    genDishName:'你想吃什么？', 
-    optStandard:'日常餐', 
-    optBaby:'婴儿餐', 
-    optPregnancy:'孕期餐', 
-    generate:'生成食谱', 
-    generating:'生成中...', 
-    aiAssistTitle:'AI助手', 
-    enterQuestion:'针对此食谱提问...', 
-    ask:'提问', 
-    dishNameHint:'可输入单一或多个食材', 
-    watchVideo:'观看视频指南', 
-    addToHome:'添加', 
-    freeLimitInfo:'免费试用：{{used}}/3 ({{plan}})', 
-    starterInfo:'基础订阅：{{used}}/10 | 剩余提问 {{qLeft}}', 
-    proInfo:'高级订阅：{{used}}/30 | 剩余提问 {{qLeft}}', 
-    premiumInfo:'家庭订阅：{{used}}/200 | 剩余提问 {{qLeft}}', 
-    alertNoPermission:'免费试用已用完，请订阅后继续。', 
-    alertDailyLimit:'今日次数已达上限，请升级或明日再试。', 
-    alertNoPoints:'配额不足。', 
-    alertCooldown:'操作过快，请稍等。', 
-    alertMonthlyCost:'月度限额已达。', 
-    alertNoRecipe:'请先生成食谱。', 
-    alertQTooLong:'问题过长。', 
-    alertInvalidFood:'请输入有效食材。', 
-    paymentSuccess:'订阅成功！', 
-    q:'问', a:'答', 
-    qLimitReached:'本食谱已达到10次提问上限。', 
-    starterName:'基础订阅', 
-    proName:'高级订阅', 
-    premiumName:'Premium 共享订阅 （家庭版）', 
-    starterDesc:'10次/日 · 每食谱10问', 
-    proDesc:'30次/日 · 每食谱10问', 
-    premiumDesc:'无限次 · 每食谱10问 · 3人家庭共享 · 优先生成', 
-    finePrint:'订阅即表示同意', 
-    loginTitle:'登录', 
-    registerTitle:'注册', 
-    email:'邮箱', 
-    password:'密码', 
-    confirmPwd:'确认密码', 
-    forgot:'忘记密码？', 
-    noAccount:'没有账号？', 
-    signUp:'注册', 
-    signIn:'登录', 
-    haveAccount:'已有账号？', 
-    registerNote:'请使用有效邮箱避免账号损失。', 
-    forgotTitle:'重置密码', 
-    forgotNote:'密码无法找回，请牢记。', 
-    cancel:'取消', 
-    reset:'重置', 
-    profileNickname:'昵称', 
-    profileEmail:'邮箱', 
-    profilePlan:'套餐', 
-    profileJoined:'注册时间', 
-    logout:'退出登录', 
-    profileSub:'我的订阅', 
-    subStatus:'状态', 
-    subExpiry:'到期', 
-    inviteCodeTitle:'邀请码', 
-    joinFamily:'加入', 
-    nicknameTitle:'修改昵称', 
-    emailTitle:'修改邮箱', 
-    legalPrivacyTitle:'隐私政策', 
-    legalEffDate:'生效日期：2025-01-01', 
-    legalPrivacyCollect:'1. 信息收集', 
-    legalPrivacy1:'AI厨师是客户端应用，不收集个人信息。', 
-    legalPrivacyUse:'2. 信息使用', 
-    legalPrivacy2:'所有食谱生成在本地进行。', 
-    legalPrivacySecurity:'3. 数据安全', 
-    legalPrivacy3:'不收集数据 = 无泄露风险。', 
-    legalPrivacyChanges:'4. 政策变更', 
-    legalPrivacy4:'我们可能更新本政策，变更将在此处公告。', 
-    legalPrivacyContact:'5. 联系我们', 
-    legalPrivacy5:'如有问题请联系我们。', 
-    legalTermsTitle:'服务条款', 
-    legalTermEffDate:'生效日期：2025-01-01', 
-    legalTermsLicense:'1. 许可', 
-    legalTerms1:'仅限个人非商业使用。', 
-    legalTermsDisclaimer:'2. 免责声明', 
-    legalTerms2:'AI生成内容仅供参考。', 
-    legalTermsLimitations:'3. 责任限制', 
-    legalTerms3:'我们不承担任何损害责任。', 
-    legalTermsModifications:'4. 修改', 
-    legalTerms4:'我们可随时修改条款。', 
-    legalTermsLaw:'5. 适用法律', 
-    legalTerms5:'适用法律：用户所在司法管辖区。', 
-    legalTermsSubRules:'6. 订阅规则', 
-    legalTermsSub1:'6.1 订阅者登录后即享有本工具站权益。', 
-    legalTermsSub2:'6.2 订阅用户分为基础订阅、高级订阅、家庭订阅。', 
-    legalTermsSub3:'6.3 订单激活期限为24小时，登录账号即自动激活权益。', 
-    legalTermsSub4:'6.4 订阅用户每生成食谱1次赠10次AI助手提问，当次使用不结转。', 
-    legalTermsSub5:'6.5 家庭共享仅限Premium套餐，最多3人共用。', 
-    legalTermsSub6:'6.6 订阅自动续费默认开启，用户需通过PayPal管理。', 
-    legalTermsSub7:'6.7 订单支付后不支持退款。', 
-    legalTermsSub8:'6.8 请使用真实邮箱，虚假信息导致账号丢失本站不担责。', 
-    legalTermsSub9:'6.9 菜谱及问答由DeepSeek生成，仅供参考。', 
-    legalTermsSub10:'6.10 本站拥有最终解释权。', 
-    success:'成功', 
-    ok:'确定', 
-    personalizedGreeting:'亲爱的{{name}}，已为您生成美味菜谱，祝您用餐愉快🌹', 
-    save:'保存', 
-    edit:'修改', 
-    change:'更改' 
+    heroSubtitle:'全球菜系 · 智能搭配', sectionFeatures:'功能特点', feat1:'18种菜系', feat1Sub:'世界风味', feat2:'AI助手', feat2Sub:'对话式解答', feat3:'营养分析', feat3Sub:'健康参考', feat4:'婴儿安全', feat4Sub:'无盐无糖', feat5:'孕期', feat5Sub:'母婴友好', feat6:'视频指南', feat6Sub:'分步教学', sectionSubscribe:'订阅套餐', subText:'订阅', subSub:'解锁全部功能', familyText:'家庭共享', familySub:'多账号共享套餐', legalLink:'隐私/服务', genTitle:'AI菜谱生成器', genMealType:'分类', genCuisine:'菜系', genDishName:'你想吃什么？', optStandard:'日常餐', optBaby:'婴儿餐', optPregnancy:'孕期餐', generate:'生成食谱', generating:'生成中...', aiAssistTitle:'AI助手', enterQuestion:'针对此食谱提问...', ask:'提问', dishNameHint:'可输入单一或多个食材', watchVideo:'观看视频指南', addToHome:'添加', freeLimitInfo:'免费试用：{{used}}/3 ({{plan}})', starterInfo:'基础订阅：{{used}}/10 | 剩余提问 {{qLeft}}', proInfo:'高级订阅：{{used}}/30 | 剩余提问 {{qLeft}}', premiumInfo:'家庭订阅：{{used}}/200 | 剩余提问 {{qLeft}}', alertNoPermission:'免费试用已用完，请订阅后继续。', alertDailyLimit:'今日次数已达上限，请升级或明日再试。', alertNoPoints:'配额不足。', alertCooldown:'操作过快，请稍等。', alertMonthlyCost:'月度限额已达。', alertNoRecipe:'请先生成食谱。', alertQTooLong:'问题过长。', alertInvalidFood:'请输入有效食材。', paymentSuccess:'订阅成功！', q:'问', a:'答', qLimitReached:'本食谱已达到10次提问上限。', starterName:'基础订阅', proName:'高级订阅', premiumName:'Premium 共享订阅 （家庭版）', starterDesc:'10次/日 · 每食谱10问', proDesc:'30次/日 · 每食谱10问', premiumDesc:'无限次 · 每食谱10问 · 3人家庭共享 · 优先生成', finePrint:'订阅即表示同意', loginTitle:'登录', registerTitle:'注册', email:'邮箱', password:'密码', confirmPwd:'确认密码', forgot:'忘记密码？', noAccount:'没有账号？', signUp:'注册', signIn:'登录', haveAccount:'已有账号？', registerNote:'请使用有效邮箱避免账号损失。', forgotTitle:'重置密码', forgotNote:'密码无法找回，请牢记。', cancel:'取消', reset:'重置', profileNickname:'昵称', profileEmail:'邮箱', profilePlan:'套餐', profileJoined:'注册时间', logout:'退出登录', profileSub:'我的订阅', subStatus:'状态', subExpiry:'到期', inviteCodeTitle:'邀请码', joinFamily:'加入', nicknameTitle:'修改昵称', emailTitle:'修改邮箱', legalPrivacyTitle:'隐私政策', legalEffDate:'生效日期：2025-01-01', legalPrivacyCollect:'1. 信息收集', legalPrivacy1:'AI厨师是客户端应用，不收集个人信息。', legalPrivacyUse:'2. 信息使用', legalPrivacy2:'所有食谱生成在本地进行。', legalPrivacySecurity:'3. 数据安全', legalPrivacy3:'不收集数据 = 无泄露风险。', legalPrivacyChanges:'4. 政策变更', legalPrivacy4:'我们可能更新本政策，变更将在此处公告。', legalPrivacyContact:'5. 联系我们', legalPrivacy5:'如有问题请联系我们。', legalTermsTitle:'服务条款', legalTermEffDate:'生效日期：2025-01-01', legalTermsLicense:'1. 许可', legalTerms1:'仅限个人非商业使用。', legalTermsDisclaimer:'2. 免责声明', legalTerms2:'AI生成内容仅供参考。', legalTermsLimitations:'3. 责任限制', legalTerms3:'我们不承担任何损害责任。', legalTermsModifications:'4. 修改', legalTerms4:'我们可随时修改条款。', legalTermsLaw:'5. 适用法律', legalTerms5:'适用法律：用户所在司法管辖区。', legalTermsSubRules:'6. 订阅规则', legalTermsSub1:'6.1 订阅者登录后即享有本工具站权益。', legalTermsSub2:'6.2 订阅用户分为基础订阅、高级订阅、家庭订阅。', legalTermsSub3:'6.3 订单激活期限为24小时，登录账号即自动激活权益。', legalTermsSub4:'6.4 订阅用户每生成食谱1次赠10次AI助手提问，当次使用不结转。', legalTermsSub5:'6.5 家庭共享仅限Premium套餐，最多3人共用。', legalTermsSub6:'6.6 订阅自动续费默认开启，用户需通过PayPal管理。', legalTermsSub7:'6.7 订单支付后不支持退款。', legalTermsSub8:'6.8 请使用真实邮箱，虚假信息导致账号丢失本站不担责。', legalTermsSub9:'6.9 菜谱及问答由DeepSeek生成，仅供参考。', legalTermsSub10:'6.10 本站拥有最终解释权。', success:'成功', ok:'确定', personalizedGreeting:'亲爱的{{name}}，已为您生成美味菜谱，祝您用餐愉快🌹', save:'保存', edit:'修改', change:'更改' 
   }
 };
-// 为其他语言提供英文翻译（实际可后续替换为真实翻译）
 ['es', 'fr', 'de', 'it', 'pt'].forEach(l => translations[l] = translations.en);
 
 function t(key, params) {
@@ -288,7 +60,6 @@ async function initDeviceId() {
   return deviceId;
 }
 
-// 通用 API 请求函数
 async function apiCall(endpoint, options = {}) {
   const token = localStorage.getItem('authToken');
   const headers = { 'Content-Type': 'application/json', ...options.headers };
@@ -301,7 +72,6 @@ async function apiCall(endpoint, options = {}) {
   return res.json();
 }
 
-// 加载用户数据（设备或已登录用户）
 async function loadUserData() {
   await initDeviceId();
   const token = localStorage.getItem('authToken');
@@ -323,7 +93,7 @@ async function loadUserData() {
     email: null,
     nickname: 'Foodie123',
     plan: device.plan || 'free',
-    freeUsed: device.freeUsed || 0,
+    freeUsed: device.freeUsed !== undefined ? device.freeUsed : 0,
     dailyUsed: device.dailyUsed || 0,
     lastReset: device.lastReset || Date.now(),
     qLeft: 0,
@@ -341,7 +111,6 @@ async function refreshUserData() {
   updateLimitInfo();
 }
 
-// 记录生成（免费或订阅）
 async function recordGeneration(useFree) {
   if (useFree) {
     await apiCall('/api/device/record-generation', {
@@ -363,7 +132,6 @@ async function recordQuestion() {
   document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
 }
 
-// 权限检查（前端快速判断，实际以后端为准）
 async function checkGeneratePermission() {
   if (userData.plan === 'free') {
     if (userData.freeUsed >= 3) return { allowed: false, message: t('alertNoPermission'), redirect: true };

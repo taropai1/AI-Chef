@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Chef · 智能食谱生成器</title>
   <link rel="manifest" href="/manifest.json">
-  <!-- FingerprintJS 生成稳定设备ID -->
+  <!-- FingerprintJS -->
   <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.1/dist/fp.min.js"></script>
   <!-- PayPal SDK (生产环境) 启用订阅功能 -->
   <script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&currency=USD&vault=true&intent=subscription"></script>
@@ -188,19 +188,19 @@
           <div class="plan-name" id="planStarterName">Starter</div>
           <div class="plan-price" id="planStarterPrice">$4.99<small>/month</small></div>
           <div class="plan-desc" id="planStarterDesc">• 10 recipes per day • 10 AI questions per recipe • Personal use only</div>
-          <div id="paypal-starter-container" class="paypal-button-container" data-plan-id="P-1U5765718B789804NNG3MBWQ"></div>
+          <div id="paypal-starter-container"></div>
         </div>
         <div class="plan-card">
           <div class="plan-name" id="planProName">Pro <span style="background:#ffd966; padding:2px 8px; border-radius:12px; font-size:12px;">Most Popular</span></div>
           <div class="plan-price" id="planProPrice">$9.99<small>/month</small></div>
           <div class="plan-desc" id="planProDesc">• 30 recipes per day • 10 AI questions per recipe • Full features unlocked</div>
-          <div id="paypal-pro-container" class="paypal-button-container" data-plan-id="P-5P885108R60234815NG3MEPY"></div>
+          <div id="paypal-pro-container"></div>
         </div>
         <div class="plan-card">
           <div class="plan-name" id="planPremiumName">Premium <span style="font-size:12px; color:#2563eb;">(Shared)</span></div>
           <div class="plan-price" id="planPremiumPrice">$19.99<small>/month</small></div>
           <div class="plan-desc" id="planPremiumDesc">• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation</div>
-          <div id="paypal-premium-container" class="paypal-button-container" data-plan-id="P-1880277264176022RNG3MFRA"></div>
+          <div id="paypal-premium-container"></div>
         </div>
       </div>
       <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
