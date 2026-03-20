@@ -388,80 +388,45 @@ function saveEmail() {
 function renderPayPal() {
   if (!window.paypal) return;
   
-  // 三个套餐的配置：容器ID 和 对应的订阅计划ID
   const plans = [
-    { 
-      container: 'paypal-starter-container', 
-      planId: 'P-1U5765718B789804NNG3MBWQ', // Starter 计划ID
-      name: 'Starter' 
-    },
-    { 
-      container: 'paypal-pro-container', 
-      planId: 'P-5P885108R60234815NG3MEPY', // Pro 计划ID
-      name: 'Pro' 
-    },
-    { 
-      container: 'paypal-premium-container', 
-      planId: 'P-1880277264176022RNG3MFRA', // Premium 计划ID
-      name: 'Premium' 
-    }
+    { container: 'paypal-starter-container', planId: 'P-1U5765718B789804NNG3MBWQ', name: 'Starter' },
+    { container: 'paypal-pro-container', planId: 'P-5P885108R60234815NG3MEPY', name: 'Pro' },
+    { container: 'paypal-premium-container', planId: 'P-1880277264176022RNG3MFRA', name: 'Premium' }
   ];
 
   plans.forEach(p => {
     const container = document.getElementById(p.container);
     if (!container) return;
-    
-    // 清空容器（防止重复渲染）
-    container.innerHTML = ''; 
-
+    container.innerHTML = '';
     paypal.Buttons({
-      style: { 
-        shape: 'pill', 
-        color: 'gold', 
-        label: 'subscribe' // 明确显示为订阅按钮
-      },
-      // 创建订阅，而不是一次性订单
+      style: { shape: 'pill', color: 'gold', label: 'subscribe' },
       createSubscription: function(data, actions) {
-        return actions.subscription.create({
-          'plan_id': p.planId // 使用您提供的计划ID
-        });
+        return actions.subscription.create({ plan_id: p.planId });
       },
-      // 订阅成功后的回调
       onApprove: function(data, actions) {
-        // 检查用户是否已登录
         if (!userData.email) {
           alert('Please login first to activate your subscription');
           showPage('page-login-register');
           return;
         }
-
-        // 订阅成功，更新用户套餐
-        // 根据 planId 判断是哪个套餐（或者直接使用传入的 p.name）
         let planType = 'starter';
         if (p.planId === 'P-5P885108R60234815NG3MEPY') planType = 'pro';
         if (p.planId === 'P-1880277264176022RNG3MFRA') planType = 'premium';
-
         userData.plan = planType;
         userData.dailyUsed = 0;
         userData.lastReset = Date.now();
-        
-        // 如果是 Premium，生成一个邀请码（示例）
         if (planType === 'premium') {
           userData.inviteCode = Math.random().toString(36).substr(2,6).toUpperCase();
           userData.familyMembers = [];
         }
-        
         saveUserData();
-        
-        // 同步更新 users 存储（用于登录状态保持）
         const users = JSON.parse(localStorage.getItem('users') || '{}');
         if (users[userData.email]) {
           users[userData.email].plan = planType;
           localStorage.setItem('users', JSON.stringify(users));
         }
-
-        showToast(t('paymentSuccess')); // 显示成功提示
-        showPage('page-profile'); // 跳转到个人中心
+        showToast(t('paymentSuccess'));
+        showPage('page-profile');
         renderProfile();
       },
       onError: function(err) {
@@ -536,3 +501,16 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target; if (target.classList.contains('lang-option')) { const lang = target.getAttribute('data-lang'); if (lang) switchLang(lang); } });
   populateCuisines(); renderLanguage();
 });
+
+// ==================== PWA Service Worker 注册 ====================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('ServiceWorker registered successfully:', registration);
+      })
+      .catch(error => {
+        console.log('ServiceWorker registration failed:', error);
+      });
+  });
+}

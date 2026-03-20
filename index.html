@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Chef · 智能食谱生成器</title>
+  <!-- 添加 PWA manifest -->
+  <link rel="manifest" href="/manifest.json">
   <!-- PayPal SDK (生产环境) 启用订阅功能 -->
   <script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&currency=USD&vault=true&intent=subscription"></script>
   <!-- 外部样式 -->
@@ -12,8 +14,9 @@
 <body>
   <div class="nav">
     <div class="container nav-inner">
+      <!-- Logo 区域：移除内联样式，由 CSS 控制 -->
       <div class="logo" id="logoText" onclick="showPage('page-home')">
-        <img src="images/logo-120x40.png" alt="AI Chef" style="height: 32px; vertical-align: middle;">
+        <img src="images/logo-120x40.png" alt="AI Chef">
       </div>
       <div class="nav-right">
         <div class="lang-selector">
