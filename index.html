@@ -4,17 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Chef · 智能食谱生成器</title>
-  <!-- 添加 PWA manifest -->
   <link rel="manifest" href="/manifest.json">
+  <!-- FingerprintJS 生成稳定设备ID -->
+  <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.1/dist/fp.min.js"></script>
   <!-- PayPal SDK (生产环境) 启用订阅功能 -->
   <script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&currency=USD&vault=true&intent=subscription"></script>
-  <!-- 外部样式 -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="nav">
     <div class="container nav-inner">
-      <!-- Logo 区域：移除内联样式，由 CSS 控制 -->
       <div class="logo" id="logoText" onclick="showPage('page-home')">
         <img src="images/logo-120x40.png" alt="AI Chef">
       </div>
@@ -248,7 +247,6 @@
   <div class="modal-overlay" id="emailModal"><div class="modal-card"><h3 id="emailTitle">Change Email</h3><input class="auth-input" id="newEmailInput" placeholder="New Email"><div class="small-note">Please use a valid email for account recovery.</div><div class="modal-actions"><button class="btn btn-outline" id="cancelEmail" onclick="closeModal('emailModal')">Cancel</button><button class="btn btn-primary" id="saveEmailBtn" onclick="saveEmail()">Save</button></div></div></div>
   <div class="modal-overlay" id="successModal"><div class="modal-card"><div style="font-size:48px;">✅</div><h3 id="successTitle">Success</h3><p id="successMsg"></p><button class="btn btn-primary" id="closeSuccessBtn" onclick="closeModal('successModal')">OK</button></div></div>
 
-  <!-- 外部脚本 -->
   <script src="script.js"></script>
 </body>
 </html>

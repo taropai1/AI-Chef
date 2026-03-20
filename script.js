@@ -1,16 +1,20 @@
-// ==================== 全局变量 ====================
-const API_URL = "https://api.taropai.com/v1/chat/completions";
+// ==================== 全局配置 ====================
+const DEEPSEEK_API = "https://api.taropai.com/v1/chat/completions";
+const BACKEND_URL = "https://auth.taropai.com";   // 您的认证与数据后端
 const LANGS = ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh-CN'];
 const CUISINES = ["American","Italian","Mexican","French","Spanish","German","Mediterranean","Middle Eastern","Chinese Home Cooking","Chinese Cantonese Cuisine","Chinese Sichuan Cuisine","Chinese Hunan Cuisine","Chinese Huaiyang Cuisine","Chinese Northern Cuisine","Japanese Cuisine","Thai Cuisine","Korean cuisine","Indian Cuisine"];
-const CUISINE_MAP_ZH = {"American":"美式西餐","Italian":"意大利餐","Mexican":"墨西哥菜","French":"法国菜","Spanish":"西班牙菜","German":"德式西餐","Mediterranean":"地中海菜","Middle Eastern":"中东菜","Chinese Home Cooking":"中餐家常菜","Chinese Cantonese Cuisine":"中餐粤菜","Chinese Sichuan Cuisine":"中餐川菜","Chinese Hunan Cuisine":"中餐湘菜","Chinese Huaiyang Cuisine":"中餐苏菜/淮扬菜","Chinese Northern Cuisine":"中餐东北菜","Japanese Cuisine":"日本料理","Thai Cuisine":"泰国菜","Korean cuisine":"韩国菜","Indian Cuisine":"印度菜"};
+const CUISINE_MAP_ZH = {
+  "American":"美式西餐","Italian":"意大利餐","Mexican":"墨西哥菜","French":"法国菜","Spanish":"西班牙菜","German":"德式西餐",
+  "Mediterranean":"地中海菜","Middle Eastern":"中东菜","Chinese Home Cooking":"中餐家常菜","Chinese Cantonese Cuisine":"中餐粤菜",
+  "Chinese Sichuan Cuisine":"中餐川菜","Chinese Hunan Cuisine":"中餐湘菜","Chinese Huaiyang Cuisine":"中餐苏菜/淮扬菜",
+  "Chinese Northern Cuisine":"中餐东北菜","Japanese Cuisine":"日本料理","Thai Cuisine":"泰国菜","Korean cuisine":"韩国菜","Indian Cuisine":"印度菜"
+};
 const PLANS = { free: { dailyLimit: 3, qPerRecipe: 0 }, starter: { dailyLimit: 10, qPerRecipe: 10 }, pro: { dailyLimit: 30, qPerRecipe: 10 }, premium: { dailyLimit: 200, qPerRecipe: 10 } };
 
 let currentLang = localStorage.getItem('aiChefLang') || (navigator.language.startsWith('zh') ? 'zh-CN' : 'en');
 if (!LANGS.includes(currentLang)) currentLang = 'en';
-let deviceId = localStorage.getItem('deviceId') || 'dev_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36);
-if (!localStorage.getItem('deviceId')) localStorage.setItem('deviceId', deviceId);
-
-let userData = loadUserData();
+let deviceId = null;
+let userData = null;
 let recipeHistory = [], historyIndex = -1;
 
 // ==================== 多语言翻译 ====================
@@ -254,6 +258,7 @@ const translations = {
     change:'更改' 
   }
 };
+// 为其他语言提供英文翻译（实际可后续替换为真实翻译）
 ['es', 'fr', 'de', 'it', 'pt'].forEach(l => translations[l] = translations.en);
 
 function t(key, params) {
@@ -263,20 +268,117 @@ function t(key, params) {
 }
 function getLangName(lang) { const map = { en:'English', es:'Español', fr:'Français', de:'Deutsch', it:'Italiano', pt:'Português', 'zh-CN':'简体中文' }; return map[lang] || 'English'; }
 
-// ==================== 用户数据 ====================
-function loadUserData() {
-  let data = localStorage.getItem('userData');
-  if (data) { try { let p = JSON.parse(data); p.freeUsed = parseInt(localStorage.getItem('freeUsed_'+deviceId)) || p.freeUsed || 0; return p; } catch(e){} }
-  return { deviceId, email: null, nickname: 'Foodie123', plan: 'free', freeUsed: parseInt(localStorage.getItem('freeUsed_'+deviceId)) || 0, dailyUsed: 0, lastReset: Date.now(), qLeft: 0, familyOwner: null, familyMembers: [], inviteCode: null, expireAt: null, lastRecipeText: '', createdAt: Date.now() };
+// ==================== 设备指纹与后端交互 ====================
+async function initDeviceId() {
+  if (deviceId) return deviceId;
+  let stored = localStorage.getItem('deviceId');
+  if (stored && stored.length > 10) {
+    deviceId = stored;
+    return deviceId;
+  }
+  try {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    deviceId = `fp_${result.visitorId}`;
+    localStorage.setItem('deviceId', deviceId);
+  } catch (e) {
+    deviceId = 'dev_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36);
+    localStorage.setItem('deviceId', deviceId);
+  }
+  return deviceId;
 }
-function saveUserData() { localStorage.setItem('userData', JSON.stringify(userData)); if (userData.plan === 'free') localStorage.setItem('freeUsed_'+deviceId, userData.freeUsed); }
-function checkDailyReset() { if (userData.plan === 'free') return; const now = Date.now(); const oneDay = 86400000; if (now - userData.lastReset > oneDay) { userData.dailyUsed = 0; userData.lastReset = now; saveUserData(); } }
-function checkGeneratePermission() {
-  if (userData.plan === 'free') { if (userData.freeUsed >= 3) return { allowed: false, message: t('alertNoPermission'), redirect: true }; return { allowed: true, useFree: true }; }
-  else { checkDailyReset(); const plan = PLANS[userData.plan]; if (!plan) return { allowed: false, message: 'Invalid plan' }; if (userData.dailyUsed >= plan.dailyLimit) return { allowed: false, message: t('alertDailyLimit'), redirect: true }; return { allowed: true, useFree: false }; }
+
+// 通用 API 请求函数
+async function apiCall(endpoint, options = {}) {
+  const token = localStorage.getItem('authToken');
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(`${BACKEND_URL}${endpoint}`, { ...options, headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+  return res.json();
 }
+
+// 加载用户数据（设备或已登录用户）
+async function loadUserData() {
+  await initDeviceId();
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    try {
+      const user = await apiCall('/api/user/me');
+      return { ...user, deviceId };
+    } catch (e) {
+      if (e.message.includes('401')) localStorage.removeItem('authToken');
+    }
+  }
+  // 未登录，获取设备状态
+  const device = await apiCall('/api/device/status', {
+    method: 'POST',
+    body: JSON.stringify({ deviceId })
+  });
+  return {
+    deviceId,
+    email: null,
+    nickname: 'Foodie123',
+    plan: device.plan || 'free',
+    freeUsed: device.freeUsed || 0,
+    dailyUsed: device.dailyUsed || 0,
+    lastReset: device.lastReset || Date.now(),
+    qLeft: 0,
+    familyOwner: null,
+    familyMembers: [],
+    inviteCode: null,
+    expireAt: null,
+    lastRecipeText: '',
+    createdAt: Date.now()
+  };
+}
+
+async function refreshUserData() {
+  userData = await loadUserData();
+  updateLimitInfo();
+}
+
+// 记录生成（免费或订阅）
+async function recordGeneration(useFree) {
+  if (useFree) {
+    await apiCall('/api/device/record-generation', {
+      method: 'POST',
+      body: JSON.stringify({ deviceId })
+    });
+    userData.freeUsed++;
+  } else {
+    await apiCall('/api/user/record-generation', { method: 'POST' });
+    userData.dailyUsed++;
+    userData.qLeft = PLANS[userData.plan].qPerRecipe;
+  }
+  await refreshUserData();
+}
+
+async function recordQuestion() {
+  await apiCall('/api/user/record-question', { method: 'POST' });
+  userData.qLeft--;
+  document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
+}
+
+// 权限检查（前端快速判断，实际以后端为准）
+async function checkGeneratePermission() {
+  if (userData.plan === 'free') {
+    if (userData.freeUsed >= 3) return { allowed: false, message: t('alertNoPermission'), redirect: true };
+    return { allowed: true, useFree: true };
+  } else {
+    if (userData.dailyUsed >= PLANS[userData.plan].dailyLimit) {
+      return { allowed: false, message: t('alertDailyLimit'), redirect: true };
+    }
+    return { allowed: true, useFree: false };
+  }
+}
+
 function updateLimitInfo() {
-  const el = document.getElementById('limitInfo'); if (!el) return;
+  const el = document.getElementById('limitInfo');
+  if (!el) return;
   let planDisplay = '';
   if (!userData.email) planDisplay = 'Not subscribed';
   else if (userData.plan === 'free') planDisplay = 'Free trial';
@@ -286,231 +388,556 @@ function updateLimitInfo() {
   if (userData.plan === 'free') {
     el.innerText = t('freeLimitInfo', { used: userData.freeUsed, plan: planDisplay });
   } else {
-    const plan = PLANS[userData.plan]; const qLeft = userData.qLeft ?? plan.qPerRecipe;
+    const plan = PLANS[userData.plan];
+    const qLeft = userData.qLeft !== undefined ? userData.qLeft : plan.qPerRecipe;
     el.innerText = t(userData.plan+'Info', { used: userData.dailyUsed, qLeft }) + ` (${planDisplay})`;
   }
 }
 
 // ==================== 生成器 ====================
 async function generateRecipe() {
-  const dish = document.getElementById('dishName').value.trim(); if (!dish) { alert(t('alertInvalidFood')); return; }
-  const perm = checkGeneratePermission(); if (!perm.allowed) { alert(perm.message); if (perm.redirect) showPage('page-subscribe'); return; }
-  const mealType = document.getElementById('mealType').value, cuisine = document.getElementById('cuisine').value;
-  const resultEl = document.getElementById('recipeResult'), genBtn = document.getElementById('btnGenerate');
-  genBtn.disabled = true; genBtn.innerText = t('generating');
+  const dish = document.getElementById('dishName').value.trim();
+  if (!dish) { alert(t('alertInvalidFood')); return; }
+  const perm = await checkGeneratePermission();
+  if (!perm.allowed) { alert(perm.message); if (perm.redirect) showPage('page-subscribe'); return; }
+
+  const mealType = document.getElementById('mealType').value;
+  const cuisine = document.getElementById('cuisine').value;
+  const resultEl = document.getElementById('recipeResult');
+  const genBtn = document.getElementById('btnGenerate');
+  genBtn.disabled = true;
+  genBtn.innerText = t('generating');
+
   const systemPrompt = `你是专业营养厨师，只输出纯净食谱文本，无任何符号、无星号、无加粗、无特殊格式。\n严格按以下结构输出，每个标题之间空一行：\n\n菜名（单独一行）\n\n食材准备:\n- 食材 用量\n\n制作方法 (总时间: X分钟)\n1. 步骤\n2. 步骤\n\n营养参数:\n- 热量: 约X千卡\n- 蛋白质: X克\n- 碳水化合物: X克\n- 脂肪: X克\n- 膳食纤维: X克\n\n风险提示与建议:\n1. 食材安全与搭配风险\n2. 额外营养建议\n\n语言：${currentLang === 'zh-CN' ? '中文' : 'English'}\n人群：${mealType === 'baby' ? '婴幼儿（无盐无糖）' : mealType === 'pregnancy' ? '孕妇' : '普通人群'}`;
+
   try {
-    const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'deepseek-chat', temperature: 0.8, max_tokens: 1200, messages: [ { role: 'system', content: systemPrompt }, { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法，避免与之前完全相同。随机种子：${Math.random().toString(36).substring(2,8)}` } ] }), signal: controller.signal });
-    clearTimeout(timeoutId); if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json(); let recipe = data.choices[0].message.content;
-    if (userData.plan !== 'free' && userData.email) recipe = t('personalizedGreeting', { name: userData.nickname || userData.email }) + '\n\n' + recipe;
-    resultEl.innerText = recipe; addToHistory(recipe); userData.lastRecipeText = recipe;
-    if (userData.plan !== 'free') { userData.dailyUsed++; userData.qLeft = PLANS[userData.plan].qPerRecipe; } else { userData.freeUsed++; localStorage.setItem('freeUsed_'+deviceId, userData.freeUsed); }
-    saveUserData(); updateLimitInfo();
-    if (userData.plan !== 'free') { document.getElementById('qaInput').disabled = false; document.getElementById('askBtn').disabled = false; document.getElementById('qaHistory').innerText = ''; document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft; }
-  } catch (e) {
-    console.error(e); let fallback = `Mock ${cuisine} ${dish}\n\nIngredients:\n- 200g main\n- 1 tbsp oil\n\nMethod:\n1. Step one\n2. Step two\n\nNutrition:\n- Calories: 350 kcal`;
-    if (userData.plan !== 'free' && userData.email) fallback = t('personalizedGreeting', { name: userData.nickname || userData.email }) + '\n\n' + fallback;
-    resultEl.innerText = fallback; addToHistory(fallback); userData.lastRecipeText = fallback;
-    if (userData.plan !== 'free') { userData.dailyUsed++; userData.qLeft = PLANS[userData.plan].qPerRecipe; } else { userData.freeUsed++; localStorage.setItem('freeUsed_'+deviceId, userData.freeUsed); }
-    saveUserData(); updateLimitInfo();
-  } finally { genBtn.disabled = false; genBtn.innerText = t('generate'); }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const response = await fetch(DEEPSEEK_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        temperature: 0.8,
+        max_tokens: 1200,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法，避免与之前完全相同。随机种子：${Math.random().toString(36).substring(2,8)}` }
+        ]
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    let recipe = data.choices[0].message.content;
+
+    if (userData.plan !== 'free' && userData.email) {
+      recipe = t('personalizedGreeting', { name: userData.nickname || userData.email }) + '\n\n' + recipe;
+    }
+    resultEl.innerText = recipe;
+    addToHistory(recipe);
+    userData.lastRecipeText = recipe;
+
+    await recordGeneration(perm.useFree);
+
+    if (userData.plan !== 'free') {
+      document.getElementById('qaInput').disabled = false;
+      document.getElementById('askBtn').disabled = false;
+      document.getElementById('qaHistory').innerText = '';
+      document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
+    }
+    updateLimitInfo();
+  } catch (error) {
+    console.error(error);
+    resultEl.innerText = `生成失败：${error.message}`;
+    // 降级模拟
+    let fallback = `Mock ${cuisine} ${dish}\n\nIngredients:\n- 200g main\n- 1 tbsp oil\n\nMethod:\n1. Step one\n2. Step two\n\nNutrition:\n- Calories: 350 kcal`;
+    if (userData.plan !== 'free' && userData.email) {
+      fallback = t('personalizedGreeting', { name: userData.nickname || userData.email }) + '\n\n' + fallback;
+    }
+    resultEl.innerText = fallback;
+    addToHistory(fallback);
+    userData.lastRecipeText = fallback;
+    await recordGeneration(perm.useFree);
+  } finally {
+    genBtn.disabled = false;
+    genBtn.innerText = t('generate');
+  }
 }
+
 async function askQuestion() {
   if (!userData.lastRecipeText) { alert(t('alertNoRecipe')); return; }
   if (userData.qLeft <= 0) { alert(t('qLimitReached')); return; }
-  const question = document.getElementById('qaInput').value.trim(); if (!question) return;
-  const askBtn = document.getElementById('askBtn'); askBtn.disabled = true;
-  const historyEl = document.getElementById('qaHistory'); historyEl.innerText += `${t('q')}: ${question}\n`;
+  const question = document.getElementById('qaInput').value.trim();
+  if (!question) return;
+
+  const askBtn = document.getElementById('askBtn');
+  askBtn.disabled = true;
+  const historyEl = document.getElementById('qaHistory');
+  historyEl.innerText += `${t('q')}: ${question}\n`;
+
   try {
-    const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'deepseek-chat', temperature: 0.3, max_tokens: 600, messages: [ { role: 'system', content: `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，每次回答不超过10行，不要使用任何*符号。\n食谱：\n${userData.lastRecipeText}` }, { role: 'user', content: question } ] }), signal: controller.signal });
-    clearTimeout(timeoutId); if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json(); let answer = data.choices[0].message.content.replace(/\*/g, '');
-    const lines = answer.split('\n'); if (lines.length > 10) answer = lines.slice(0,10).join('\n');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const response = await fetch(DEEPSEEK_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        temperature: 0.3,
+        max_tokens: 600,
+        messages: [
+          { role: 'system', content: `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，每次回答不超过10行，不要使用任何*符号。\n食谱：\n${userData.lastRecipeText}` },
+          { role: 'user', content: question }
+        ]
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    let answer = data.choices[0].message.content.replace(/\*/g, '');
+    const lines = answer.split('\n');
+    if (lines.length > 10) answer = lines.slice(0,10).join('\n');
     historyEl.innerText += `${t('a')}: ${answer}\n\n`;
-    userData.qLeft--; document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft; saveUserData();
-  } catch (e) { historyEl.innerText += `${t('a')}: Error, please try again.\n\n`; } finally { askBtn.disabled = false; document.getElementById('qaInput').value = ''; }
+
+    await recordQuestion();
+  } catch (error) {
+    historyEl.innerText += `${t('a')}: Error, please try again.\n\n`;
+  } finally {
+    askBtn.disabled = false;
+    document.getElementById('qaInput').value = '';
+  }
 }
-function showVideo() { const dish = document.getElementById('dishName').value.trim() || 'recipe', cuisine = document.getElementById('cuisine').value; document.getElementById('videoFrame').src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(cuisine+' '+dish+' cooking')}`; document.getElementById('videoContainer').style.display = 'block'; }
-function addToHistory(recipe) { recipeHistory.push(recipe); historyIndex = recipeHistory.length-1; updateHistoryButtons(); }
-function showPrevRecipe() { if (historyIndex > 0) { historyIndex--; document.getElementById('recipeResult').innerText = recipeHistory[historyIndex]; userData.lastRecipeText = recipeHistory[historyIndex]; } updateHistoryButtons(); }
-function showNextRecipe() { if (historyIndex < recipeHistory.length-1) { historyIndex++; document.getElementById('recipeResult').innerText = recipeHistory[historyIndex]; userData.lastRecipeText = recipeHistory[historyIndex]; } updateHistoryButtons(); }
-function updateHistoryButtons() { document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0; document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length-1; }
+
+function showVideo() {
+  const dish = document.getElementById('dishName').value.trim() || 'recipe';
+  const cuisine = document.getElementById('cuisine').value;
+  const query = encodeURIComponent(`${cuisine} ${dish} cooking`);
+  document.getElementById('videoFrame').src = `https://www.youtube.com/embed?listType=search&list=${query}`;
+  document.getElementById('videoContainer').style.display = 'block';
+}
+
+function addToHistory(recipe) {
+  recipeHistory.push(recipe);
+  historyIndex = recipeHistory.length - 1;
+  updateHistoryButtons();
+}
+
+function showPrevRecipe() {
+  if (historyIndex > 0) {
+    historyIndex--;
+    document.getElementById('recipeResult').innerText = recipeHistory[historyIndex];
+    userData.lastRecipeText = recipeHistory[historyIndex];
+  }
+  updateHistoryButtons();
+}
+
+function showNextRecipe() {
+  if (historyIndex < recipeHistory.length - 1) {
+    historyIndex++;
+    document.getElementById('recipeResult').innerText = recipeHistory[historyIndex];
+    userData.lastRecipeText = recipeHistory[historyIndex];
+  }
+  updateHistoryButtons();
+}
+
+function updateHistoryButtons() {
+  document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0;
+  document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length - 1;
+}
 
 // ==================== 登录/注册 ====================
-function switchAuthTab(tab) { document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register'); document.getElementById('loginForm').style.display = tab==='login'?'block':'none'; document.getElementById('registerForm').style.display = tab==='register'?'block':'none'; }
-function register() {
-  const email = document.getElementById('registerEmail').value, pwd = document.getElementById('registerPassword').value, confirm = document.getElementById('registerConfirmPwd').value;
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (!emailPattern.test(email)) { alert('Invalid email'); return; } if (pwd.length < 6) { alert('Password must be at least 6 characters'); return; } if (pwd !== confirm) { alert('Passwords do not match'); return; }
-  const users = JSON.parse(localStorage.getItem('users') || '{}'); if (users[email]) { alert('Email already registered'); return; }
-  const currentFreeUsed = parseInt(localStorage.getItem('freeUsed_'+deviceId)) || 0;
-  const newUser = { email, password: pwd, nickname: email.split('@')[0], plan: 'free', freeUsed: currentFreeUsed, dailyUsed:0, lastReset:Date.now(), qLeft:0, familyOwner:null, familyMembers:[], inviteCode:null, expireAt:null, lastRecipeText:'', createdAt: Date.now() };
-  users[email] = newUser; localStorage.setItem('users', JSON.stringify(users));
-  userData = { ...newUser, deviceId };
-  localStorage.setItem('userData', JSON.stringify(userData));
-  showToast('Registration successful!'); showPage('page-profile'); renderProfile();
+function switchAuthTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
 }
-function login() {
-  const email = document.getElementById('loginEmail').value, pwd = document.getElementById('loginPassword').value;
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (!emailPattern.test(email)) { alert('Invalid email'); return; }
-  const users = JSON.parse(localStorage.getItem('users') || '{}'); const user = users[email]; if (!user || user.password !== pwd) { alert('Invalid email or password'); return; }
-  userData = { ...user, deviceId, freeUsed: parseInt(localStorage.getItem('freeUsed_'+deviceId)) || 0 };
-  localStorage.setItem('userData', JSON.stringify(userData)); showPage('page-profile'); renderProfile();
+
+async function register() {
+  const email = document.getElementById('registerEmail').value;
+  const pwd = document.getElementById('registerPassword').value;
+  const confirm = document.getElementById('registerConfirmPwd').value;
+  if (pwd !== confirm) { alert('Passwords do not match'); return; }
+  try {
+    const data = await apiCall('/api/user/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: pwd, deviceId })
+    });
+    localStorage.setItem('authToken', data.token);
+    userData = await loadUserData();
+    showToast('Registration successful!');
+    showPage('page-profile');
+    renderProfile();
+  } catch (e) {
+    alert(e.message);
+  }
 }
+
+async function login() {
+  const email = document.getElementById('loginEmail').value;
+  const pwd = document.getElementById('loginPassword').value;
+  try {
+    const data = await apiCall('/api/user/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: pwd, deviceId })
+    });
+    localStorage.setItem('authToken', data.token);
+    userData = await loadUserData();
+    showPage('page-profile');
+    renderProfile();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
 function logout() {
-  userData = { deviceId, email: null, nickname: 'Foodie123', plan: 'free', freeUsed: parseInt(localStorage.getItem('freeUsed_'+deviceId)) || 0, dailyUsed:0, lastReset:Date.now(), qLeft:0, createdAt: Date.now() };
-  localStorage.setItem('userData', JSON.stringify(userData)); showPage('page-home');
+  localStorage.removeItem('authToken');
+  loadUserData().then(data => {
+    userData = data;
+    showPage('page-home');
+    renderProfile();
+  });
 }
+
 function showForgotModal() { document.getElementById('forgotModal').classList.add('show'); }
-function resetPassword() {
-  const email = document.getElementById('forgotEmail').value, newPwd = document.getElementById('forgotNewPwd').value;
-  const users = JSON.parse(localStorage.getItem('users') || '{}'); if (users[email]) { users[email].password = newPwd; localStorage.setItem('users', JSON.stringify(users)); alert('Password reset successfully!'); closeModal('forgotModal'); } else alert('Email not found');
+
+async function resetPassword() {
+  const email = document.getElementById('forgotEmail').value;
+  const newPwd = document.getElementById('forgotNewPwd').value;
+  try {
+    await apiCall('/api/user/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, newPassword: newPwd })
+    });
+    alert('Password reset successfully!');
+    closeModal('forgotModal');
+  } catch (e) {
+    alert(e.message);
+  }
 }
+
 function showNicknameModal() { document.getElementById('newNicknameInput').value = userData.nickname || ''; document.getElementById('nicknameModal').classList.add('show'); }
-function saveNickname() {
-  const newName = document.getElementById('newNicknameInput').value.trim(); if (!newName || newName.length>10) { alert('Nickname must be 1-10 characters'); return; }
-  userData.nickname = newName; saveUserData(); if (userData.email) { const users = JSON.parse(localStorage.getItem('users')||'{}'); if (users[userData.email]) { users[userData.email].nickname = newName; localStorage.setItem('users', JSON.stringify(users)); } }
-  document.getElementById('profileNickname').innerText = newName; closeModal('nicknameModal'); showToast('Nickname updated');
+
+async function saveNickname() {
+  const newName = document.getElementById('newNicknameInput').value.trim();
+  if (!newName || newName.length > 10) { alert('Nickname must be 1-10 characters'); return; }
+  await apiCall('/api/user/update', {
+    method: 'PATCH',
+    body: JSON.stringify({ nickname: newName })
+  });
+  userData.nickname = newName;
+  document.getElementById('profileNickname').innerText = newName;
+  closeModal('nicknameModal');
+  showToast('Nickname updated');
 }
+
 function showEmailModal() { document.getElementById('newEmailInput').value = userData.email || ''; document.getElementById('emailModal').classList.add('show'); }
-function saveEmail() {
-  const newEmail = document.getElementById('newEmailInput').value.trim(); const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (!emailPattern.test(newEmail)) { alert('Invalid email'); return; }
+
+async function saveEmail() {
+  const newEmail = document.getElementById('newEmailInput').value.trim();
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(newEmail)) { alert('Invalid email'); return; }
   if (newEmail === userData.email) { closeModal('emailModal'); return; }
-  const users = JSON.parse(localStorage.getItem('users') || '{}'); if (users[newEmail]) { alert('Email already used'); return; }
-  if (userData.email) delete users[userData.email];
-  userData.email = newEmail; users[newEmail] = { ...userData, password: users[userData.email]?.password || '' }; localStorage.setItem('users', JSON.stringify(users)); saveUserData();
-  document.getElementById('profileEmail').innerText = newEmail; closeModal('emailModal'); showToast('Email updated');
+  try {
+    const data = await apiCall('/api/user/change-email', {
+      method: 'POST',
+      body: JSON.stringify({ newEmail })
+    });
+    localStorage.setItem('authToken', data.token);
+    userData.email = newEmail;
+    document.getElementById('profileEmail').innerText = newEmail;
+    closeModal('emailModal');
+    showToast('Email updated');
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 // ==================== 订阅支付 ====================
 function renderPayPal() {
   if (!window.paypal) return;
-  
   const plans = [
-    { container: 'paypal-starter-container', planId: 'P-1U5765718B789804NNG3MBWQ', name: 'Starter' },
-    { container: 'paypal-pro-container', planId: 'P-5P885108R60234815NG3MEPY', name: 'Pro' },
-    { container: 'paypal-premium-container', planId: 'P-1880277264176022RNG3MFRA', name: 'Premium' }
+    { container: 'paypal-starter-container', planId: 'P-1U5765718B789804NNG3MBWQ', planType: 'starter' },
+    { container: 'paypal-pro-container', planId: 'P-5P885108R60234815NG3MEPY', planType: 'pro' },
+    { container: 'paypal-premium-container', planId: 'P-1880277264176022RNG3MFRA', planType: 'premium' }
   ];
-
   plans.forEach(p => {
     const container = document.getElementById(p.container);
     if (!container) return;
     container.innerHTML = '';
     paypal.Buttons({
       style: { shape: 'pill', color: 'gold', label: 'subscribe' },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({ plan_id: p.planId });
-      },
-      onApprove: function(data, actions) {
+      createSubscription: (data, actions) => actions.subscription.create({ plan_id: p.planId }),
+      onApprove: async (data, actions) => {
         if (!userData.email) {
-          alert('Please login first to activate your subscription');
+          alert('Please login first');
           showPage('page-login-register');
           return;
         }
-        let planType = 'starter';
-        if (p.planId === 'P-5P885108R60234815NG3MEPY') planType = 'pro';
-        if (p.planId === 'P-1880277264176022RNG3MFRA') planType = 'premium';
-        userData.plan = planType;
-        userData.dailyUsed = 0;
-        userData.lastReset = Date.now();
-        if (planType === 'premium') {
-          userData.inviteCode = Math.random().toString(36).substr(2,6).toUpperCase();
-          userData.familyMembers = [];
+        try {
+          await apiCall('/api/subscription/verify', {
+            method: 'POST',
+            body: JSON.stringify({
+              subscriptionId: data.subscriptionID,
+              planType: p.planType,
+              deviceId
+            })
+          });
+          userData = await loadUserData();
+          showToast(t('paymentSuccess'));
+          showPage('page-profile');
+          renderProfile();
+        } catch (e) {
+          alert('Subscription verification failed: ' + e.message);
         }
-        saveUserData();
-        const users = JSON.parse(localStorage.getItem('users') || '{}');
-        if (users[userData.email]) {
-          users[userData.email].plan = planType;
-          localStorage.setItem('users', JSON.stringify(users));
-        }
-        showToast(t('paymentSuccess'));
-        showPage('page-profile');
-        renderProfile();
       },
-      onError: function(err) {
-        console.error('PayPal Subscription Error:', err);
+      onError: (err) => {
+        console.error(err);
         alert('Subscription failed. Please try again.');
       }
     }).render(container);
   });
 }
-function bindInvite() {
+
+async function bindInvite() {
   if (!userData.email) { alert('Please login'); showPage('page-login-register'); return; }
-  const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase(); if (!code) return;
-  userData.plan = 'premium'; userData.dailyUsed = 0; userData.lastReset = Date.now(); userData.familyOwner = 'ownerId'; saveUserData(); showToast('Joined family!'); renderProfile();
+  const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
+  if (!code) return;
+  try {
+    await apiCall('/api/invite/bind', {
+      method: 'POST',
+      body: JSON.stringify({ inviteCode: code })
+    });
+    userData = await loadUserData();
+    showToast('Joined family!');
+    renderProfile();
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 // ==================== 页面渲染 ====================
 function populateCuisines() {
-  const select = document.getElementById('cuisine'); if (!select) return;
-  select.innerHTML = CUISINES.map(c => `<option value="${c}">${currentLang === 'zh-CN' ? (CUISINE_MAP_ZH[c]||c) : c}</option>`).join('');
+  const select = document.getElementById('cuisine');
+  if (!select) return;
+  select.innerHTML = CUISINES.map(c => `<option value="${c}">${currentLang === 'zh-CN' ? (CUISINE_MAP_ZH[c] || c) : c}</option>`).join('');
 }
+
 function renderLanguage() {
-  document.getElementById('heroSubtitle').innerText = t('heroSubtitle'); document.getElementById('sectionFeatures').innerText = t('sectionFeatures');
-  for (let i=1;i<=6;i++) { let el = document.getElementById(`feat${i}`); if (el) el.innerText = t(`feat${i}`); let sub = document.getElementById(`feat${i}Sub`); if (sub) sub.innerText = t(`feat${i}Sub`); }
-  document.getElementById('sectionSubscribe').innerText = t('sectionSubscribe'); document.getElementById('subText').innerText = t('subText'); document.getElementById('subSub').innerText = t('subSub'); document.getElementById('familyText').innerText = t('familyText'); document.getElementById('familySub').innerText = t('familySub'); document.getElementById('linkLegal').innerText = t('legalLink');
-  document.getElementById('genTitle').innerText = t('genTitle'); document.getElementById('genMealType').innerText = t('genMealType'); document.getElementById('genCuisine').innerText = t('genCuisine'); document.getElementById('genDishName').innerText = t('genDishName'); document.getElementById('optStandard').innerText = t('optStandard'); document.getElementById('optBaby').innerText = t('optBaby'); document.getElementById('optPregnancy').innerText = t('optPregnancy'); document.getElementById('btnGenerate').innerText = t('generate'); document.getElementById('aiAssistTitle').innerText = t('aiAssistTitle'); document.getElementById('qaInput').placeholder = t('enterQuestion'); document.getElementById('askBtn').innerText = t('ask'); document.getElementById('dishNameHint').innerText = t('dishNameHint'); document.getElementById('openVideoBtn').innerHTML = '🎬 ' + t('watchVideo'); document.getElementById('addToHomeBtn').innerHTML = '📱 ' + t('addToHome');
-  document.getElementById('tabLogin').innerText = t('signIn'); document.getElementById('tabRegister').innerText = t('signUp'); document.getElementById('loginEmail').placeholder = t('email'); document.getElementById('loginPassword').placeholder = t('password'); document.getElementById('forgotPwdLink').innerText = t('forgot'); document.getElementById('btnLoginSubmit').innerText = t('signIn'); document.getElementById('noAccount').innerText = t('noAccount'); document.getElementById('switchToRegister').innerText = t('signUp'); document.getElementById('registerEmail').placeholder = t('email'); document.getElementById('registerPassword').placeholder = t('password'); document.getElementById('registerConfirmPwd').placeholder = t('confirmPwd'); document.getElementById('btnRegisterSubmit').innerText = t('signUp'); document.getElementById('haveAccount').innerText = t('haveAccount'); document.getElementById('switchToLogin').innerText = t('signIn'); document.getElementById('registerNote').innerText = t('registerNote');
-  document.getElementById('profileNicknameLabel').innerText = t('profileNickname'); document.getElementById('profileEmailLabel').innerText = t('profileEmail'); document.getElementById('profilePlanLabel').innerText = t('profilePlan'); document.getElementById('profileJoinedLabel').innerText = t('profileJoined'); document.getElementById('logoutBtn').innerText = t('logout'); document.getElementById('profileSubTitle').innerText = t('profileSub'); document.getElementById('goSubscribeBtn').innerText = t('subText'); document.getElementById('inviteCodeTitle').innerText = t('inviteCodeTitle'); document.getElementById('editNicknameBtn').innerText = t('edit'); document.getElementById('editEmailBtn').innerText = t('change');
-  document.getElementById('sectionSubTitle').innerText = t('sectionSubscribe'); document.getElementById('planStarterName').innerText = t('starterName'); document.getElementById('planProName').innerHTML = t('proName') + ' <span style="background:#ffd966; padding:2px 8px; border-radius:12px; font-size:12px;">Most Popular</span>'; document.getElementById('planPremiumName').innerHTML = t('premiumName'); document.getElementById('planStarterDesc').innerHTML = t('starterDesc'); document.getElementById('planProDesc').innerHTML = t('proDesc'); document.getElementById('planPremiumDesc').innerHTML = t('premiumDesc'); document.getElementById('finePrint').innerHTML = t('finePrint') + '<a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
-  document.querySelectorAll('.legal-tab')[0].innerText = t('legalPrivacyTitle'); document.querySelectorAll('.legal-tab')[1].innerText = t('legalTermsTitle');
-  document.getElementById('legalPrivacyTitle').innerText = t('legalPrivacyTitle'); document.getElementById('legalEffDate').innerText = t('legalEffDate'); document.getElementById('legalPrivacyCollect').innerText = t('legalPrivacyCollect'); document.getElementById('legalPrivacy1').innerText = t('legalPrivacy1'); document.getElementById('legalPrivacyUse').innerText = t('legalPrivacyUse'); document.getElementById('legalPrivacy2').innerText = t('legalPrivacy2'); document.getElementById('legalPrivacySecurity').innerText = t('legalPrivacySecurity'); document.getElementById('legalPrivacy3').innerText = t('legalPrivacy3'); document.getElementById('legalPrivacyChanges').innerText = t('legalPrivacyChanges'); document.getElementById('legalPrivacy4').innerText = t('legalPrivacy4'); document.getElementById('legalPrivacyContact').innerText = t('legalPrivacyContact'); document.getElementById('legalPrivacy5').innerText = t('legalPrivacy5');
-  document.getElementById('legalTermsTitle').innerText = t('legalTermsTitle'); document.getElementById('legalTermEffDate').innerText = t('legalTermEffDate'); document.getElementById('legalTermsLicense').innerText = t('legalTermsLicense'); document.getElementById('legalTerms1').innerText = t('legalTerms1'); document.getElementById('legalTermsDisclaimer').innerText = t('legalTermsDisclaimer'); document.getElementById('legalTerms2').innerText = t('legalTerms2'); document.getElementById('legalTermsLimitations').innerText = t('legalTermsLimitations'); document.getElementById('legalTerms3').innerText = t('legalTerms3'); document.getElementById('legalTermsModifications').innerText = t('legalTermsModifications'); document.getElementById('legalTerms4').innerText = t('legalTerms4'); document.getElementById('legalTermsLaw').innerText = t('legalTermsLaw'); document.getElementById('legalTerms5').innerText = t('legalTerms5'); document.getElementById('legalTermsSubRules').innerText = t('legalTermsSubRules');
-  for (let i=1;i<=10;i++) { const el = document.getElementById(`legalTermsSub${i}`); if (el) el.innerText = t(`legalTermsSub${i}`); }
-  document.getElementById('forgotTitle').innerText = t('forgotTitle'); document.getElementById('forgotNote').innerText = t('forgotNote'); document.getElementById('cancelForgot').innerText = t('cancel'); document.getElementById('resetPwdBtn').innerText = t('reset');
-  document.getElementById('nicknameTitle').innerText = t('nicknameTitle'); document.getElementById('cancelNickname').innerText = t('cancel'); document.getElementById('saveNicknameBtn').innerText = t('save');
-  document.getElementById('emailTitle').innerText = t('emailTitle'); document.getElementById('cancelEmail').innerText = t('cancel'); document.getElementById('saveEmailBtn').innerText = t('save');
-  document.getElementById('successTitle').innerText = t('success'); document.getElementById('closeSuccessBtn').innerText = t('ok');
+  // 更新所有静态文本
+  document.getElementById('heroSubtitle').innerText = t('heroSubtitle');
+  document.getElementById('sectionFeatures').innerText = t('sectionFeatures');
+  for (let i = 1; i <= 6; i++) {
+    let el = document.getElementById(`feat${i}`); if (el) el.innerText = t(`feat${i}`);
+    let sub = document.getElementById(`feat${i}Sub`); if (sub) sub.innerText = t(`feat${i}Sub`);
+  }
+  document.getElementById('sectionSubscribe').innerText = t('sectionSubscribe');
+  document.getElementById('subText').innerText = t('subText');
+  document.getElementById('subSub').innerText = t('subSub');
+  document.getElementById('familyText').innerText = t('familyText');
+  document.getElementById('familySub').innerText = t('familySub');
+  document.getElementById('linkLegal').innerText = t('legalLink');
+  document.getElementById('genTitle').innerText = t('genTitle');
+  document.getElementById('genMealType').innerText = t('genMealType');
+  document.getElementById('genCuisine').innerText = t('genCuisine');
+  document.getElementById('genDishName').innerText = t('genDishName');
+  document.getElementById('optStandard').innerText = t('optStandard');
+  document.getElementById('optBaby').innerText = t('optBaby');
+  document.getElementById('optPregnancy').innerText = t('optPregnancy');
+  document.getElementById('btnGenerate').innerText = t('generate');
+  document.getElementById('aiAssistTitle').innerText = t('aiAssistTitle');
+  document.getElementById('qaInput').placeholder = t('enterQuestion');
+  document.getElementById('askBtn').innerText = t('ask');
+  document.getElementById('dishNameHint').innerText = t('dishNameHint');
+  document.getElementById('openVideoBtn').innerHTML = '🎬 ' + t('watchVideo');
+  document.getElementById('addToHomeBtn').innerHTML = '📱 ' + t('addToHome');
+  // 登录注册
+  document.getElementById('tabLogin').innerText = t('signIn');
+  document.getElementById('tabRegister').innerText = t('signUp');
+  document.getElementById('loginEmail').placeholder = t('email');
+  document.getElementById('loginPassword').placeholder = t('password');
+  document.getElementById('forgotPwdLink').innerText = t('forgot');
+  document.getElementById('btnLoginSubmit').innerText = t('signIn');
+  document.getElementById('noAccount').innerText = t('noAccount');
+  document.getElementById('switchToRegister').innerText = t('signUp');
+  document.getElementById('registerEmail').placeholder = t('email');
+  document.getElementById('registerPassword').placeholder = t('password');
+  document.getElementById('registerConfirmPwd').placeholder = t('confirmPwd');
+  document.getElementById('btnRegisterSubmit').innerText = t('signUp');
+  document.getElementById('haveAccount').innerText = t('haveAccount');
+  document.getElementById('switchToLogin').innerText = t('signIn');
+  document.getElementById('registerNote').innerText = t('registerNote');
+  // 个人信息
+  document.getElementById('profileNicknameLabel').innerText = t('profileNickname');
+  document.getElementById('profileEmailLabel').innerText = t('profileEmail');
+  document.getElementById('profilePlanLabel').innerText = t('profilePlan');
+  document.getElementById('profileJoinedLabel').innerText = t('profileJoined');
+  document.getElementById('logoutBtn').innerText = t('logout');
+  document.getElementById('profileSubTitle').innerText = t('profileSub');
+  document.getElementById('goSubscribeBtn').innerText = t('subText');
+  document.getElementById('inviteCodeTitle').innerText = t('inviteCodeTitle');
+  document.getElementById('editNicknameBtn').innerText = t('edit');
+  document.getElementById('editEmailBtn').innerText = t('change');
+  // 订阅页
+  document.getElementById('sectionSubTitle').innerText = t('sectionSubscribe');
+  document.getElementById('planStarterName').innerText = t('starterName');
+  document.getElementById('planProName').innerHTML = t('proName') + ' <span style="background:#ffd966; padding:2px 8px; border-radius:12px; font-size:12px;">Most Popular</span>';
+  document.getElementById('planPremiumName').innerHTML = t('premiumName');
+  document.getElementById('planStarterDesc').innerHTML = t('starterDesc');
+  document.getElementById('planProDesc').innerHTML = t('proDesc');
+  document.getElementById('planPremiumDesc').innerHTML = t('premiumDesc');
+  document.getElementById('finePrint').innerHTML = t('finePrint') + '<a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
+  // 法律
+  document.querySelectorAll('.legal-tab')[0].innerText = t('legalPrivacyTitle');
+  document.querySelectorAll('.legal-tab')[1].innerText = t('legalTermsTitle');
+  document.getElementById('legalPrivacyTitle').innerText = t('legalPrivacyTitle');
+  document.getElementById('legalEffDate').innerText = t('legalEffDate');
+  document.getElementById('legalPrivacyCollect').innerText = t('legalPrivacyCollect');
+  document.getElementById('legalPrivacy1').innerText = t('legalPrivacy1');
+  document.getElementById('legalPrivacyUse').innerText = t('legalPrivacyUse');
+  document.getElementById('legalPrivacy2').innerText = t('legalPrivacy2');
+  document.getElementById('legalPrivacySecurity').innerText = t('legalPrivacySecurity');
+  document.getElementById('legalPrivacy3').innerText = t('legalPrivacy3');
+  document.getElementById('legalPrivacyChanges').innerText = t('legalPrivacyChanges');
+  document.getElementById('legalPrivacy4').innerText = t('legalPrivacy4');
+  document.getElementById('legalPrivacyContact').innerText = t('legalPrivacyContact');
+  document.getElementById('legalPrivacy5').innerText = t('legalPrivacy5');
+  document.getElementById('legalTermsTitle').innerText = t('legalTermsTitle');
+  document.getElementById('legalTermEffDate').innerText = t('legalTermEffDate');
+  document.getElementById('legalTermsLicense').innerText = t('legalTermsLicense');
+  document.getElementById('legalTerms1').innerText = t('legalTerms1');
+  document.getElementById('legalTermsDisclaimer').innerText = t('legalTermsDisclaimer');
+  document.getElementById('legalTerms2').innerText = t('legalTerms2');
+  document.getElementById('legalTermsLimitations').innerText = t('legalTermsLimitations');
+  document.getElementById('legalTerms3').innerText = t('legalTerms3');
+  document.getElementById('legalTermsModifications').innerText = t('legalTermsModifications');
+  document.getElementById('legalTerms4').innerText = t('legalTerms4');
+  document.getElementById('legalTermsLaw').innerText = t('legalTermsLaw');
+  document.getElementById('legalTerms5').innerText = t('legalTerms5');
+  document.getElementById('legalTermsSubRules').innerText = t('legalTermsSubRules');
+  for (let i = 1; i <= 10; i++) { const el = document.getElementById(`legalTermsSub${i}`); if (el) el.innerText = t(`legalTermsSub${i}`); }
+  // 弹窗
+  document.getElementById('forgotTitle').innerText = t('forgotTitle');
+  document.getElementById('forgotNote').innerText = t('forgotNote');
+  document.getElementById('cancelForgot').innerText = t('cancel');
+  document.getElementById('resetPwdBtn').innerText = t('reset');
+  document.getElementById('nicknameTitle').innerText = t('nicknameTitle');
+  document.getElementById('cancelNickname').innerText = t('cancel');
+  document.getElementById('saveNicknameBtn').innerText = t('save');
+  document.getElementById('emailTitle').innerText = t('emailTitle');
+  document.getElementById('cancelEmail').innerText = t('cancel');
+  document.getElementById('saveEmailBtn').innerText = t('save');
+  document.getElementById('successTitle').innerText = t('success');
+  document.getElementById('closeSuccessBtn').innerText = t('ok');
   populateCuisines();
 }
+
 function renderProfile() {
   document.getElementById('profileNickname').innerText = userData.nickname || 'Foodie123';
   document.getElementById('profileEmail').innerText = userData.email || 'Not logged in';
-  document.getElementById('profilePlan').innerText = userData.plan==='free'?'Free':(userData.plan==='starter'?'Starter':userData.plan==='pro'?'Pro':'Premium');
+  document.getElementById('profilePlan').innerText = userData.plan === 'free' ? 'Free' : (userData.plan === 'starter' ? 'Starter' : userData.plan === 'pro' ? 'Pro' : 'Premium');
   const joinedDate = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A';
   document.getElementById('profileJoined').innerText = joinedDate;
-  document.getElementById('subStatus').innerText = userData.plan==='free'?'Free':(userData.plan==='starter'?'Starter':userData.plan==='pro'?'Pro':'Premium');
-  document.getElementById('subExpiry').innerText = userData.expireAt?new Date(userData.expireAt).toLocaleDateString():'';
-  if (userData.plan === 'premium') { document.getElementById('familyArea').style.display = 'block'; document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || ''); } else { document.getElementById('familyArea').style.display = 'none'; }
+  document.getElementById('subStatus').innerText = userData.plan === 'free' ? 'Free' : (userData.plan === 'starter' ? 'Starter' : userData.plan === 'pro' ? 'Pro' : 'Premium');
+  document.getElementById('subExpiry').innerText = userData.expireAt ? new Date(userData.expireAt).toLocaleDateString() : '';
+  if (userData.plan === 'premium') {
+    document.getElementById('familyArea').style.display = 'block';
+    document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || '');
+  } else {
+    document.getElementById('familyArea').style.display = 'none';
+  }
 }
-function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active');
-  if (pageId === 'page-generator') { updateLimitInfo(); populateCuisines(); }
+
+async function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  if (pageId === 'page-generator') {
+    await refreshUserData();
+    updateLimitInfo();
+    populateCuisines();
+  }
   if (pageId === 'page-subscribe') renderPayPal();
   if (pageId === 'page-profile') renderProfile();
   renderLanguage();
 }
-function switchLang(lang) { currentLang = lang; localStorage.setItem('aiChefLang', lang); document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼'; renderLanguage(); document.getElementById('langDropdown').style.display = 'none'; }
+
+function switchLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('aiChefLang', lang);
+  document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼';
+  renderLanguage();
+  document.getElementById('langDropdown').style.display = 'none';
+}
+
 function addToHome() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  if (isIOS) alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。');
-  else if (navigator.share) navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{});
-  else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); }
+  if (isIOS) {
+    alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。');
+  } else if (navigator.share) {
+    navigator.share({ title: 'AI Chef', text: t('heroSubtitle'), url: window.location.href }).catch(() => {});
+  } else {
+    window.dispatchEvent(new Event('beforeinstallprompt'));
+    alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。');
+  }
 }
-function showToast(msg) { document.getElementById('successMsg').innerText = msg; document.getElementById('successModal').classList.add('show'); setTimeout(()=>closeModal('successModal'),2000); }
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-function switchLegalTab(tab) { document.getElementById('legal-privacy-content').style.display = tab==='privacy'?'block':'none'; document.getElementById('legal-terms-content').style.display = tab==='terms'?'block':'none'; document.querySelectorAll('.legal-tab').forEach(t=>t.classList.remove('active')); document.querySelector(`.legal-tab[data-tab="${tab}"]`).classList.add('active'); }
-function handleLoginClick() { if (userData.email) showPage('page-profile'); else showPage('page-login-register'); }
 
-// ==================== 初始化 ====================
-window.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('.lang-btn').addEventListener('click', function(e) { e.stopPropagation(); document.getElementById('langDropdown').style.display = document.getElementById('langDropdown').style.display === 'block' ? 'none' : 'block'; });
-  document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
-  document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target; if (target.classList.contains('lang-option')) { const lang = target.getAttribute('data-lang'); if (lang) switchLang(lang); } });
-  populateCuisines(); renderLanguage();
-});
+function showToast(msg) {
+  document.getElementById('successMsg').innerText = msg;
+  document.getElementById('successModal').classList.add('show');
+  setTimeout(() => closeModal('successModal'), 2000);
+}
 
-// ==================== PWA Service Worker 注册 ====================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function switchLegalTab(tab) {
+  document.getElementById('legal-privacy-content').style.display = tab === 'privacy' ? 'block' : 'none';
+  document.getElementById('legal-terms-content').style.display = tab === 'terms' ? 'block' : 'none';
+  document.querySelectorAll('.legal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.legal-tab[data-tab="${tab}"]`).classList.add('active');
+}
+
+function handleLoginClick() {
+  if (userData.email) showPage('page-profile');
+  else showPage('page-login-register');
+}
+
+// ==================== Service Worker 注册（PWA）====================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
-      .then(registration => {
-        console.log('ServiceWorker registered successfully:', registration);
-      })
-      .catch(error => {
-        console.log('ServiceWorker registration failed:', error);
-      });
+      .then(reg => console.log('Service Worker registered'))
+      .catch(err => console.log('Service Worker registration failed:', err));
   });
 }
+
+// ==================== 初始化 ====================
+(async function init() {
+  await initDeviceId();
+  userData = await loadUserData();
+  document.querySelector('.lang-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('langDropdown').style.display = document.getElementById('langDropdown').style.display === 'block' ? 'none' : 'block';
+  });
+  document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
+  document.getElementById('langDropdown').addEventListener('click', (e) => {
+    const target = e.target;
+    if (target.classList.contains('lang-option')) {
+      const lang = target.getAttribute('data-lang');
+      if (lang) switchLang(lang);
+    }
+  });
+  populateCuisines();
+  renderLanguage();
+  // 无痕模式检测
+  try {
+    localStorage.setItem('test', '1');
+    localStorage.removeItem('test');
+  } catch (e) {
+    setTimeout(() => alert('您正在使用隐私/无痕模式。建议改用普通模式以获得最佳体验。'), 1000);
+  }
+})();
