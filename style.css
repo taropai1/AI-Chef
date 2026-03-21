@@ -90,7 +90,6 @@ input, select, textarea { font-size: 16px; }
 .profile-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .paypal-button-container { min-height: 45px; }
 
-/* Logo 样式 */
 .logo {
   max-width: 120px;
   flex-shrink: 0;
