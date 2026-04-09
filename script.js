@@ -3,11 +3,43 @@ const DEEPSEEK_API = "https://api.taropai.com/v1/chat/completions";
 const BACKEND_URL = "https://auth.taropai.com";
 const LANGS = ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh-CN'];
 const CUISINES = ["American","Italian","Mexican","French","Spanish","German","Mediterranean","Middle Eastern","Chinese Home Cooking","Chinese Cantonese Cuisine","Chinese Sichuan Cuisine","Chinese Hunan Cuisine","Chinese Huaiyang Cuisine","Chinese Northern Cuisine","Japanese Cuisine","Thai Cuisine","Korean cuisine","Indian Cuisine"];
-const CUISINE_MAP_ZH = {
-  "American":"美式西餐","Italian":"意大利餐","Mexican":"墨西哥菜","French":"法国菜","Spanish":"西班牙菜","German":"德式西餐",
-  "Mediterranean":"地中海菜","Middle Eastern":"中东菜","Chinese Home Cooking":"中餐家常菜","Chinese Cantonese Cuisine":"中餐粤菜",
-  "Chinese Sichuan Cuisine":"中餐川菜","Chinese Hunan Cuisine":"中餐湘菜","Chinese Huaiyang Cuisine":"中餐苏菜/淮扬菜",
-  "Chinese Northern Cuisine":"中餐东北菜","Japanese Cuisine":"日本料理","Thai Cuisine":"泰国菜","Korean cuisine":"韩国菜","Indian Cuisine":"印度菜"
+const CUISINE_MAP = {
+  'zh-CN': {
+    "American":"美式西餐","Italian":"意大利餐","Mexican":"墨西哥菜","French":"法国菜","Spanish":"西班牙菜","German":"德式西餐",
+    "Mediterranean":"地中海菜","Middle Eastern":"中东菜","Chinese Home Cooking":"中餐家常菜","Chinese Cantonese Cuisine":"中餐粤菜",
+    "Chinese Sichuan Cuisine":"中餐川菜","Chinese Hunan Cuisine":"中餐湘菜","Chinese Huaiyang Cuisine":"中餐苏菜/淮扬菜",
+    "Chinese Northern Cuisine":"中餐东北菜","Japanese Cuisine":"日本料理","Thai Cuisine":"泰国菜","Korean cuisine":"韩国菜","Indian Cuisine":"印度菜"
+  },
+  'es': {
+    "American":"Americana","Italian":"Italiana","Mexican":"Mexicana","French":"Francesa","Spanish":"Española","German":"Alemana",
+    "Mediterranean":"Mediterránea","Middle Eastern":"Oriente Medio","Chinese Home Cooking":"Cocina casera china","Chinese Cantonese Cuisine":"Cocina cantonesa",
+    "Chinese Sichuan Cuisine":"Cocina sichuanesa","Chinese Hunan Cuisine":"Cocina hunanesa","Chinese Huaiyang Cuisine":"Cocina huaiyang",
+    "Chinese Northern Cuisine":"Cocina del norte de China","Japanese Cuisine":"Japonesa","Thai Cuisine":"Tailandesa","Korean cuisine":"Coreana","Indian Cuisine":"India"
+  },
+  'fr': {
+    "American":"Américaine","Italian":"Italienne","Mexican":"Mexicaine","French":"Française","Spanish":"Espagnole","German":"Allemande",
+    "Mediterranean":"Méditerranéenne","Middle Eastern":"Moyen-Orient","Chinese Home Cooking":"Cuisine familiale chinoise","Chinese Cantonese Cuisine":"Cuisine cantonaise",
+    "Chinese Sichuan Cuisine":"Cuisine sichuanaise","Chinese Hunan Cuisine":"Cuisine hunanaise","Chinese Huaiyang Cuisine":"Cuisine huaiyang",
+    "Chinese Northern Cuisine":"Cuisine du nord de la Chine","Japanese Cuisine":"Japonaise","Thai Cuisine":"Thaïlandaise","Korean cuisine":"Coréenne","Indian Cuisine":"Indienne"
+  },
+  'de': {
+    "American":"Amerikanisch","Italian":"Italienisch","Mexican":"Mexikanisch","French":"Französisch","Spanish":"Spanisch","German":"Deutsch",
+    "Mediterranean":"Mediterran","Middle Eastern":"Nahöstlich","Chinese Home Cooking":"Chinesische Hausmannskost","Chinese Cantonese Cuisine":"Kantonesische Küche",
+    "Chinese Sichuan Cuisine":"Szechuan-Küche","Chinese Hunan Cuisine":"Hunan-Küche","Chinese Huaiyang Cuisine":"Huaiyang-Küche",
+    "Chinese Northern Cuisine":"Nordchinesische Küche","Japanese Cuisine":"Japanisch","Thai Cuisine":"Thailändisch","Korean cuisine":"Koreanisch","Indian Cuisine":"Indisch"
+  },
+  'it': {
+    "American":"Americana","Italian":"Italiana","Mexican":"Messicana","French":"Francese","Spanish":"Spagnola","German":"Tedesca",
+    "Mediterranean":"Mediterranea","Middle Eastern":"Medio Oriente","Chinese Home Cooking":"Cucina casalinga cinese","Chinese Cantonese Cuisine":"Cucina cantonese",
+    "Chinese Sichuan Cuisine":"Cucina sichuanese","Chinese Hunan Cuisine":"Cucina hunanese","Chinese Huaiyang Cuisine":"Cucina huaiyang",
+    "Chinese Northern Cuisine":"Cucina del nord della Cina","Japanese Cuisine":"Giapponese","Thai Cuisine":"Tailandese","Korean cuisine":"Coreana","Indian Cuisine":"Indiana"
+  },
+  'pt': {
+    "American":"Americana","Italian":"Italiana","Mexican":"Mexicana","French":"Francesa","Spanish":"Espanhola","German":"Alemã",
+    "Mediterranean":"Mediterrânea","Middle Eastern":"Oriente Médio","Chinese Home Cooking":"Culinária caseira chinesa","Chinese Cantonese Cuisine":"Culinária cantonesa",
+    "Chinese Sichuan Cuisine":"Culinária sichuanesa","Chinese Hunan Cuisine":"Culinária hunanesa","Chinese Huaiyang Cuisine":"Culinária huaiyang",
+    "Chinese Northern Cuisine":"Culinária do norte da China","Japanese Cuisine":"Japonesa","Thai Cuisine":"Tailandesa","Korean cuisine":"Coreana","Indian Cuisine":"Indiana"
+  }
 };
 const PLANS = { free: { dailyLimit: 3, qPerRecipe: 0 }, starter: { dailyLimit: 10, qPerRecipe: 10 }, pro: { dailyLimit: 30, qPerRecipe: 10 }, premium: { dailyLimit: 200, qPerRecipe: 10 } };
 
@@ -22,281 +54,24 @@ let deviceId = null;
 let userData = null;
 let recipeHistory = [], historyIndex = -1;
 
-// ==================== 多语言翻译（完整7种语言）====================
+// ==================== 多语言翻译 ====================
 const translations = {
   en: {
-    heroSubtitle:'Global Cuisines · Smart Pairing', sectionFeatures:'Features', feat1:'18 Cuisines', feat1Sub:'Global flavors', feat2:'AI Assistant', feat2Sub:'Interactive Q&A', feat3:'Nutrition', feat3Sub:'Healthy Weight', feat4:'Baby Safe', feat4Sub:'No salt/sugar', feat5:'Pregnancy', feat5Sub:'Mom friendly', feat6:'Video Guides', feat6Sub:'Step-by-step', sectionSubscribe:'Subscription Plans', subText:'Subscribe', subSub:'Unlock full access', familyText:'Family Share', familySub:'Multi-User Plan', legalLink:'Privacy/Terms', genTitle:'AI Recipe Generator', genMealType:'Category', genCuisine:'Cuisine', genDishName:'What to eat?', optStandard:'Standard', optBaby:'Baby', optPregnancy:'Pregnancy', generate:'Generate Recipe', generating:'Generating...', aiAssistTitle:'AI Assistant', enterQuestion:'Ask about this recipe...', ask:'Ask', dishNameHint:'You can enter one or more ingredients.', watchVideo:'Watch Video Guides', addToHome:'Add', freeLimitInfo:'Free trial: {{used}}/3 ({{plan}})', starterInfo:'Starter: {{used}}/10 | Q left: {{qLeft}}', proInfo:'Pro: {{used}}/30 | Q left: {{qLeft}}', premiumInfo:'Premium: {{used}}/200 | Q left: {{qLeft}}', alertNoPermission:'Your free trial has expired. Subscribe to continue.', alertDailyLimit:'Daily limit reached. Please upgrade or try tomorrow.', alertNoPoints:'Insufficient quota.', alertCooldown:'Too fast, please wait.', alertMonthlyCost:'Monthly limit reached.', alertNoRecipe:'Generate a recipe first.', alertQTooLong:'Question too long.', alertInvalidFood:'Please enter a valid food name.', paymentSuccess:'Subscription activated!', q:'Q', a:'A', qLimitReached:'You’ve reached the 10-question limit for this recipe.', starterName:'Starter', proName:'Pro', premiumName:'Premium', starterDesc:'• 10 recipes per day • 10 AI questions per recipe • Personal use only', proDesc:'• 30 recipes per day • 10 AI questions per recipe • Full features unlocked', premiumDesc:'• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation', finePrint:'By subscribing you agree to our ', loginTitle:'Login', registerTitle:'Sign Up', email:'Email', password:'Password', confirmPwd:'Confirm Password', forgot:'Forgot password?', noAccount:"Don't have an account?", signUp:'Sign Up', signIn:'Login', haveAccount:'Already have an account?', registerNote:'Please use a valid email to avoid account loss.', forgotTitle:'Reset Password', forgotNote:'Password cannot be recovered if forgotten. Please remember it.', cancel:'Cancel', reset:'Reset', profileNickname:'Nickname', profileEmail:'Email', profilePlan:'Plan', profileJoined:'Joined', logout:'Logout', profileSub:'My Subscription', subStatus:'Status', subExpiry:'Expires', inviteCodeTitle:'Your Invite Code', joinFamily:'Join', nicknameTitle:'Change Nickname', emailTitle:'Change Email', legalPrivacyTitle:'Privacy Policy', legalEffDate:'Effective date: 2025-01-01', legalPrivacyCollect:'1. Information We Collect', legalPrivacy1:'AI Chef is a client-side application. We do not collect, store, or transmit any personal information.', legalPrivacyUse:'2. Information Use', legalPrivacy2:'All recipe generation runs locally on your device.', legalPrivacySecurity:'3. Data Security', legalPrivacy3:'No data collected = no risk of breach.', legalPrivacyChanges:'4. Policy Changes', legalPrivacy4:'We may update this policy. Changes will be posted here.', legalPrivacyContact:'5. Contact Us', legalPrivacy5:'Contact us if you have questions.', legalTermsTitle:'Terms of Service', legalTermEffDate:'Effective Date: 2025-01-01', legalTermsLicense:'1. License', legalTerms1:'For personal, non-commercial use only.', legalTermsDisclaimer:'2. Disclaimer', legalTerms2:'Recipes are AI-generated and for reference only.', legalTermsLimitations:'3. Limitation of Liability', legalTerms3:'We are not liable for any damages.', legalTermsModifications:'4. Modifications', legalTerms4:'We may modify these terms at any time.', legalTermsLaw:'5. Governing Law', legalTerms5:'Governing law: your jurisdiction.', legalTermsSubRules:'6. Subscription Rules', legalTermsSub1:'6.1 Subscribers have access upon login.', legalTermsSub2:'6.2 Three subscription types: Starter, Pro, Premium.', legalTermsSub3:'6.3 Orders must be activated within 24 hours by logging in.', legalTermsSub4:'6.4 Each recipe generation grants 10 AI questions for that session.', legalTermsSub5:'6.5 Family share is available only for Premium (up to 3 people).', legalTermsSub6:'6.6 Auto-renewal is enabled by default; manage via PayPal.', legalTermsSub7:'6.7 No refunds after payment.', legalTermsSub8:'6.8 Use a valid email; we are not responsible for account loss due to fake emails.', legalTermsSub9:'6.9 Recipes and answers are AI-generated by DeepSeek and for reference only.', legalTermsSub10:'6.10 We reserve the right of final interpretation.', success:'Success', ok:'OK', personalizedGreeting:'Dear {{name}}, your delicious recipe is ready. Enjoy your meal! 🌹', save:'Save', edit:'Edit', change:'Change'
+    heroSubtitle:'Global Cuisines · Smart Pairing', sectionFeatures:'Features', feat1:'18 Cuisines', feat1Sub:'Global flavors', feat2:'AI Assistant', feat2Sub:'Interactive Q&A', feat3:'Nutrition', feat3Sub:'Healthy Weight', feat4:'Baby Safe', feat4Sub:'No salt/sugar', feat5:'Pregnancy', feat5Sub:'Mom friendly', feat6:'Video Guides', feat6Sub:'Step-by-step', sectionSubscribe:'Subscription Plans', subText:'Subscribe', subSub:'Unlock full access', familyText:'Family Share', familySub:'Multi-User Plan', legalLink:'Privacy/Terms', genTitle:'AI Recipe Generator', genMealType:'Category', genCuisine:'Cuisine', genDishName:'What to eat?', optStandard:'Standard', optBaby:'Baby', optPregnancy:'Pregnancy', generate:'Generate Recipe', generating:'Generating...', aiAssistTitle:'AI Assistant', enterQuestion:'Ask about this recipe...', ask:'Ask', dishNameHint:'You can enter one or more ingredients.', watchVideo:'Watch Video Guides', addToHome:'Add', freeLimitInfo:'Free trial: {{used}}/3', starterInfo:'Starter: {{used}}/10 | Q left: {{qLeft}}', proInfo:'Pro: {{used}}/30 | Q left: {{qLeft}}', premiumInfo:'Premium: {{used}}/200 | Q left: {{qLeft}}', alertNoPermission:'Your free trial has expired. Subscribe to continue.', alertDailyLimit:'Daily limit reached. Please upgrade or try tomorrow.', alertNoPoints:'Insufficient quota.', alertCooldown:'Too fast, please wait.', alertMonthlyCost:'Monthly limit reached.', alertNoRecipe:'Generate a recipe first.', alertQTooLong:'Question too long.', alertInvalidFood:'Please enter a valid food name.', paymentSuccess:'Subscription activated!', q:'Q', a:'A', qLimitReached:'You’ve reached the 10-question limit for this recipe.', starterName:'Starter', proName:'Pro', premiumName:'Premium', starterDesc:'• 10 recipes per day • 10 AI questions per recipe • Personal use only', proDesc:'• 30 recipes per day • 10 AI questions per recipe • Full features unlocked', premiumDesc:'• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation', finePrint:'By subscribing you agree to our ', loginTitle:'Login', registerTitle:'Sign Up', email:'Email', password:'Password', confirmPwd:'Confirm Password', forgot:'Forgot password?', noAccount:"Don't have an account?", signUp:'Sign Up', signIn:'Login', haveAccount:'Already have an account?', registerNote:'Please use a valid email to avoid account loss.', forgotTitle:'Reset Password', forgotNote:'Password cannot be recovered if forgotten. Please remember it.', cancel:'Cancel', reset:'Reset', profileNickname:'Nickname', profileEmail:'Email', profilePlan:'Plan', profileJoined:'Joined', logout:'Logout', profileSub:'My Subscription', subStatus:'Status', subExpiry:'Expires', inviteCodeTitle:'Your Invite Code', joinFamily:'Join', nicknameTitle:'Change Nickname', emailTitle:'Change Email', legalPrivacyTitle:'Privacy Policy', legalEffDate:'Effective date: 2025-01-01', legalPrivacyCollect:'1. Information We Collect', legalPrivacy1:'AI Chef is a client-side application. We do not collect, store, or transmit any personal information.', legalPrivacyUse:'2. Information Use', legalPrivacy2:'All recipe generation runs locally on your device.', legalPrivacySecurity:'3. Data Security', legalPrivacy3:'No data collected = no risk of breach.', legalPrivacyChanges:'4. Policy Changes', legalPrivacy4:'We may update this policy. Changes will be posted here.', legalPrivacyContact:'5. Contact Us', legalPrivacy5:'Contact us if you have questions.', legalTermsTitle:'Terms of Service', legalTermEffDate:'Effective Date: 2025-01-01', legalTermsLicense:'1. License', legalTerms1:'For personal, non-commercial use only.', legalTermsDisclaimer:'2. Disclaimer', legalTerms2:'Recipes are AI-generated and for reference only.', legalTermsLimitations:'3. Limitation of Liability', legalTerms3:'We are not liable for any damages.', legalTermsModifications:'4. Modifications', legalTerms4:'We may modify these terms at any time.', legalTermsLaw:'5. Governing Law', legalTerms5:'Governing law: your jurisdiction.', legalTermsSubRules:'6. Subscription Rules', legalTermsSub1:'6.1 Subscribers have access upon login.', legalTermsSub2:'6.2 Three subscription types: Starter, Pro, Premium.', legalTermsSub3:'6.3 Orders must be activated within 24 hours by logging in.', legalTermsSub4:'6.4 Each recipe generation grants 10 AI questions for that session.', legalTermsSub5:'6.5 Family share is available only for Premium (up to 3 people).', legalTermsSub6:'6.6 Auto-renewal is enabled by default; manage via PayPal.', legalTermsSub7:'6.7 No refunds after payment.', legalTermsSub8:'6.8 Use a valid email; we are not responsible for account loss due to fake emails.', legalTermsSub9:'6.9 Recipes and answers are AI-generated by DeepSeek and for reference only.', legalTermsSub10:'6.10 We reserve the right of final interpretation.', success:'Success', ok:'OK', personalizedGreeting:'Dear {{name}}, your delicious recipe is ready. Enjoy your meal! 🌹', save:'Save', edit:'Edit', change:'Change', pleaseLogin:'Please login first'
   },
   'zh-CN': {
-    heroSubtitle:'全球菜系 · 智能搭配', sectionFeatures:'功能特点', feat1:'18种菜系', feat1Sub:'世界风味', feat2:'AI助手', feat2Sub:'对话式解答', feat3:'营养分析', feat3Sub:'健康参考', feat4:'婴儿安全', feat4Sub:'无盐无糖', feat5:'孕期', feat5Sub:'母婴友好', feat6:'视频指南', feat6Sub:'分步教学', sectionSubscribe:'订阅套餐', subText:'订阅', subSub:'解锁全部功能', familyText:'家庭共享', familySub:'多账号共享套餐', legalLink:'隐私/服务', genTitle:'AI菜谱生成器', genMealType:'分类', genCuisine:'菜系', genDishName:'你想吃什么？', optStandard:'日常餐', optBaby:'婴儿餐', optPregnancy:'孕期餐', generate:'生成食谱', generating:'生成中...', aiAssistTitle:'AI助手', enterQuestion:'针对此食谱提问...', ask:'提问', dishNameHint:'可输入单一或多个食材', watchVideo:'观看视频指南', addToHome:'添加', freeLimitInfo:'免费试用：{{used}}/3 ({{plan}})', starterInfo:'基础订阅：{{used}}/10 | 剩余提问 {{qLeft}}', proInfo:'高级订阅：{{used}}/30 | 剩余提问 {{qLeft}}', premiumInfo:'家庭订阅：{{used}}/200 | 剩余提问 {{qLeft}}', alertNoPermission:'免费试用已用完，请订阅后继续。', alertDailyLimit:'今日次数已达上限，请升级或明日再试。', alertNoPoints:'配额不足。', alertCooldown:'操作过快，请稍等。', alertMonthlyCost:'月度限额已达。', alertNoRecipe:'请先生成食谱。', alertQTooLong:'问题过长。', alertInvalidFood:'请输入有效食材。', paymentSuccess:'订阅成功！', q:'问', a:'答', qLimitReached:'本食谱已达到10次提问上限。', starterName:'基础订阅', proName:'高级订阅', premiumName:'Premium 共享订阅 （家庭版）', starterDesc:'10次/日 · 每食谱10问', proDesc:'30次/日 · 每食谱10问', premiumDesc:'无限次 · 每食谱10问 · 3人家庭共享 · 优先生成', finePrint:'订阅即表示同意', loginTitle:'登录', registerTitle:'注册', email:'邮箱', password:'密码', confirmPwd:'确认密码', forgot:'忘记密码？', noAccount:'没有账号？', signUp:'注册', signIn:'登录', haveAccount:'已有账号？', registerNote:'请使用有效邮箱避免账号损失。', forgotTitle:'重置密码', forgotNote:'密码无法找回，请牢记。', cancel:'取消', reset:'重置', profileNickname:'昵称', profileEmail:'邮箱', profilePlan:'套餐', profileJoined:'注册时间', logout:'退出登录', profileSub:'我的订阅', subStatus:'状态', subExpiry:'到期', inviteCodeTitle:'邀请码', joinFamily:'加入', nicknameTitle:'修改昵称', emailTitle:'修改邮箱', legalPrivacyTitle:'隐私政策', legalEffDate:'生效日期：2025-01-01', legalPrivacyCollect:'1. 信息收集', legalPrivacy1:'AI厨师是客户端应用，不收集个人信息。', legalPrivacyUse:'2. 信息使用', legalPrivacy2:'所有食谱生成在本地进行。', legalPrivacySecurity:'3. 数据安全', legalPrivacy3:'不收集数据 = 无泄露风险。', legalPrivacyChanges:'4. 政策变更', legalPrivacy4:'我们可能更新本政策，变更将在此处公告。', legalPrivacyContact:'5. 联系我们', legalPrivacy5:'如有问题请联系我们。', legalTermsTitle:'服务条款', legalTermEffDate:'生效日期：2025-01-01', legalTermsLicense:'1. 许可', legalTerms1:'仅限个人非商业使用。', legalTermsDisclaimer:'2. 免责声明', legalTerms2:'AI生成内容仅供参考。', legalTermsLimitations:'3. 责任限制', legalTerms3:'我们不承担任何损害责任。', legalTermsModifications:'4. 修改', legalTerms4:'我们可随时修改条款。', legalTermsLaw:'5. 适用法律', legalTerms5:'适用法律：用户所在司法管辖区。', legalTermsSubRules:'6. 订阅规则', legalTermsSub1:'6.1 订阅者登录后即享有本工具站权益。', legalTermsSub2:'6.2 订阅用户分为基础订阅、高级订阅、家庭订阅。', legalTermsSub3:'6.3 订单激活期限为24小时，登录账号即自动激活权益。', legalTermsSub4:'6.4 订阅用户每生成食谱1次赠10次AI助手提问，当次使用不结转。', legalTermsSub5:'6.5 家庭共享仅限Premium套餐，最多3人共用。', legalTermsSub6:'6.6 订阅自动续费默认开启，用户需通过PayPal管理。', legalTermsSub7:'6.7 订单支付后不支持退款。', legalTermsSub8:'6.8 请使用真实邮箱，虚假信息导致账号丢失本站不担责。', legalTermsSub9:'6.9 菜谱及问答由DeepSeek生成，仅供参考。', legalTermsSub10:'6.10 本站拥有最终解释权。', success:'成功', ok:'确定', personalizedGreeting:'亲爱的{{name}}，已为您生成美味菜谱，祝您用餐愉快🌹', save:'保存', edit:'修改', change:'更改'
+    heroSubtitle:'全球菜系 · 智能搭配', sectionFeatures:'功能特点', feat1:'18种菜系', feat1Sub:'世界风味', feat2:'AI助手', feat2Sub:'对话式解答', feat3:'营养分析', feat3Sub:'健康参考', feat4:'婴儿安全', feat4Sub:'无盐无糖', feat5:'孕期', feat5Sub:'母婴友好', feat6:'视频指南', feat6Sub:'分步教学', sectionSubscribe:'订阅套餐', subText:'订阅', subSub:'解锁全部功能', familyText:'家庭共享', familySub:'多账号共享套餐', legalLink:'隐私/服务', genTitle:'AI菜谱生成器', genMealType:'分类', genCuisine:'菜系', genDishName:'你想吃什么？', optStandard:'日常餐', optBaby:'婴儿餐', optPregnancy:'孕期餐', generate:'生成食谱', generating:'生成中...', aiAssistTitle:'AI助手', enterQuestion:'针对此食谱提问...', ask:'提问', dishNameHint:'可输入单一或多个食材', watchVideo:'观看视频指南', addToHome:'添加', freeLimitInfo:'免费试用：{{used}}/3', starterInfo:'基础订阅：{{used}}/10 | 剩余提问 {{qLeft}}', proInfo:'高级订阅：{{used}}/30 | 剩余提问 {{qLeft}}', premiumInfo:'家庭订阅：{{used}}/200 | 剩余提问 {{qLeft}}', alertNoPermission:'免费试用已用完，请订阅后继续。', alertDailyLimit:'今日次数已达上限，请升级或明日再试。', alertNoPoints:'配额不足。', alertCooldown:'操作过快，请稍等。', alertMonthlyCost:'月度限额已达。', alertNoRecipe:'请先生成食谱。', alertQTooLong:'问题过长。', alertInvalidFood:'请输入有效食材。', paymentSuccess:'订阅成功！', q:'问', a:'答', qLimitReached:'本食谱已达到10次提问上限。', starterName:'基础订阅', proName:'高级订阅', premiumName:'Premium 共享订阅 （家庭版）', starterDesc:'10次/日 · 每食谱10问', proDesc:'30次/日 · 每食谱10问', premiumDesc:'无限次 · 每食谱10问 · 3人家庭共享 · 优先生成', finePrint:'订阅即表示同意', loginTitle:'登录', registerTitle:'注册', email:'邮箱', password:'密码', confirmPwd:'确认密码', forgot:'忘记密码？', noAccount:'没有账号？', signUp:'注册', signIn:'登录', haveAccount:'已有账号？', registerNote:'请使用有效邮箱避免账号损失。', forgotTitle:'重置密码', forgotNote:'密码无法找回，请牢记。', cancel:'取消', reset:'重置', profileNickname:'昵称', profileEmail:'邮箱', profilePlan:'套餐', profileJoined:'注册时间', logout:'退出登录', profileSub:'我的订阅', subStatus:'状态', subExpiry:'到期', inviteCodeTitle:'邀请码', joinFamily:'加入', nicknameTitle:'修改昵称', emailTitle:'修改邮箱', legalPrivacyTitle:'隐私政策', legalEffDate:'生效日期：2025-01-01', legalPrivacyCollect:'1. 信息收集', legalPrivacy1:'AI厨师是客户端应用，不收集个人信息。', legalPrivacyUse:'2. 信息使用', legalPrivacy2:'所有食谱生成在本地进行。', legalPrivacySecurity:'3. 数据安全', legalPrivacy3:'不收集数据 = 无泄露风险。', legalPrivacyChanges:'4. 政策变更', legalPrivacy4:'我们可能更新本政策，变更将在此处公告。', legalPrivacyContact:'5. 联系我们', legalPrivacy5:'如有问题请联系我们。', legalTermsTitle:'服务条款', legalTermEffDate:'生效日期：2025-01-01', legalTermsLicense:'1. 许可', legalTerms1:'仅限个人非商业使用。', legalTermsDisclaimer:'2. 免责声明', legalTerms2:'AI生成内容仅供参考。', legalTermsLimitations:'3. 责任限制', legalTerms3:'我们不承担任何损害责任。', legalTermsModifications:'4. 修改', legalTerms4:'我们可随时修改条款。', legalTermsLaw:'5. 适用法律', legalTerms5:'适用法律：用户所在司法管辖区。', legalTermsSubRules:'6. 订阅规则', legalTermsSub1:'6.1 订阅者登录后即享有本工具站权益。', legalTermsSub2:'6.2 订阅用户分为基础订阅、高级订阅、家庭订阅。', legalTermsSub3:'6.3 订单激活期限为24小时，登录账号即自动激活权益。', legalTermsSub4:'6.4 订阅用户每生成食谱1次赠10次AI助手提问，当次使用不结转。', legalTermsSub5:'6.5 家庭共享仅限Premium套餐，最多3人共用。', legalTermsSub6:'6.6 订阅自动续费默认开启，用户需通过PayPal管理。', legalTermsSub7:'6.7 订单支付后不支持退款。', legalTermsSub8:'6.8 请使用真实邮箱，虚假信息导致账号丢失本站不担责。', legalTermsSub9:'6.9 菜谱及问答由DeepSeek生成，仅供参考。', legalTermsSub10:'6.10 本站拥有最终解释权。', success:'成功', ok:'确定', personalizedGreeting:'亲爱的{{name}}，已为您生成美味菜谱，祝您用餐愉快🌹', save:'保存', edit:'修改', change:'更改', pleaseLogin:'请先登录'
   }
 };
 
-// 补充其他语言的翻译（西班牙语、法语、德语、意大利语、葡萄牙语）
+// 补充其他语言的翻译
 const langExtras = {
-  es: {
-    heroSubtitle: 'Cocinas Globales · Combinación Inteligente',
-    genTitle: 'Generador de recetas AI',
-    generate: 'Generar receta',
-    generating: 'Generando...',
-    ask: 'Preguntar',
-    addToHome: 'Agregar',
-    freeLimitInfo: 'Prueba gratuita: {{used}}/3 ({{plan}})',
-    starterInfo: 'Starter: {{used}}/10 | Preguntas restantes: {{qLeft}}',
-    proInfo: 'Pro: {{used}}/30 | Preguntas restantes: {{qLeft}}',
-    premiumInfo: 'Premium: {{used}}/200 | Preguntas restantes: {{qLeft}}',
-    alertNoPermission: 'Tu prueba gratuita ha expirado. Suscríbete para continuar.',
-    alertDailyLimit: 'Límite diario alcanzado. Mejora o inténtalo mañana.',
-    paymentSuccess: '¡Suscripción activada!',
-    q: 'P', a: 'R',
-    qLimitReached: 'Has alcanzado el límite de 10 preguntas para esta receta.',
-    loginTitle: 'Iniciar sesión',
-    registerTitle: 'Registrarse',
-    email: 'Correo electrónico',
-    password: 'Contraseña',
-    confirmPwd: 'Confirmar contraseña',
-    forgot: '¿Olvidaste tu contraseña?',
-    noAccount: '¿No tienes una cuenta?',
-    signUp: 'Registrarse',
-    signIn: 'Iniciar sesión',
-    haveAccount: '¿Ya tienes una cuenta?',
-    registerNote: 'Usa un correo válido para evitar pérdida de cuenta.',
-    forgotTitle: 'Restablecer contraseña',
-    forgotNote: 'La contraseña no se puede recuperar si se olvida. Recuérdala.',
-    cancel: 'Cancelar',
-    reset: 'Restablecer',
-    profileNickname: 'Apodo',
-    profileEmail: 'Correo',
-    profilePlan: 'Plan',
-    profileJoined: 'Registrado',
-    logout: 'Cerrar sesión',
-    profileSub: 'Mi suscripción',
-    subStatus: 'Estado',
-    subExpiry: 'Expira',
-    inviteCodeTitle: 'Código de invitación',
-    joinFamily: 'Unirse',
-    nicknameTitle: 'Cambiar apodo',
-    emailTitle: 'Cambiar correo',
-    legalPrivacyTitle: 'Política de privacidad',
-    legalTermsTitle: 'Términos de servicio',
-    success: 'Éxito',
-    ok: 'Aceptar',
-    personalizedGreeting: 'Estimado {{name}}, tu deliciosa receta está lista. ¡Disfruta tu comida! 🌹',
-    save: 'Guardar',
-    edit: 'Editar',
-    change: 'Cambiar'
-  },
-  fr: {
-    heroSubtitle: 'Cuisines mondiales · Association intelligente',
-    genTitle: 'Générateur de recettes IA',
-    generate: 'Générer une recette',
-    generating: 'Génération...',
-    ask: 'Demander',
-    addToHome: 'Ajouter',
-    freeLimitInfo: 'Essai gratuit: {{used}}/3 ({{plan}})',
-    starterInfo: 'Starter: {{used}}/10 | Questions restantes: {{qLeft}}',
-    proInfo: 'Pro: {{used}}/30 | Questions restantes: {{qLeft}}',
-    premiumInfo: 'Premium: {{used}}/200 | Questions restantes: {{qLeft}}',
-    alertNoPermission: 'Votre essai gratuit a expiré. Abonnez-vous pour continuer.',
-    alertDailyLimit: 'Limite quotidienne atteinte. Améliorez ou réessayez demain.',
-    paymentSuccess: 'Abonnement activé !',
-    q: 'Q', a: 'R',
-    qLimitReached: 'Vous avez atteint la limite de 10 questions pour cette recette.',
-    loginTitle: 'Connexion',
-    registerTitle: 'Inscription',
-    email: 'E-mail',
-    password: 'Mot de passe',
-    confirmPwd: 'Confirmer le mot de passe',
-    forgot: 'Mot de passe oublié ?',
-    noAccount: 'Pas de compte ?',
-    signUp: "S'inscrire",
-    signIn: 'Se connecter',
-    haveAccount: 'Déjà un compte ?',
-    registerNote: 'Utilisez un e-mail valide pour éviter la perte de compte.',
-    forgotTitle: 'Réinitialiser le mot de passe',
-    forgotNote: 'Le mot de passe ne peut pas être récupéré s\'il est oublié. Veuillez vous en souvenir.',
-    cancel: 'Annuler',
-    reset: 'Réinitialiser',
-    profileNickname: 'Surnom',
-    profileEmail: 'E-mail',
-    profilePlan: 'Forfait',
-    profileJoined: 'Inscrit le',
-    logout: 'Déconnexion',
-    profileSub: 'Mon abonnement',
-    subStatus: 'Statut',
-    subExpiry: 'Expire',
-    inviteCodeTitle: "Code d'invitation",
-    joinFamily: 'Rejoindre',
-    nicknameTitle: 'Changer de surnom',
-    emailTitle: "Changer d'e-mail",
-    legalPrivacyTitle: 'Politique de confidentialité',
-    legalTermsTitle: "Conditions d'utilisation",
-    success: 'Succès',
-    ok: 'OK',
-    personalizedGreeting: 'Cher {{name}}, votre délicieuse recette est prête. Bon appétit ! 🌹',
-    save: 'Enregistrer',
-    edit: 'Modifier',
-    change: 'Changer'
-  },
-  de: {
-    heroSubtitle: 'Globale Küchen · Intelligente Kombination',
-    genTitle: 'KI-Rezeptgenerator',
-    generate: 'Rezept generieren',
-    generating: 'Generiere...',
-    ask: 'Fragen',
-    addToHome: 'Hinzufügen',
-    freeLimitInfo: 'Kostenlose Testversion: {{used}}/3 ({{plan}})',
-    starterInfo: 'Starter: {{used}}/10 | Fragen übrig: {{qLeft}}',
-    proInfo: 'Pro: {{used}}/30 | Fragen übrig: {{qLeft}}',
-    premiumInfo: 'Premium: {{used}}/200 | Fragen übrig: {{qLeft}}',
-    alertNoPermission: 'Ihre kostenlose Testversion ist abgelaufen. Abonnieren Sie, um fortzufahren.',
-    alertDailyLimit: 'Tägliches Limit erreicht. Bitte upgraden oder versuchen Sie es morgen erneut.',
-    paymentSuccess: 'Abonnement aktiviert!',
-    q: 'F', a: 'A',
-    qLimitReached: 'Sie haben das Limit von 10 Fragen für dieses Rezept erreicht.',
-    loginTitle: 'Anmelden',
-    registerTitle: 'Registrieren',
-    email: 'E-Mail',
-    password: 'Passwort',
-    confirmPwd: 'Passwort bestätigen',
-    forgot: 'Passwort vergessen?',
-    noAccount: 'Kein Konto?',
-    signUp: 'Registrieren',
-    signIn: 'Anmelden',
-    haveAccount: 'Bereits ein Konto?',
-    registerNote: 'Verwenden Sie eine gültige E-Mail, um Kontoverlust zu vermeiden.',
-    forgotTitle: 'Passwort zurücksetzen',
-    forgotNote: 'Passwort kann nicht wiederhergestellt werden, wenn vergessen. Bitte merken Sie es sich.',
-    cancel: 'Abbrechen',
-    reset: 'Zurücksetzen',
-    profileNickname: 'Spitzname',
-    profileEmail: 'E-Mail',
-    profilePlan: 'Plan',
-    profileJoined: 'Registriert',
-    logout: 'Abmelden',
-    profileSub: 'Mein Abonnement',
-    subStatus: 'Status',
-    subExpiry: 'Läuft ab',
-    inviteCodeTitle: 'Einladungscode',
-    joinFamily: 'Beitreten',
-    nicknameTitle: 'Spitzname ändern',
-    emailTitle: 'E-Mail ändern',
-    legalPrivacyTitle: 'Datenschutzerklärung',
-    legalTermsTitle: 'Nutzungsbedingungen',
-    success: 'Erfolg',
-    ok: 'OK',
-    personalizedGreeting: 'Liebe/r {{name}}, Ihr köstliches Rezept ist fertig. Genießen Sie Ihre Mahlzeit! 🌹',
-    save: 'Speichern',
-    edit: 'Bearbeiten',
-    change: 'Ändern'
-  },
-  it: {
-    heroSubtitle: 'Cucine globali · Abbinamento intelligente',
-    genTitle: 'Generatore di ricette AI',
-    generate: 'Genera ricetta',
-    generating: 'Generazione...',
-    ask: 'Chiedi',
-    addToHome: 'Aggiungi',
-    freeLimitInfo: 'Prova gratuita: {{used}}/3 ({{plan}})',
-    starterInfo: 'Starter: {{used}}/10 | Domande rimaste: {{qLeft}}',
-    proInfo: 'Pro: {{used}}/30 | Domande rimaste: {{qLeft}}',
-    premiumInfo: 'Premium: {{used}}/200 | Domande rimaste: {{qLeft}}',
-    alertNoPermission: 'La tua prova gratuita è scaduta. Abbonati per continuare.',
-    alertDailyLimit: 'Limite giornaliero raggiunto. Aggiorna o riprova domani.',
-    paymentSuccess: 'Abbonamento attivato!',
-    q: 'D', a: 'R',
-    qLimitReached: 'Hai raggiunto il limite di 10 domande per questa ricetta.',
-    loginTitle: 'Accedi',
-    registerTitle: 'Registrati',
-    email: 'Email',
-    password: 'Password',
-    confirmPwd: 'Conferma password',
-    forgot: 'Password dimenticata?',
-    noAccount: 'Non hai un account?',
-    signUp: 'Registrati',
-    signIn: 'Accedi',
-    haveAccount: 'Hai già un account?',
-    registerNote: 'Usa un\'email valida per evitare la perdita dell\'account.',
-    forgotTitle: 'Reimposta password',
-    forgotNote: 'La password non può essere recuperata se dimenticata. Ricordala per favore.',
-    cancel: 'Annulla',
-    reset: 'Reimposta',
-    profileNickname: 'Soprannome',
-    profileEmail: 'Email',
-    profilePlan: 'Piano',
-    profileJoined: 'Registrato il',
-    logout: 'Esci',
-    profileSub: 'Il mio abbonamento',
-    subStatus: 'Stato',
-    subExpiry: 'Scade',
-    inviteCodeTitle: 'Codice invito',
-    joinFamily: 'Unisciti',
-    nicknameTitle: 'Cambia soprannome',
-    emailTitle: 'Cambia email',
-    legalPrivacyTitle: 'Informativa sulla privacy',
-    legalTermsTitle: 'Termini di servizio',
-    success: 'Successo',
-    ok: 'OK',
-    personalizedGreeting: 'Caro {{name}}, la tua deliziosa ricetta è pronta. Buon appetito! 🌹',
-    save: 'Salva',
-    edit: 'Modifica',
-    change: 'Cambia'
-  },
-  pt: {
-    heroSubtitle: 'Cozinhas globais · Combinação inteligente',
-    genTitle: 'Gerador de receitas IA',
-    generate: 'Gerar receita',
-    generating: 'Gerando...',
-    ask: 'Perguntar',
-    addToHome: 'Adicionar',
-    freeLimitInfo: 'Teste gratuito: {{used}}/3 ({{plan}})',
-    starterInfo: 'Starter: {{used}}/10 | Perguntas restantes: {{qLeft}}',
-    proInfo: 'Pro: {{used}}/30 | Perguntas restantes: {{qLeft}}',
-    premiumInfo: 'Premium: {{used}}/200 | Perguntas restantes: {{qLeft}}',
-    alertNoPermission: 'Seu teste gratuito expirou. Assine para continuar.',
-    alertDailyLimit: 'Limite diário atingido. Atualize ou tente novamente amanhã.',
-    paymentSuccess: 'Assinatura ativada!',
-    q: 'P', a: 'R',
-    qLimitReached: 'Você atingiu o limite de 10 perguntas para esta receita.',
-    loginTitle: 'Entrar',
-    registerTitle: 'Registrar',
-    email: 'E-mail',
-    password: 'Senha',
-    confirmPwd: 'Confirmar senha',
-    forgot: 'Esqueceu a senha?',
-    noAccount: 'Não tem uma conta?',
-    signUp: 'Registrar',
-    signIn: 'Entrar',
-    haveAccount: 'Já tem uma conta?',
-    registerNote: 'Use um e-mail válido para evitar perda de conta.',
-    forgotTitle: 'Redefinir senha',
-    forgotNote: 'A senha não pode ser recuperada se esquecida. Por favor, lembre-se dela.',
-    cancel: 'Cancelar',
-    reset: 'Redefinir',
-    profileNickname: 'Apelido',
-    profileEmail: 'E-mail',
-    profilePlan: 'Plano',
-    profileJoined: 'Registrado em',
-    logout: 'Sair',
-    profileSub: 'Minha assinatura',
-    subStatus: 'Status',
-    subExpiry: 'Expira',
-    inviteCodeTitle: 'Código de convite',
-    joinFamily: 'Entrar',
-    nicknameTitle: 'Alterar apelido',
-    emailTitle: 'Alterar e-mail',
-    legalPrivacyTitle: 'Política de privacidade',
-    legalTermsTitle: 'Termos de serviço',
-    success: 'Sucesso',
-    ok: 'OK',
-    personalizedGreeting: 'Caro {{name}}, sua deliciosa receita está pronta. Aproveite sua refeição! 🌹',
-    save: 'Salvar',
-    edit: 'Editar',
-    change: 'Alterar'
-  }
+  es: { pleaseLogin:'Inicie sesión primero' },
+  fr: { pleaseLogin:'Veuillez vous connecter d\'abord' },
+  de: { pleaseLogin:'Bitte melden Sie sich zuerst an' },
+  it: { pleaseLogin:'Effettua il login prima' },
+  pt: { pleaseLogin:'Faça login primeiro' }
 };
-
-// 合并翻译
 ['es', 'fr', 'de', 'it', 'pt'].forEach(l => {
   translations[l] = { ...translations.en, ...langExtras[l] };
 });
@@ -308,7 +83,7 @@ function t(key, params) {
 }
 function getLangName(lang) { const map = { en:'English', es:'Español', fr:'Français', de:'Deutsch', it:'Italiano', pt:'Português', 'zh-CN':'简体中文' }; return map[lang] || 'English'; }
 
-// ==================== 设备指纹与后端交互 ====================
+// ==================== 设备指纹 ====================
 async function initDeviceId() {
   if (deviceId) return deviceId;
   let stored = localStorage.getItem('deviceId');
@@ -328,115 +103,72 @@ async function initDeviceId() {
   return deviceId;
 }
 
+// ==================== API 调用 ====================
 async function apiCall(endpoint, options = {}) {
   const token = localStorage.getItem('authToken');
   const headers = { 'Content-Type': 'application/json', ...options.headers };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token && !endpoint.startsWith('/api/auth/')) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${BACKEND_URL}${endpoint}`, { ...options, headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
+    if (res.status === 401 && endpoint !== '/api/user/me') {
+      localStorage.removeItem('authToken');
+      userData = null;
+      showPage('page-login-register');
+    }
     throw new Error(err.error || `HTTP ${res.status}`);
   }
   return res.json();
 }
 
+// ==================== 用户数据加载 ====================
 async function loadUserData() {
-  await initDeviceId();
   const token = localStorage.getItem('authToken');
-  if (token) {
-    try {
-      const user = await apiCall('/api/user/me');
-      return { ...user, deviceId };
-    } catch (e) {
-      if (e.message.includes('401')) localStorage.removeItem('authToken');
-    }
+  if (!token) return null;
+  try {
+    const user = await apiCall('/api/user/me');
+    return user;
+  } catch (e) {
+    if (e.message.includes('401')) localStorage.removeItem('authToken');
+    return null;
   }
-  // 未登录，获取设备状态
-  const device = await apiCall('/api/device/status', {
-    method: 'POST',
-    body: JSON.stringify({ deviceId })
-  });
-  return {
-    deviceId,
-    email: null,
-    nickname: 'Foodie123',
-    plan: device.plan || 'free',
-    freeUsed: device.freeUsed !== undefined ? device.freeUsed : 0,
-    dailyUsed: device.dailyUsed || 0,
-    lastReset: device.lastReset || Date.now(),
-    qLeft: 0,
-    familyOwner: null,
-    familyMembers: [],
-    inviteCode: null,
-    expireAt: null,
-    lastRecipeText: '',
-    createdAt: Date.now()
-  };
 }
 
 async function refreshUserData() {
   userData = await loadUserData();
   updateLimitInfo();
+  updateNavButton();
+  renderProfile();
 }
 
-async function recordGeneration(useFree) {
-  if (useFree) {
-    const res = await apiCall('/api/device/record-generation', {
-      method: 'POST',
-      body: JSON.stringify({ deviceId })
-    });
-    userData.freeUsed = res.freeUsed;
+function updateNavButton() {
+  const btn = document.getElementById('btnLogin');
+  if (userData && userData.email) {
+    let displayName = userData.nickname || userData.email.split('@')[0];
+    if (displayName.length > 12) displayName = displayName.slice(0, 10) + '…';
+    btn.innerText = displayName;
+    btn.title = userData.nickname || userData.email;
   } else {
-    const res = await apiCall('/api/user/record-generation', { method: 'POST' });
-    userData.dailyUsed = res.dailyUsed;
-    userData.qLeft = res.qLeft;
-  }
-  await refreshUserData();
-}
-
-async function recordQuestion() {
-  const res = await apiCall('/api/user/record-question', { method: 'POST' });
-  userData.qLeft = res.qLeft;
-  document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
-}
-
-async function checkGeneratePermission() {
-  await refreshUserData();
-  if (userData.plan === 'free') {
-    if (userData.freeUsed >= 3) return { allowed: false, message: t('alertNoPermission'), redirect: true };
-    return { allowed: true, useFree: true };
-  } else {
-    if (userData.dailyUsed >= PLANS[userData.plan].dailyLimit) {
-      return { allowed: false, message: t('alertDailyLimit'), redirect: true };
-    }
-    return { allowed: true, useFree: false };
+    btn.innerText = 'Login';
   }
 }
 
-function updateLimitInfo() {
-  const el = document.getElementById('limitInfo');
-  if (!el) return;
-  let planDisplay = '';
-  if (!userData.email) planDisplay = 'Not subscribed';
-  else if (userData.plan === 'free') planDisplay = 'Free trial';
-  else if (userData.plan === 'starter') planDisplay = 'Starter';
-  else if (userData.plan === 'pro') planDisplay = 'Pro';
-  else if (userData.plan === 'premium') planDisplay = 'Premium';
-  if (userData.plan === 'free') {
-    el.innerText = t('freeLimitInfo', { used: userData.freeUsed, plan: planDisplay });
-  } else {
-    const plan = PLANS[userData.plan];
-    const qLeft = userData.qLeft !== undefined ? userData.qLeft : plan.qPerRecipe;
-    el.innerText = t(userData.plan+'Info', { used: userData.dailyUsed, qLeft }) + ` (${planDisplay})`;
-  }
-}
-
-// ==================== 生成器 ====================
+// ==================== 生成器相关 ====================
 async function generateRecipe() {
-  const perm = await checkGeneratePermission();
-  if (!perm.allowed) {
-    alert(perm.message);
-    if (perm.redirect) showPage('page-subscribe');
+  if (!userData) {
+    alert(t('pleaseLogin'));
+    showPage('page-login-register');
+    return;
+  }
+  // 检查权限
+  if (userData.plan === 'free' && userData.freeUsed >= 3) {
+    alert(t('alertNoPermission'));
+    showPage('page-subscribe');
+    return;
+  }
+  if (userData.plan !== 'free' && userData.dailyUsed >= PLANS[userData.plan].dailyLimit) {
+    alert(t('alertDailyLimit'));
+    showPage('page-subscribe');
     return;
   }
 
@@ -474,16 +206,26 @@ async function generateRecipe() {
     const data = await response.json();
     let recipe = data.choices[0].message.content;
 
-    if (userData.plan !== 'free' && userData.email) {
-      recipe = t('personalizedGreeting', { name: userData.nickname || userData.email }) + '\n\n' + recipe;
+    if (userData.plan !== 'free') {
+      let displayName = userData.nickname || userData.email.split('@')[0];
+      if (displayName.length > 8) displayName = displayName.slice(0, 6) + '…';
+      recipe = t('personalizedGreeting', { name: displayName }) + '\n\n' + recipe;
     }
     resultEl.innerText = recipe;
     addToHistory(recipe);
     userData.lastRecipeText = recipe;
 
-    await recordGeneration(perm.useFree);
-
-    if (userData.plan !== 'free') {
+    // 记录生成次数
+    await initDeviceId();
+    const res = await apiCall('/api/user/record-generation', {
+      method: 'POST',
+      body: JSON.stringify({ deviceId })
+    });
+    if (userData.plan === 'free') {
+      userData.freeUsed = res.freeUsed;
+    } else {
+      userData.dailyUsed = res.dailyUsed;
+      userData.qLeft = res.qLeft;
       document.getElementById('qaInput').disabled = false;
       document.getElementById('askBtn').disabled = false;
       document.getElementById('qaHistory').innerText = '';
@@ -492,7 +234,12 @@ async function generateRecipe() {
     updateLimitInfo();
   } catch (error) {
     console.error(error);
-    resultEl.innerText = `生成失败：${error.message}`;
+    if (error.message.includes('Free trial expired')) {
+      alert(t('alertNoPermission'));
+      showPage('page-subscribe');
+    } else {
+      resultEl.innerText = `生成失败：${error.message}`;
+    }
   } finally {
     genBtn.disabled = false;
     genBtn.innerText = t('generate');
@@ -500,7 +247,7 @@ async function generateRecipe() {
 }
 
 async function askQuestion() {
-  if (!userData.lastRecipeText) { alert(t('alertNoRecipe')); return; }
+  if (!userData || !userData.lastRecipeText) { alert(t('alertNoRecipe')); return; }
   if (userData.qLeft <= 0) { alert(t('qLimitReached')); return; }
   const question = document.getElementById('qaInput').value.trim();
   if (!question) return;
@@ -535,7 +282,9 @@ async function askQuestion() {
     if (lines.length > 10) answer = lines.slice(0,10).join('\n');
     historyEl.innerText += `${t('a')}: ${answer}\n\n`;
 
-    await recordQuestion();
+    const res = await apiCall('/api/user/record-question', { method: 'POST' });
+    userData.qLeft = res.qLeft;
+    document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
   } catch (error) {
     historyEl.innerText += `${t('a')}: Error, please try again.\n\n`;
   } finally {
@@ -544,41 +293,25 @@ async function askQuestion() {
   }
 }
 
-function showVideo() {
-  const dish = document.getElementById('dishName').value.trim() || 'recipe';
-  const cuisine = document.getElementById('cuisine').value;
-  const query = encodeURIComponent(`${cuisine} ${dish} cooking`);
-  document.getElementById('videoFrame').src = `https://www.youtube.com/embed?listType=search&list=${query}`;
-  document.getElementById('videoContainer').style.display = 'block';
-}
-
-function addToHistory(recipe) {
-  recipeHistory.push(recipe);
-  historyIndex = recipeHistory.length - 1;
-  updateHistoryButtons();
-}
-
-function showPrevRecipe() {
-  if (historyIndex > 0) {
-    historyIndex--;
-    document.getElementById('recipeResult').innerText = recipeHistory[historyIndex];
-    userData.lastRecipeText = recipeHistory[historyIndex];
+function updateLimitInfo() {
+  const el = document.getElementById('limitInfo');
+  if (!el) return;
+  if (!userData) {
+    el.innerText = 'Please login to generate recipes';
+    return;
   }
-  updateHistoryButtons();
-}
-
-function showNextRecipe() {
-  if (historyIndex < recipeHistory.length - 1) {
-    historyIndex++;
-    document.getElementById('recipeResult').innerText = recipeHistory[historyIndex];
-    userData.lastRecipeText = recipeHistory[historyIndex];
+  let planDisplay = '';
+  if (userData.plan === 'free') planDisplay = 'Free trial';
+  else if (userData.plan === 'starter') planDisplay = 'Starter';
+  else if (userData.plan === 'pro') planDisplay = 'Pro';
+  else if (userData.plan === 'premium') planDisplay = 'Premium';
+  if (userData.plan === 'free') {
+    el.innerText = t('freeLimitInfo', { used: userData.freeUsed });
+  } else {
+    const plan = PLANS[userData.plan];
+    const qLeft = userData.qLeft !== undefined ? userData.qLeft : plan.qPerRecipe;
+    el.innerText = t(userData.plan+'Info', { used: userData.dailyUsed, qLeft }) + ` (${planDisplay})`;
   }
-  updateHistoryButtons();
-}
-
-function updateHistoryButtons() {
-  document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0;
-  document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length - 1;
 }
 
 // ==================== 登录/注册 ====================
@@ -591,19 +324,23 @@ function switchAuthTab(tab) {
 
 async function register() {
   const email = document.getElementById('registerEmail').value;
+  const code = document.getElementById('registerCode').value;
   const pwd = document.getElementById('registerPassword').value;
   const confirm = document.getElementById('registerConfirmPwd').value;
   if (pwd !== confirm) { alert('Passwords do not match'); return; }
+  if (!code) { alert('Verification code required'); return; }
+  await initDeviceId();
   try {
     const data = await apiCall('/api/user/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password: pwd, deviceId })
+      body: JSON.stringify({ email, password: pwd, verificationCode: code, deviceId })
     });
     localStorage.setItem('authToken', data.token);
-    userData = await loadUserData();
+    userData = data.user;
     showToast('Registration successful!');
-    showPage('page-profile');
+    showPage('page-generator');
     renderProfile();
+    updateLimitInfo();
   } catch (e) {
     alert(e.message);
   }
@@ -613,14 +350,16 @@ async function login() {
   const email = document.getElementById('loginEmail').value;
   const pwd = document.getElementById('loginPassword').value;
   try {
+    await initDeviceId();
     const data = await apiCall('/api/user/login', {
       method: 'POST',
       body: JSON.stringify({ email, password: pwd, deviceId })
     });
     localStorage.setItem('authToken', data.token);
-    userData = await loadUserData();
-    showPage('page-profile');
+    userData = data.user;
+    showPage('page-generator');
     renderProfile();
+    updateLimitInfo();
   } catch (e) {
     alert(e.message);
   }
@@ -628,35 +367,76 @@ async function login() {
 
 function logout() {
   localStorage.removeItem('authToken');
-  loadUserData().then(data => {
-    userData = data;
-    showPage('page-home');
-    renderProfile();
-  });
+  userData = null;
+  showPage('page-home');
+  renderProfile();
+  updateLimitInfo();
+  updateNavButton();
 }
 
-function showForgotModal() { document.getElementById('forgotModal').classList.add('show'); }
+// ==================== 验证码发送 ====================
+let countdowns = {};
 
-async function resetPassword() {
-  const email = document.getElementById('forgotEmail').value;
-  const newPwd = document.getElementById('forgotNewPwd').value;
+function startCountdown(btnId, seconds) {
+  if (countdowns[btnId]) return;
+  let remaining = seconds;
+  const btn = document.getElementById(btnId);
+  btn.disabled = true;
+  countdowns[btnId] = setInterval(() => {
+    remaining--;
+    btn.innerText = `${remaining}s`;
+    if (remaining <= 0) {
+      clearInterval(countdowns[btnId]);
+      delete countdowns[btnId];
+      btn.disabled = false;
+      btn.innerText = 'Send code';
+    }
+  }, 1000);
+}
+
+async function sendVerificationCode() {
+  const email = document.getElementById('registerEmail').value;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) { alert('Invalid email'); return; }
   try {
-    await apiCall('/api/user/reset-password', {
-      method: 'POST',
-      body: JSON.stringify({ email, newPassword: newPwd })
-    });
-    alert('Password reset successfully!');
-    closeModal('forgotModal');
+    await apiCall('/api/send-verification-code', { method: 'POST', body: JSON.stringify({ email }) });
+    alert('Verification code sent!');
+    startCountdown('sendCodeBtn', 60);
   } catch (e) {
     alert(e.message);
   }
 }
 
-function showNicknameModal() { document.getElementById('newNicknameInput').value = userData.nickname || ''; document.getElementById('nicknameModal').classList.add('show'); }
+async function sendResetCode() {
+  const email = document.getElementById('forgotEmail').value;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) { alert('Invalid email'); return; }
+  try {
+    await apiCall('/api/send-reset-code', { method: 'POST', body: JSON.stringify({ email }) });
+    alert('Reset code sent!');
+    startCountdown('sendResetCodeBtn', 60);
+  } catch (e) {
+    alert(e.message);
+  }
+}
 
+async function sendEmailChangeCode() {
+  const newEmail = document.getElementById('newEmailInput').value;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(newEmail)) { alert('Invalid email'); return; }
+  try {
+    await apiCall('/api/send-email-change-code', { method: 'POST', body: JSON.stringify({ newEmail }) });
+    alert('Verification code sent to new email');
+    startCountdown('sendEmailChangeCodeBtn', 60);
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+// ==================== 个人信息修改 ====================
 async function saveNickname() {
   const newName = document.getElementById('newNicknameInput').value.trim();
-  if (!newName || newName.length > 10) { alert('Nickname must be 1-10 characters'); return; }
+  if (!newName || newName.length > 12) { alert('Nickname must be 1-12 characters'); return; }
   await apiCall('/api/user/update', {
     method: 'PATCH',
     body: JSON.stringify({ nickname: newName })
@@ -664,20 +444,20 @@ async function saveNickname() {
   userData.nickname = newName;
   document.getElementById('profileNickname').innerText = newName;
   closeModal('nicknameModal');
+  updateNavButton();
   showToast('Nickname updated');
 }
 
-function showEmailModal() { document.getElementById('newEmailInput').value = userData.email || ''; document.getElementById('emailModal').classList.add('show'); }
-
 async function saveEmail() {
   const newEmail = document.getElementById('newEmailInput').value.trim();
+  const code = document.getElementById('emailChangeCode').value;
+  if (!code) { alert('Verification code required'); return; }
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(newEmail)) { alert('Invalid email'); return; }
-  if (newEmail === userData.email) { closeModal('emailModal'); return; }
   try {
     const data = await apiCall('/api/user/change-email', {
       method: 'POST',
-      body: JSON.stringify({ newEmail })
+      body: JSON.stringify({ newEmail, verificationCode: code })
     });
     localStorage.setItem('authToken', data.token);
     userData.email = newEmail;
@@ -686,6 +466,78 @@ async function saveEmail() {
     showToast('Email updated');
   } catch (e) {
     alert(e.message);
+  }
+}
+
+async function setPassword() {
+  const pwd = document.getElementById('newPasswordInput').value;
+  const confirm = document.getElementById('confirmPasswordInput').value;
+  if (pwd !== confirm) { alert('Passwords do not match'); return; }
+  if (pwd.length < 6) { alert('Password must be at least 6 characters'); return; }
+  try {
+    await apiCall('/api/user/set-password', { method: 'POST', body: JSON.stringify({ newPassword: pwd }) });
+    alert('Password set. You can now login with email.');
+    document.getElementById('setPasswordArea').style.display = 'none';
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function resetPassword() {
+  const email = document.getElementById('forgotEmail').value;
+  const code = document.getElementById('forgotCode').value;
+  const newPwd = document.getElementById('forgotNewPwd').value;
+  if (!code) { alert('Verification code required'); return; }
+  if (!newPwd || newPwd.length < 6) { alert('Password must be at least 6 characters'); return; }
+  try {
+    await apiCall('/api/user/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, verificationCode: code, newPassword: newPwd })
+    });
+    alert('Password reset successfully!');
+    closeModal('forgotModal');
+    document.getElementById('forgotEmail').value = '';
+    document.getElementById('forgotCode').value = '';
+    document.getElementById('forgotNewPwd').value = '';
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+// ==================== 社交登录 ====================
+function initSocialLogin() {
+  const googleBtn = document.getElementById('googleLoginBtn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', () => {
+      window.location.href = `${BACKEND_URL}/api/auth/google`;
+    });
+  }
+  const facebookBtn = document.getElementById('facebookLoginBtn');
+  if (facebookBtn) {
+    facebookBtn.addEventListener('click', () => {
+      window.location.href = `${BACKEND_URL}/api/auth/facebook`;
+    });
+  }
+}
+
+function checkOAuthCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  const userParam = urlParams.get('user');
+  if (token && userParam) {
+    localStorage.setItem('authToken', token);
+    try {
+      const user = JSON.parse(decodeURIComponent(userParam));
+      userData = user;
+      showToast('Login successful!');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showPage('page-generator');
+      renderProfile();
+      updateLimitInfo();
+      updateNavButton();
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
@@ -705,7 +557,7 @@ function renderPayPal() {
       style: { shape: 'pill', color: 'gold', label: 'subscribe' },
       createSubscription: (data, actions) => actions.subscription.create({ plan_id: p.planId }),
       onApprove: async (data, actions) => {
-        if (!userData.email) {
+        if (!userData) {
           alert('Please login first');
           showPage('page-login-register');
           return;
@@ -715,8 +567,7 @@ function renderPayPal() {
             method: 'POST',
             body: JSON.stringify({
               subscriptionId: data.subscriptionID,
-              planType: p.planType,
-              deviceId
+              planType: p.planType
             })
           });
           userData = await loadUserData();
@@ -737,14 +588,11 @@ function renderPayPal() {
 }
 
 async function bindInvite() {
-  if (!userData.email) { alert('Please login'); showPage('page-login-register'); return; }
+  if (!userData) { alert('Please login'); showPage('page-login-register'); return; }
   const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
   if (!code) return;
   try {
-    await apiCall('/api/invite/bind', {
-      method: 'POST',
-      body: JSON.stringify({ inviteCode: code })
-    });
+    await apiCall('/api/invite/bind', { method: 'POST', body: JSON.stringify({ inviteCode: code }) });
     userData = await loadUserData();
     showToast('Joined family!');
     renderProfile();
@@ -757,7 +605,13 @@ async function bindInvite() {
 function populateCuisines() {
   const select = document.getElementById('cuisine');
   if (!select) return;
-  select.innerHTML = CUISINES.map(c => `<option value="${c}">${currentLang === 'zh-CN' ? (CUISINE_MAP_ZH[c] || c) : c}</option>`).join('');
+  const map = CUISINE_MAP[currentLang];
+  select.innerHTML = CUISINES.map(c => {
+    let displayName = c;
+    if (map && map[c]) displayName = map[c];
+    else if (currentLang === 'zh-CN' && CUISINE_MAP['zh-CN'][c]) displayName = CUISINE_MAP['zh-CN'][c];
+    return `<option value="${c}">${displayName}</option>`;
+  }).join('');
 }
 
 function renderLanguage() {
@@ -865,8 +719,19 @@ function renderLanguage() {
 }
 
 function renderProfile() {
-  document.getElementById('profileNickname').innerText = userData.nickname || 'Foodie123';
-  document.getElementById('profileEmail').innerText = userData.email || 'Not logged in';
+  if (!userData) {
+    document.getElementById('profileNickname').innerText = 'Not logged in';
+    document.getElementById('profileEmail').innerText = '';
+    document.getElementById('profilePlan').innerText = '';
+    document.getElementById('profileJoined').innerText = '';
+    document.getElementById('subStatus').innerText = '';
+    document.getElementById('subExpiry').innerText = '';
+    document.getElementById('familyArea').style.display = 'none';
+    document.getElementById('setPasswordArea').style.display = 'none';
+    return;
+  }
+  document.getElementById('profileNickname').innerText = userData.nickname || userData.email.split('@')[0];
+  document.getElementById('profileEmail').innerText = userData.email;
   document.getElementById('profilePlan').innerText = userData.plan === 'free' ? 'Free' : (userData.plan === 'starter' ? 'Starter' : userData.plan === 'pro' ? 'Pro' : 'Premium');
   const joinedDate = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A';
   document.getElementById('profileJoined').innerText = joinedDate;
@@ -878,13 +743,18 @@ function renderProfile() {
   } else {
     document.getElementById('familyArea').style.display = 'none';
   }
+  if (!userData.hasPassword) {
+    document.getElementById('setPasswordArea').style.display = 'block';
+  } else {
+    document.getElementById('setPasswordArea').style.display = 'none';
+  }
 }
 
 async function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   if (pageId === 'page-generator') {
-    await refreshUserData();
+    if (userData) await refreshUserData();
     updateLimitInfo();
     populateCuisines();
   }
@@ -931,11 +801,48 @@ function switchLegalTab(tab) {
 }
 
 function handleLoginClick() {
-  if (userData.email) showPage('page-profile');
+  if (userData) showPage('page-profile');
   else showPage('page-login-register');
 }
 
-// ==================== Service Worker 注册（PWA）====================
+function showForgotModal() { document.getElementById('forgotModal').classList.add('show'); }
+function showNicknameModal() { document.getElementById('newNicknameInput').value = userData?.nickname || ''; document.getElementById('nicknameModal').classList.add('show'); }
+function showEmailModal() { document.getElementById('newEmailInput').value = userData?.email || ''; document.getElementById('emailModal').classList.add('show'); }
+
+function addToHistory(recipe) {
+  recipeHistory.push(recipe);
+  historyIndex = recipeHistory.length - 1;
+  updateHistoryButtons();
+}
+function showPrevRecipe() {
+  if (historyIndex > 0) {
+    historyIndex--;
+    document.getElementById('recipeResult').innerText = recipeHistory[historyIndex];
+    userData.lastRecipeText = recipeHistory[historyIndex];
+  }
+  updateHistoryButtons();
+}
+function showNextRecipe() {
+  if (historyIndex < recipeHistory.length - 1) {
+    historyIndex++;
+    document.getElementById('recipeResult').innerText = recipeHistory[historyIndex];
+    userData.lastRecipeText = recipeHistory[historyIndex];
+  }
+  updateHistoryButtons();
+}
+function updateHistoryButtons() {
+  document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0;
+  document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length - 1;
+}
+function showVideo() {
+  const dish = document.getElementById('dishName').value.trim() || 'recipe';
+  const cuisine = document.getElementById('cuisine').value;
+  const query = encodeURIComponent(`${cuisine} ${dish} cooking`);
+  document.getElementById('videoFrame').src = `https://www.youtube.com/embed?listType=search&list=${query}`;
+  document.getElementById('videoContainer').style.display = 'block';
+}
+
+// ==================== Service Worker 注册 ====================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
@@ -948,6 +855,8 @@ if ('serviceWorker' in navigator) {
 (async function init() {
   await initDeviceId();
   userData = await loadUserData();
+  updateNavButton();
+  // 语言菜单事件绑定
   document.querySelector('.lang-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('langDropdown').style.display = document.getElementById('langDropdown').style.display === 'block' ? 'none' : 'block';
@@ -962,4 +871,11 @@ if ('serviceWorker' in navigator) {
   });
   populateCuisines();
   renderLanguage();
+  initSocialLogin();
+  checkOAuthCallback();
+  // 绑定验证码发送按钮
+  document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode);
+  document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode);
+  document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
+  if (userData && userData.email) updateLimitInfo();
 })();

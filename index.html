@@ -1,250 +1,335 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chef · 智能食谱生成器</title>
-  <link rel="manifest" href="/manifest.json">
-  <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.1/dist/fp.min.js"></script>
-  <script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&currency=USD&vault=true&intent=subscription"></script>
-  <link rel="stylesheet" href="style.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
 </head>
 <body>
-  <div class="nav">
-    <div class="container nav-inner">
-      <div class="logo" id="logoText" onclick="showPage('page-home')">
-        <img src="images/logo-120x40.png" alt="AI Chef">
-      </div>
-      <div class="nav-right">
-        <div class="lang-selector">
-          <div class="lang-btn" id="currentLang">English ▼</div>
-          <div class="lang-dropdown" id="langDropdown">
-            <div class="lang-option" data-lang="en">English</div>
-            <div class="lang-option" data-lang="es">Español</div>
-            <div class="lang-option" data-lang="fr">Français</div>
-            <div class="lang-option" data-lang="de">Deutsch</div>
-            <div class="lang-option" data-lang="it">Italiano</div>
-            <div class="lang-option" data-lang="pt">Português</div>
-            <div class="lang-option" data-lang="zh-CN">简体中文</div>
-          </div>
-        </div>
-        <button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
-        <button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 首页 -->
-  <div class="page active" id="page-home">
-    <div class="container">
-      <div class="hero">
-        <h1 id="heroTitle">AI Chef</h1>
-        <p id="heroSubtitle">Global Cuisines · Smart Pairing</p>
-        <div class="hero-actions">
-          <button class="btn btn-outline" style="background:#fff;color:#2563eb" id="btnTryFree" onclick="showPage('page-generator')">Try Free</button>
-          <button class="btn btn-primary" id="btnSubscribe" onclick="showPage('page-subscribe')">Subscribe Now</button>
-        </div>
-      </div>
-      <h2 class="section-title" id="sectionFeatures">Features</h2>
-      <div class="grid">
-        <div class="card feature-card"><div class="feature-icon">🍽️</div><div class="feature-title" id="feat1">18 Cuisines</div><div class="feature-sub" id="feat1Sub">Global flavors</div></div>
-        <div class="card feature-card"><div class="feature-icon">🥗</div><div class="feature-title" id="feat2">AI Assistant</div><div class="feature-sub" id="feat2Sub">Interactive Q&A</div></div>
-        <div class="card feature-card"><div class="feature-icon">📊</div><div class="feature-title" id="feat3">Nutrition</div><div class="feature-sub" id="feat3Sub">Healthy Weight</div></div>
-        <div class="card feature-card"><div class="feature-icon">👶</div><div class="feature-title" id="feat4">Baby Safe</div><div class="feature-sub" id="feat4Sub">No salt/sugar</div></div>
-        <div class="card feature-card"><div class="feature-icon">🤰</div><div class="feature-title" id="feat5">Pregnancy</div><div class="feature-sub" id="feat5Sub">Mom friendly</div></div>
-        <div class="card feature-card"><div class="feature-icon">🎥</div><div class="feature-title" id="feat6">Video Guides</div><div class="feature-sub" id="feat6Sub">Step-by-step</div></div>
-      </div>
-      <h2 class="section-title" id="sectionSubscribe">Subscription Plans</h2>
-      <div class="grid-2">
-        <div class="card clickable" id="goPay" onclick="showPage('page-subscribe')"><div class="feature-icon">💳</div><div class="feature-title" id="subText">Subscribe</div><div class="feature-sub" id="subSub">Unlock full access</div></div>
-        <div class="card clickable" id="goFamily" onclick="showPage('page-subscribe')"><div class="feature-icon">👪</div><div class="feature-title" id="familyText">Family Share</div><div class="feature-sub" id="familySub">Multi-User Plan</div></div>
-      </div>
-      <div class="footer-links">
-        <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- 生成器页 -->
-  <div class="page" id="page-generator">
-    <div class="container">
-      <div class="card">
-        <div class="generator-header">
-          <h2 id="genTitle">AI Recipe Generator</h2>
-          <button class="add-home-btn" id="addToHomeBtn" onclick="addToHome()">📱 Add</button>
-          <div class="nav-history">
-            <button class="history-btn" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>← Prev</button>
-            <button class="history-btn" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>Next →</button>
-          </div>
-        </div>
-        <div id="limitInfo"></div>
-        <label style="font-size:14px;margin-bottom:6px;display:block" id="genMealType">Category</label>
-        <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="mealType">
-          <option value="standard" id="optStandard">Standard</option>
-          <option value="baby" id="optBaby">Baby</option>
-          <option value="pregnancy" id="optPregnancy">Pregnancy</option>
-        </select>
-        <label style="font-size:14px;margin-bottom:6px;display:block" id="genCuisine">Cuisine</label>
-        <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="cuisine"></select>
-        <label style="font-size:14px;margin-bottom:6px;display:block" id="genDishName">What to eat?</label>
-        <input id="dishName" placeholder="e.g. chicken, tomato" maxlength="100" style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0">
-        <div class="small-note" id="dishNameHint">You can enter one or more ingredients.</div>
-        <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
-      </div>
-      <div class="card">
-        <div id="recipeResult" class="recipe-result">Please generate a recipe first</div>
-      </div>
-      <div class="card">
-        <h4 style="margin:0 0 8px;font-size:14px" id="aiAssistTitle">AI Assistant</h4>
-        <div class="qa-box">
-          <div class="qa-history" id="qaHistory"></div>
-          <input class="qa-input" id="qaInput" placeholder="Ask about this recipe..." disabled>
-          <button class="btn btn-primary" style="width:100%" id="askBtn" onclick="askQuestion()" disabled>Ask</button>
-          <div class="small-note" id="qaLimitNote"></div>
-        </div>
-        <button class="btn btn-video" id="openVideoBtn" onclick="showVideo()">🎬 Watch Video Guides</button>
-        <div id="videoContainer" class="video-container" style="display: none; margin-top:12px;">
-          <iframe id="videoFrame" src="" allowfullscreen></iframe>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 登录/注册页 -->
-  <div class="page" id="page-login-register">
-    <div class="container">
-      <div class="auth-card">
-        <div class="tabs">
-          <div class="tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
-          <div class="tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
-        </div>
-        <div id="loginForm">
-          <input type="email" class="auth-input" id="loginEmail" placeholder="Email">
-          <input type="password" class="auth-input" id="loginPassword" placeholder="Password">
-          <div style="text-align:right;"><span class="edit-btn" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span></div>
-          <button class="auth-btn primary" id="btnLoginSubmit" onclick="login()">Login</button>
-          <div class="auth-footer"><span id="noAccount">Don't have an account?</span> <span class="auth-link" id="switchToRegister" onclick="switchAuthTab('register')">Sign Up</span></div>
-        </div>
-        <div id="registerForm" style="display:none;">
-          <input type="email" class="auth-input" id="registerEmail" placeholder="Email">
-          <input type="password" class="auth-input" id="registerPassword" placeholder="Password">
-          <input type="password" class="auth-input" id="registerConfirmPwd" placeholder="Confirm Password">
-          <div class="small-note" id="registerNote">Please use a valid email to avoid account loss.</div>
-          <button class="auth-btn primary" id="btnRegisterSubmit" onclick="register()">Sign Up</button>
-          <div class="auth-footer"><span id="haveAccount">Already have an account?</span> <span class="auth-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span></div>
-        </div>
-      </div>
-      <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
-    </div>
-  </div>
-
-  <!-- 个人信息页 -->
-  <div class="page" id="page-profile">
-    <div class="container">
-      <div class="auth-card">
-        <div class="profile-section">
-          <div class="profile-label" id="profileNicknameLabel">Nickname</div>
-          <div class="profile-value"><span id="profileNickname">Foodie123</span><button class="edit-btn" id="editNicknameBtn" onclick="showNicknameModal()">Edit</button></div>
-          <div class="profile-label" style="margin-top:16px;" id="profileEmailLabel">Email</div>
-          <div class="profile-value"><span id="profileEmail">user@example.com</span><button class="edit-btn" id="editEmailBtn" onclick="showEmailModal()">Change</button></div>
-          <div class="profile-label" style="margin-top:16px;" id="profilePlanLabel">Plan</div><div class="profile-value" id="profilePlan">Free</div>
-          <div class="profile-label" style="margin-top:16px;" id="profileJoinedLabel">Joined</div>
-          <div class="profile-value" id="profileJoined"></div>
-        </div>
-        <div class="asset-block" style="margin-top:24px;">
-          <div class="profile-row">
-            <span class="asset-title" id="profileSubTitle">My Subscription</span>
-            <span id="subStatus">Free</span>
-          </div>
-          <div style="display:flex; justify-content:flex-end; margin-top:4px;">
-            <span class="badge" id="subExpiry"></span>
-          </div>
-          <div id="familyArea" style="display:none; margin-top:16px;">
-            <div class="invite-box">
-              <div id="inviteCodeTitle">Invite Code</div>
-              <div style="display:flex; gap:8px; margin-top:8px;">
-                <input type="text" id="inviteCodeInput" placeholder="Enter code" class="auth-input" style="margin-bottom:0;">
-                <button class="btn btn-primary" onclick="bindInvite()">Join</button>
-              </div>
-              <div id="ownerInviteCode" style="margin-top:8px; font-weight:500;"></div>
-            </div>
-          </div>
-          <button class="btn btn-outline" style="width:100%; margin-top:16px;" id="goSubscribeBtn" onclick="showPage('page-subscribe')">Change Plan</button>
-        </div>
-        <button class="btn btn-outline" style="width:100%; margin-top:24px;" id="logoutBtn" onclick="logout()">Logout</button>
-      </div>
-      <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
-    </div>
-  </div>
-
-  <!-- 订阅支付页 -->
-  <div class="page" id="page-subscribe">
-    <div class="container">
-      <h2 class="section-title" style="font-size:20px;" id="sectionSubTitle">Choose your plan</h2>
-      <div class="subscribe-plans">
-        <div class="plan-card">
-          <div class="plan-name" id="planStarterName">Starter</div>
-          <div class="plan-price" id="planStarterPrice">$4.99<small>/month</small></div>
-          <div class="plan-desc" id="planStarterDesc">• 10 recipes per day • 10 AI questions per recipe • Personal use only</div>
-          <div id="paypal-starter-container"></div>
-        </div>
-        <div class="plan-card">
-          <div class="plan-name" id="planProName">Pro <span style="background:#ffd966; padding:2px 8px; border-radius:12px; font-size:12px;">Most Popular</span></div>
-          <div class="plan-price" id="planProPrice">$9.99<small>/month</small></div>
-          <div class="plan-desc" id="planProDesc">• 30 recipes per day • 10 AI questions per recipe • Full features unlocked</div>
-          <div id="paypal-pro-container"></div>
-        </div>
-        <div class="plan-card">
-          <div class="plan-name" id="planPremiumName">Premium <span style="font-size:12px; color:#2563eb;">(Shared)</span></div>
-          <div class="plan-price" id="planPremiumPrice">$19.99<small>/month</small></div>
-          <div class="plan-desc" id="planPremiumDesc">• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation</div>
-          <div id="paypal-premium-container"></div>
-        </div>
-      </div>
-      <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
-    </div>
-  </div>
-
-  <!-- 法律页 -->
-  <div class="page" id="page-legal">
-    <div class="container">
-      <div class="card legal-card">
-        <div class="legal-content">
-          <div id="legal-privacy-content" class="legal-section">
-            <h1 id="legalPrivacyTitle">Privacy Policy</h1>
-            <p id="legalEffDate">Effective date: 2025-01-01</p>
-            <h2 id="legalPrivacyCollect">1. Information We Collect</h2><p id="legalPrivacy1">AI Chef is a client-side application. We do not collect, store, or transmit any personal information.</p>
-            <h2 id="legalPrivacyUse">2. Information Use</h2><p id="legalPrivacy2">All recipe generation runs locally on your device.</p>
-            <h2 id="legalPrivacySecurity">3. Data Security</h2><p id="legalPrivacy3">No data collected = no risk of breach.</p>
-            <h2 id="legalPrivacyChanges">4. Policy Changes</h2><p id="legalPrivacy4">We may update this policy. Changes will be posted here.</p>
-            <h2 id="legalPrivacyContact">5. Contact Us</h2><p id="legalPrivacy5">Contact us if you have questions.</p>
-          </div>
-          <div id="legal-terms-content" class="legal-section" style="display:none;">
-            <h1 id="legalTermsTitle">Terms of Service</h1>
-            <p id="legalTermEffDate">Effective Date: 2025-01-01</p>
-            <h2 id="legalTermsLicense">1. License</h2><p id="legalTerms1">For personal, non-commercial use only.</p>
-            <h2 id="legalTermsDisclaimer">2. Disclaimer</h2><p id="legalTerms2">Recipes are AI-generated and for reference only.</p>
-            <h2 id="legalTermsLimitations">3. Limitation of Liability</h2><p id="legalTerms3">We are not liable for any damages.</p>
-            <h2 id="legalTermsModifications">4. Modifications</h2><p id="legalTerms4">We may modify these terms at any time.</p>
-            <h2 id="legalTermsLaw">5. Governing Law</h2><p id="legalTerms5">Governing law: your jurisdiction.</p>
-            <h2 id="legalTermsSubRules">6. Subscription Rules</h2>
-            <p id="legalTermsSub1">6.1 Subscribers have access upon login.</p><p id="legalTermsSub2">6.2 Three subscription types: Starter, Pro, Premium.</p><p id="legalTermsSub3">6.3 Orders must be activated within 24 hours by logging in.</p><p id="legalTermsSub4">6.4 Each recipe generation grants 10 AI questions for that session.</p><p id="legalTermsSub5">6.5 Family share is available only for Premium (up to 3 people).</p><p id="legalTermsSub6">6.6 Auto-renewal is enabled by default; manage via PayPal.</p><p id="legalTermsSub7">6.7 No refunds after payment.</p><p id="legalTermsSub8">6.8 Use a valid email; we are not responsible for account loss due to fake emails.</p><p id="legalTermsSub9">6.9 Recipes and answers are AI-generated by DeepSeek and for reference only.</p><p id="legalTermsSub10">6.10 We reserve the right of final interpretation.</p>
-          </div>
-        </div>
-        <div class="legal-tabs">
-          <div class="legal-tab active" data-tab="privacy" onclick="switchLegalTab('privacy')">Privacy Policy</div>
-          <div class="legal-tab" data-tab="terms" onclick="switchLegalTab('terms')">Terms of Service</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 弹窗 -->
-  <div class="modal-overlay" id="forgotModal"><div class="modal-card"><h3 id="forgotTitle">Reset Password</h3><input class="auth-input" placeholder="Email" id="forgotEmail"><input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwd"><div class="small-note" id="forgotNote">Password cannot be recovered if forgotten. Please remember it.</div><div class="modal-actions"><button class="btn btn-outline" id="cancelForgot" onclick="closeModal('forgotModal')">Cancel</button><button class="btn btn-primary" id="resetPwdBtn" onclick="resetPassword()">Reset</button></div></div></div>
-  <div class="modal-overlay" id="nicknameModal"><div class="modal-card"><h3 id="nicknameTitle">Change Nickname</h3><input class="auth-input" id="newNicknameInput" maxlength="10" placeholder="New nickname"><div class="modal-actions"><button class="btn btn-outline" id="cancelNickname" onclick="closeModal('nicknameModal')">Cancel</button><button class="btn btn-primary" id="saveNicknameBtn" onclick="saveNickname()">Save</button></div></div></div>
-  <div class="modal-overlay" id="emailModal"><div class="modal-card"><h3 id="emailTitle">Change Email</h3><input class="auth-input" id="newEmailInput" placeholder="New Email"><div class="small-note">Please use a valid email for account recovery.</div><div class="modal-actions"><button class="btn btn-outline" id="cancelEmail" onclick="closeModal('emailModal')">Cancel</button><button class="btn btn-primary" id="saveEmailBtn" onclick="saveEmail()">Save</button></div></div></div>
-  <div class="modal-overlay" id="successModal"><div class="modal-card"><div style="font-size:48px;">✅</div><h3 id="successTitle">Success</h3><p id="successMsg"></p><button class="btn btn-primary" id="closeSuccessBtn" onclick="closeModal('successModal')">OK</button></div></div>
-
-  <script src="script.js"></script>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;AI Chef · 智能食谱生成器&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;link rel="manifest" href="/manifest.json"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- FingerprintJS 用于设备指纹 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.1/dist/fp.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- PayPal SDK (生产环境) 启用订阅功能 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&amp;currency=USD&amp;vault=true&amp;intent=subscription&amp;commit=false"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="style.css"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="nav"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="container nav-inner"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="logo" id="logoText" onclick="showPage('page-home')"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;img src="images/logo-120x40.png" alt="AI Chef"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="nav-right"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="lang-selector"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="lang-btn" id="currentLang"&gt;English ▼&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="lang-dropdown" id="langDropdown"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="lang-option" data-lang="en"&gt;English&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="lang-option" data-lang="es"&gt;Español&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="lang-option" data-lang="fr"&gt;Français&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="lang-option" data-lang="de"&gt;Deutsch&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="lang-option" data-lang="it"&gt;Italiano&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="lang-option" data-lang="pt"&gt;Português&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="lang-option" data-lang="zh-CN"&gt;简体中文&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()"&gt;Login&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')"&gt;Get Started&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- 首页 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="page active" id="page-home"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="hero"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h1 id="heroTitle"&gt;AI Chef&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;p id="heroSubtitle"&gt;Global Cuisines · Smart Pairing&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="hero-actions"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="btn btn-outline" style="background:#fff;color:#2563eb" id="btnTryFree" onclick="showPage('page-generator')"&gt;Try Free&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="btn btn-primary" id="btnSubscribe" onclick="showPage('page-subscribe')"&gt;Subscribe Now&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2 class="section-title" id="sectionFeatures"&gt;Features&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="grid"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card feature-card"&gt;&lt;div class="feature-icon"&gt;🍽️&lt;/div&gt;&lt;div class="feature-title" id="feat1"&gt;18 Cuisines&lt;/div&gt;&lt;div class="feature-sub" id="feat1Sub"&gt;Global flavors&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card feature-card"&gt;&lt;div class="feature-icon"&gt;🥗&lt;/div&gt;&lt;div class="feature-title" id="feat2"&gt;AI Assistant&lt;/div&gt;&lt;div class="feature-sub" id="feat2Sub"&gt;Interactive Q&amp;A&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card feature-card"&gt;&lt;div class="feature-icon"&gt;📊&lt;/div&gt;&lt;div class="feature-title" id="feat3"&gt;Nutrition&lt;/div&gt;&lt;div class="feature-sub" id="feat3Sub"&gt;Healthy Weight&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card feature-card"&gt;&lt;div class="feature-icon"&gt;👶&lt;/div&gt;&lt;div class="feature-title" id="feat4"&gt;Baby Safe&lt;/div&gt;&lt;div class="feature-sub" id="feat4Sub"&gt;No salt/sugar&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card feature-card"&gt;&lt;div class="feature-icon"&gt;🤰&lt;/div&gt;&lt;div class="feature-title" id="feat5"&gt;Pregnancy&lt;/div&gt;&lt;div class="feature-sub" id="feat5Sub"&gt;Mom friendly&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card feature-card"&gt;&lt;div class="feature-icon"&gt;🎥&lt;/div&gt;&lt;div class="feature-title" id="feat6"&gt;Video Guides&lt;/div&gt;&lt;div class="feature-sub" id="feat6Sub"&gt;Step-by-step&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2 class="section-title" id="sectionSubscribe"&gt;Subscription Plans&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="grid-2"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card clickable" id="goPay" onclick="showPage('page-subscribe')"&gt;&lt;div class="feature-icon"&gt;💳&lt;/div&gt;&lt;div class="feature-title" id="subText"&gt;Subscribe&lt;/div&gt;&lt;div class="feature-sub" id="subSub"&gt;Unlock full access&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card clickable" id="goFamily" onclick="showPage('page-subscribe')"&gt;&lt;div class="feature-icon"&gt;👪&lt;/div&gt;&lt;div class="feature-title" id="familyText"&gt;Family Share&lt;/div&gt;&lt;div class="feature-sub" id="familySub"&gt;Multi-User Plan&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="footer-links"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;a id="linkLegal" onclick="showPage('page-legal')"&gt;Privacy/Terms&lt;/a&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- 生成器页 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="page" id="page-generator"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="generator-header"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;h2 id="genTitle"&gt;AI Recipe Generator&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="add-home-btn" id="addToHomeBtn" onclick="addToHome()"&gt;📱 Add&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="nav-history"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button class="history-btn" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled&gt;← Prev&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button class="history-btn" id="nextRecipeBtn" onclick="showNextRecipe()" disabled&gt;Next →&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="limitInfo"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;label style="font-size:14px;margin-bottom:6px;display:block" id="genMealType"&gt;Category&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="mealType"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;option value="standard" id="optStandard"&gt;Standard&lt;/option&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;option value="baby" id="optBaby"&gt;Baby&lt;/option&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;option value="pregnancy" id="optPregnancy"&gt;Pregnancy&lt;/option&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;label style="font-size:14px;margin-bottom:6px;display:block" id="genCuisine"&gt;Cuisine&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="cuisine"&gt;&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;label style="font-size:14px;margin-bottom:6px;display:block" id="genDishName"&gt;What to eat?&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;input id="dishName" placeholder="e.g. chicken, tomato" maxlength="100" style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="small-note" id="dishNameHint"&gt;You can enter one or more ingredients.&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-primary" style="width:100%;margin-top:8px;" id="btnGenerate" onclick="generateRecipe()"&gt;Generate Recipe&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="recipeResult" class="recipe-result"&gt;Please generate a recipe first&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h4 style="margin:0 0 8px;font-size:14px" id="aiAssistTitle"&gt;AI Assistant&lt;/h4&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="qa-box"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="qa-history" id="qaHistory"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input class="qa-input" id="qaInput" placeholder="Ask about this recipe..." disabled&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="btn btn-primary" style="width:100%" id="askBtn" onclick="askQuestion()" disabled&gt;Ask&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="small-note" id="qaLimitNote"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-video" id="openVideoBtn" onclick="showVideo()"&gt;🎬 Watch Video Guides&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="videoContainer" class="video-container" style="display: none; margin-top:12px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;iframe id="videoFrame" src="" allowfullscreen&gt;&lt;/iframe&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- 登录/注册页 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="page" id="page-login-register"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="auth-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="tabs"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="tab active" id="tabLogin" onclick="switchAuthTab('login')"&gt;Login&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="tab" id="tabRegister" onclick="switchAuthTab('register')"&gt;Sign Up&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="loginForm"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input type="email" class="auth-input" id="loginEmail" placeholder="Email"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input type="password" class="auth-input" id="loginPassword" placeholder="Password"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="text-align:right;"&gt;&lt;span class="edit-btn" id="forgotPwdLink" onclick="showForgotModal()"&gt;Forgot password?&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="auth-btn primary" id="btnLoginSubmit" onclick="login()"&gt;Login&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="auth-footer"&gt;&lt;span id="noAccount"&gt;Don't have an account?&lt;/span&gt; &lt;span class="auth-link" id="switchToRegister" onclick="switchAuthTab('register')"&gt;Sign Up&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="oauth-buttons" style="margin-top: 20px; text-align: center;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="googleLoginBtn" class="btn btn-outline" style="width: 100%; background: #fff; border: 1px solid #ddd; margin-bottom: 8px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;img src="https://www.google.com/favicon.ico" style="width: 18px; margin-right: 8px;"&gt; Continue with Google</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="facebookLoginBtn" class="btn btn-outline" style="width: 100%; background: #fff; border: 1px solid #ddd;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;img src="https://www.facebook.com/favicon.ico" style="width: 18px; margin-right: 8px;"&gt; Continue with Facebook</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="registerForm" style="display:none;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input type="email" class="auth-input" id="registerEmail" placeholder="Email"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="display: flex; gap: 8px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input type="text" class="auth-input" id="registerCode" placeholder="Verification code" style="flex: 1;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button id="sendCodeBtn" class="btn btn-outline" style="width: 120px;"&gt;Send code&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input type="password" class="auth-input" id="registerPassword" placeholder="Password"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input type="password" class="auth-input" id="registerConfirmPwd" placeholder="Confirm Password"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="small-note" id="registerNote"&gt;Please use a valid email to avoid account loss.&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="auth-btn primary" id="btnRegisterSubmit" onclick="register()"&gt;Sign Up&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="auth-footer"&gt;&lt;span id="haveAccount"&gt;Already have an account?&lt;/span&gt; &lt;span class="auth-link" id="switchToLogin" onclick="switchAuthTab('login')"&gt;Login&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="footer-links"&gt;&lt;a onclick="showPage('page-legal')"&gt;Privacy/Terms&lt;/a&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- 个人信息页 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="page" id="page-profile"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="auth-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="profile-section"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-label" id="profileNicknameLabel"&gt;Nickname&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-value"&gt;&lt;span id="profileNickname"&gt;Foodie123&lt;/span&gt;&lt;button class="edit-btn" id="editNicknameBtn" onclick="showNicknameModal()"&gt;Edit&lt;/button&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-label" style="margin-top:16px;" id="profileEmailLabel"&gt;Email&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-value"&gt;&lt;span id="profileEmail"&gt;user@example.com&lt;/span&gt;&lt;button class="edit-btn" id="editEmailBtn" onclick="showEmailModal()"&gt;Change&lt;/button&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-label" style="margin-top:16px;" id="profilePlanLabel"&gt;Plan&lt;/div&gt;&lt;div class="profile-value" id="profilePlan"&gt;Free&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-label" style="margin-top:16px;" id="profileJoinedLabel"&gt;Joined&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-value" id="profileJoined"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="setPasswordArea" style="display: none; margin-top: 20px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-label"&gt;Set Password (for email login)&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input type="password" id="newPasswordInput" class="auth-input" placeholder="New password"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;input type="password" id="confirmPasswordInput" class="auth-input" placeholder="Confirm password"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="btn btn-primary" onclick="setPassword()"&gt;Set Password&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="asset-block" style="margin-top:24px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="profile-row"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;span class="asset-title" id="profileSubTitle"&gt;My Subscription&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;span id="subStatus"&gt;Free&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="display:flex; justify-content:flex-end; margin-top:4px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;span class="badge" id="subExpiry"&gt;&lt;/span&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="familyArea" style="display:none; margin-top:16px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="invite-box"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div id="inviteCodeTitle"&gt;Invite Code&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div style="display:flex; gap:8px; margin-top:8px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;input type="text" id="inviteCodeInput" placeholder="Enter code" class="auth-input" style="margin-bottom:0;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button class="btn btn-primary" onclick="bindInvite()"&gt;Join&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div id="ownerInviteCode" style="margin-top:8px; font-weight:500;"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="btn btn-outline" style="width:100%; margin-top:16px;" id="goSubscribeBtn" onclick="showPage('page-subscribe')"&gt;Change Plan&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-outline" style="width:100%; margin-top:24px;" id="logoutBtn" onclick="logout()"&gt;Logout&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="footer-links"&gt;&lt;a onclick="showPage('page-legal')"&gt;Privacy/Terms&lt;/a&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- 订阅支付页 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="page" id="page-subscribe"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2 class="section-title" style="font-size:20px;" id="sectionSubTitle"&gt;Choose your plan&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="subscribe-plans"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-name" id="planStarterName"&gt;Starter&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-price" id="planStarterPrice"&gt;$4.99&lt;small&gt;/month&lt;/small&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-desc" id="planStarterDesc"&gt;• 10 recipes per day • 10 AI questions per recipe • Personal use only&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="paypal-starter-container" class="paypal-button-container" data-plan-id="P-1U5765718B789804NNG3MBWQ"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="font-size: 12px; color: #888; text-align: center; margin-top: 12px;"&gt;🔒 Secured by PayPal&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-name" id="planProName"&gt;Pro &lt;span style="background:#ffd966; padding:2px 8px; border-radius:12px; font-size:12px;"&gt;Most Popular&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-price" id="planProPrice"&gt;$9.99&lt;small&gt;/month&lt;/small&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-desc" id="planProDesc"&gt;• 30 recipes per day • 10 AI questions per recipe • Full features unlocked&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="paypal-pro-container" class="paypal-button-container" data-plan-id="P-5P885108R60234815NG3MEPY"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="font-size: 12px; color: #888; text-align: center; margin-top: 12px;"&gt;🔒 Secured by PayPal&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-name" id="planPremiumName"&gt;Premium &lt;span style="font-size:12px; color:#2563eb;"&gt;(Shared)&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-price" id="planPremiumPrice"&gt;$19.99&lt;small&gt;/month&lt;/small&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="plan-desc" id="planPremiumDesc"&gt;• Unlimited recipes • 10 AI questions per recipe • Family share (3 people) • Priority generation&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="paypal-premium-container" class="paypal-button-container" data-plan-id="P-1880277264176022RNG3MFRA"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="font-size: 12px; color: #888; text-align: center; margin-top: 12px;"&gt;🔒 Secured by PayPal&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="fine-print" id="finePrint"&gt;By subscribing you agree to our &lt;a onclick="showPage('page-legal')"&gt;Terms&lt;/a&gt;.&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- 法律页 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="page" id="page-legal"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="card legal-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="legal-content"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="legal-privacy-content" class="legal-section"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h1 id="legalPrivacyTitle"&gt;Privacy Policy&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p id="legalEffDate"&gt;Effective date: 2025-01-01&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalPrivacyCollect"&gt;1. Information We Collect&lt;/h2&gt;&lt;p id="legalPrivacy1"&gt;AI Chef is a client-side application. We do not collect, store, or transmit any personal information.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalPrivacyUse"&gt;2. Information Use&lt;/h2&gt;&lt;p id="legalPrivacy2"&gt;All recipe generation runs locally on your device.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalPrivacySecurity"&gt;3. Data Security&lt;/h2&gt;&lt;p id="legalPrivacy3"&gt;No data collected = no risk of breach.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalPrivacyChanges"&gt;4. Policy Changes&lt;/h2&gt;&lt;p id="legalPrivacy4"&gt;We may update this policy. Changes will be posted here.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalPrivacyContact"&gt;5. Contact Us&lt;/h2&gt;&lt;p id="legalPrivacy5"&gt;Contact us if you have questions.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="legal-terms-content" class="legal-section" style="display:none;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h1 id="legalTermsTitle"&gt;Terms of Service&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p id="legalTermEffDate"&gt;Effective Date: 2025-01-01&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalTermsLicense"&gt;1. License&lt;/h2&gt;&lt;p id="legalTerms1"&gt;For personal, non-commercial use only.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalTermsDisclaimer"&gt;2. Disclaimer&lt;/h2&gt;&lt;p id="legalTerms2"&gt;Recipes are AI-generated and for reference only.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalTermsLimitations"&gt;3. Limitation of Liability&lt;/h2&gt;&lt;p id="legalTerms3"&gt;We are not liable for any damages.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalTermsModifications"&gt;4. Modifications&lt;/h2&gt;&lt;p id="legalTerms4"&gt;We may modify these terms at any time.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalTermsLaw"&gt;5. Governing Law&lt;/h2&gt;&lt;p id="legalTerms5"&gt;Governing law: your jurisdiction.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 id="legalTermsSubRules"&gt;6. Subscription Rules&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;p id="legalTermsSub1"&gt;6.1 Subscribers have access upon login.&lt;/p&gt;&lt;p id="legalTermsSub2"&gt;6.2 Three subscription types: Starter, Pro, Premium.&lt;/p&gt;&lt;p id="legalTermsSub3"&gt;6.3 Orders must be activated within 24 hours by logging in.&lt;/p&gt;&lt;p id="legalTermsSub4"&gt;6.4 Each recipe generation grants 10 AI questions for that session.&lt;/p&gt;&lt;p id="legalTermsSub5"&gt;6.5 Family share is available only for Premium (up to 3 people).&lt;/p&gt;&lt;p id="legalTermsSub6"&gt;6.6 Auto-renewal is enabled by default; manage via PayPal.&lt;/p&gt;&lt;p id="legalTermsSub7"&gt;6.7 No refunds after payment.&lt;/p&gt;&lt;p id="legalTermsSub8"&gt;6.8 Use a valid email; we are not responsible for account loss due to fake emails.&lt;/p&gt;&lt;p id="legalTermsSub9"&gt;6.9 Recipes and answers are AI-generated by DeepSeek and for reference only.&lt;/p&gt;&lt;p id="legalTermsSub10"&gt;6.10 We reserve the right of final interpretation.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="legal-tabs"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="legal-tab active" data-tab="privacy" onclick="switchLegalTab('privacy')"&gt;Privacy Policy&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="legal-tab" data-tab="terms" onclick="switchLegalTab('terms')"&gt;Terms of Service&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;!-- 弹窗 --&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="modal-overlay" id="forgotModal"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="modal-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h3 id="forgotTitle"&gt;Reset Password&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;input class="auth-input" placeholder="Email" id="forgotEmail"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div style="display: flex; gap: 8px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;input class="auth-input" id="forgotCode" placeholder="Verification code" style="flex: 1;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button id="sendResetCodeBtn" class="btn btn-outline" style="width: 120px;"&gt;Send code&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwd"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="small-note" id="forgotNote"&gt;Password cannot be recovered if forgotten. Please remember it.&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="modal-actions"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-outline" id="cancelForgot" onclick="closeModal('forgotModal')"&gt;Cancel&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-primary" id="resetPwdBtn" onclick="resetPassword()"&gt;Reset&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="modal-overlay" id="nicknameModal"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="modal-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h3 id="nicknameTitle"&gt;Change Nickname&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;input class="auth-input" id="newNicknameInput" maxlength="12" placeholder="New nickname (max 12 chars)"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="modal-actions"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-outline" id="cancelNickname" onclick="closeModal('nicknameModal')"&gt;Cancel&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-primary" id="saveNicknameBtn" onclick="saveNickname()"&gt;Save&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="modal-overlay" id="emailModal"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="modal-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h3 id="emailTitle"&gt;Change Email&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;input class="auth-input" id="newEmailInput" placeholder="New Email"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div style="display: flex; gap: 8px;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;input class="auth-input" id="emailChangeCode" placeholder="Verification code" style="flex: 1;"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button id="sendEmailChangeCodeBtn" class="btn btn-outline" style="width: 120px;"&gt;Send code&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="small-note"&gt;Please use a valid email for account recovery.&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="modal-actions"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-outline" id="cancelEmail" onclick="closeModal('emailModal')"&gt;Cancel&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="btn btn-primary" id="saveEmailBtn" onclick="saveEmail()"&gt;Save&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="modal-overlay" id="successModal"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="modal-card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div style="font-size:48px;"&gt;✅&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h3 id="successTitle"&gt;Success&lt;/h3&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p id="successMsg"&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="btn btn-primary" id="closeSuccessBtn" onclick="closeModal('successModal')"&gt;OK&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="script.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
 </body>
 </html>

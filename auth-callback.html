@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logging in...</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 50px; background: #f6f6f9; }
+    .loader { border: 4px solid #e2e8f0; border-top: 4px solid #2563eb; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="loader"></div>
+  <p>Completing login, please wait...</p>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const userParam = urlParams.get('user');
+    
+    if (token && userParam) {
+      localStorage.setItem('authToken', token);
+      try {
+        const user = JSON.parse(decodeURIComponent(userParam));
+        // 可选：存储用户信息或触发全局状态更新
+        console.log('Login successful:', user.email);
+      } catch (e) {
+        console.error('Failed to parse user data');
+      }
+      // 跳转到主页面
+      window.location.href = '/';
+    } else {
+      // 如果缺少参数，可能是错误，跳转首页或显示错误
+      console.error('Missing token or user parameter');
+      alert('Login failed. Please try again.');
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>
