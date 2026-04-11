@@ -122,19 +122,13 @@
         </div>
         <div id="loginForm">
           <input type="email" class="auth-input" id="loginEmail" placeholder="Email">
-          <input type="password" class="auth-input" id="loginPassword" placeholder="Password">
+          <div class="password-wrapper" style="position: relative;">
+            <input type="password" class="auth-input" id="loginPassword" placeholder="Password" style="padding-right: 40px;">
+            <span class="password-toggle" onclick="togglePassword('loginPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+          </div>
           <div style="text-align:right;"><span class="edit-btn" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span></div>
           <button class="auth-btn primary" id="btnLoginSubmit" onclick="login()">Login</button>
           <div class="auth-footer"><span id="noAccount">Don't have an account?</span> <span class="auth-link" id="switchToRegister" onclick="switchAuthTab('register')">Sign Up</span></div>
-          <!-- 社交登录按钮区域（暂时隐藏，等后续可配置时再显示） -->
-          <div class="oauth-buttons" style="margin-top: 20px; text-align: center; display: none;">
-            <button id="googleLoginBtn" class="btn btn-outline" style="width: 100%; background: #fff; border: 1px solid #ddd; margin-bottom: 8px;">
-              <img src="https://www.google.com/favicon.ico" style="width: 18px; margin-right: 8px;"> Continue with Google
-            </button>
-            <button id="facebookLoginBtn" class="btn btn-outline" style="width: 100%; background: #fff; border: 1px solid #ddd;">
-              <img src="https://www.facebook.com/favicon.ico" style="width: 18px; margin-right: 8px;"> Continue with Facebook
-            </button>
-          </div>
         </div>
         <div id="registerForm" style="display:none;">
           <input type="email" class="auth-input" id="registerEmail" placeholder="Email">
@@ -142,9 +136,14 @@
             <input type="text" class="auth-input" id="registerCode" placeholder="Verification code" style="flex: 1;">
             <button id="sendCodeBtn" class="btn btn-outline" style="width: 120px;">Send code</button>
           </div>
-          <input type="password" class="auth-input" id="registerPassword" placeholder="Password">
-          <input type="password" class="auth-input" id="registerConfirmPwd" placeholder="Confirm Password">
-          <div class="small-note" id="registerNote">Please use a valid email to avoid account loss.</div>
+          <div class="password-wrapper" style="position: relative;">
+            <input type="password" class="auth-input" id="registerPassword" placeholder="Password" style="padding-right: 40px;">
+            <span class="password-toggle" onclick="togglePassword('registerPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+          </div>
+          <div class="password-wrapper" style="position: relative;">
+            <input type="password" class="auth-input" id="registerConfirmPwd" placeholder="Confirm Password" style="padding-right: 40px;">
+            <span class="password-toggle" onclick="togglePassword('registerConfirmPwd')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+          </div>
           <button class="auth-btn primary" id="btnRegisterSubmit" onclick="register()">Sign Up</button>
           <div class="auth-footer"><span id="haveAccount">Already have an account?</span> <span class="auth-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span></div>
         </div>
@@ -168,8 +167,14 @@
         </div>
         <div id="setPasswordArea" style="display: none; margin-top: 20px;">
           <div class="profile-label">Set Password (for email login)</div>
-          <input type="password" id="newPasswordInput" class="auth-input" placeholder="New password">
-          <input type="password" id="confirmPasswordInput" class="auth-input" placeholder="Confirm password">
+          <div class="password-wrapper" style="position: relative;">
+            <input type="password" id="newPasswordInput" class="auth-input" placeholder="New password" style="padding-right: 40px;">
+            <span class="password-toggle" onclick="togglePassword('newPasswordInput')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+          </div>
+          <div class="password-wrapper" style="position: relative;">
+            <input type="password" id="confirmPasswordInput" class="auth-input" placeholder="Confirm password" style="padding-right: 40px;">
+            <span class="password-toggle" onclick="togglePassword('confirmPasswordInput')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+          </div>
           <button class="btn btn-primary" onclick="setPassword()">Set Password</button>
         </div>
         <div class="asset-block" style="margin-top:24px;">
@@ -272,8 +277,10 @@
         <input class="auth-input" id="forgotCode" placeholder="Verification code" style="flex: 1;">
         <button id="sendResetCodeBtn" class="btn btn-outline" style="width: 120px;">Send code</button>
       </div>
-      <input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwd">
-      <div class="small-note" id="forgotNote">Password cannot be recovered if forgotten. Please remember it.</div>
+      <div class="password-wrapper" style="position: relative;">
+        <input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwd" style="padding-right: 40px;">
+        <span class="password-toggle" onclick="togglePassword('forgotNewPwd')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+      </div>
       <div class="modal-actions">
         <button class="btn btn-outline" id="cancelForgot" onclick="closeModal('forgotModal')">Cancel</button>
         <button class="btn btn-primary" id="resetPwdBtn" onclick="resetPassword()">Reset</button>
