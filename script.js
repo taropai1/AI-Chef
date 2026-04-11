@@ -504,8 +504,9 @@ async function resetPassword() {
   }
 }
 
-// ==================== 社交登录 ====================
+// ==================== 社交登录（暂时隐藏，保留代码以便后续启用） ====================
 function initSocialLogin() {
+  // 按钮默认隐藏，但保留绑定逻辑，以后只需将按钮的 display 改为 block 即可启用
   const googleBtn = document.getElementById('googleLoginBtn');
   if (googleBtn) {
     googleBtn.addEventListener('click', () => {
@@ -871,7 +872,7 @@ if ('serviceWorker' in navigator) {
   });
   populateCuisines();
   renderLanguage();
-  initSocialLogin();
+  initSocialLogin();  // 保留，但按钮隐藏，所以不会触发
   checkOAuthCallback();
   // 绑定验证码发送按钮
   document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode);
