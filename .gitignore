@@ -1,9 +1,21 @@
 # macOS 系统文件
 .DS_Store
-.DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
+
+# Windows 系统文件
 Thumbs.db
-.DS_Store
+ehthumbs.db
+
+# 编辑器/IDE 临时文件
+.vscode/
+.idea/
+*.swp
+*~
+*.log
+
+# 环境变量/敏感信息
+.env
+.env.local
+.env.*.local
