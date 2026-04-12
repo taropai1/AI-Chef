@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 50px; background: #f6f6f9; }
+    .loader { border: 4px solid #e2e8f0; border-top: 4px solid #2563eb; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader"></div>
+  <div id="status">Verifying...</div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const type = urlParams.get('type');
+
+    if (!token) {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('status').innerHTML = '<span class="error">Invalid verification link.</span>';
+      return;
+    }
+
+    fetch(`https://auth.taropai.com/api/verify-email-token?token=${token}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('loader').style.display = 'none';
+        if (data.success) {
+          document.getElementById('status').innerHTML = '<span class="success">Email verified successfully!</span><br>Redirecting...';
+          localStorage.setItem('verifiedEmail', data.email);
+          if (data.type === 'register') {
+            window.location.href = '/?action=register&email=' + encodeURIComponent(data.email);
+          } else if (data.type === 'reset') {
+            window.location.href = '/?action=reset&email=' + encodeURIComponent(data.email);
+          } else if (data.type === 'changeEmail') {
+            window.location.href = '/?action=changeEmail&email=' + encodeURIComponent(data.newEmail || data.email);
+          } else {
+            window.location.href = '/';
+          }
+        } else {
+          document.getElementById('status').innerHTML = '<span class="error">Link expired or invalid. Please use the verification code sent to your email.</span>';
+        }
+      })
+      .catch(err => {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('status').innerHTML = '<span class="error">Verification failed. Please try again later.</span>';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
