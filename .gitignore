@@ -1,5 +1,0 @@
-# macOS 系统垃圾文件（核心必加）
-.DS_Store
-
-# Windows 系统垃圾文件（兼容团队跨平台开发）
-Thumbs.db
