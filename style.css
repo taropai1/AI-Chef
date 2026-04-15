@@ -121,3 +121,95 @@ input, select, textarea { font-size: 16px; }
   user-select: none;
   font-size: 18px;
 }
+/* 订阅页面样式优化 */
+.subscribe-plans {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  margin: 32px 0;
+}
+.plan-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  border: 1px solid #eef2f6;
+}
+.plan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.12);
+}
+.plan-card.popular {
+  border-top: 4px solid #ffd966;
+  border-radius: 20px 20px 20px 20px;
+}
+.plan-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffd966;
+  color: #2c3e50;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.plan-name {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.plan-price {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2563eb;
+  text-align: center;
+  margin: 16px 0;
+}
+.plan-price small {
+  font-size: 14px;
+  font-weight: normal;
+  color: #6c757d;
+}
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.plan-features li {
+  padding: 6px 0;
+  font-size: 14px;
+  color: #334155;
+}
+.paypal-button-container {
+  margin: 20px 0 12px;
+  min-height: 45px;
+}
+.plan-notice {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  margin-top: 12px;
+}
+.fine-print {
+  text-align: center;
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 30px 0;
+}
+@media (max-width: 768px) {
+  .subscribe-plans {
+    gap: 16px;
+  }
+  .plan-card {
+    max-width: 100%;
+  }
+}
