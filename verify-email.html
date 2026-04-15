@@ -23,34 +23,33 @@
     if (!token) {
       document.getElementById('loader').style.display = 'none';
       document.getElementById('status').innerHTML = '<span class="error">Invalid verification link.</span>';
-      return;
-    }
-
-    fetch(`https://auth.taropai.com/api/verify-email-token?token=${token}`)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('loader').style.display = 'none';
-        if (data.success) {
-          document.getElementById('status').innerHTML = '<span class="success">Email verified successfully!</span><br>Redirecting...';
-          localStorage.setItem('verifiedEmail', data.email);
-          if (data.type === 'register') {
-            window.location.href = '/?action=register&email=' + encodeURIComponent(data.email);
-          } else if (data.type === 'reset') {
-            window.location.href = '/?action=reset&email=' + encodeURIComponent(data.email);
-          } else if (data.type === 'changeEmail') {
-            window.location.href = '/?action=changeEmail&email=' + encodeURIComponent(data.newEmail || data.email);
+    } else {
+      fetch(`https://auth.taropai.com/api/verify-email-token?token=${token}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('loader').style.display = 'none';
+          if (data.success) {
+            document.getElementById('status').innerHTML = '<span class="success">Email verified successfully!</span><br>Redirecting...';
+            localStorage.setItem('verifiedEmail', data.email);
+            if (data.type === 'register') {
+              window.location.href = '/?action=register&email=' + encodeURIComponent(data.email);
+            } else if (data.type === 'reset') {
+              window.location.href = '/?action=reset&email=' + encodeURIComponent(data.email);
+            } else if (data.type === 'changeEmail') {
+              window.location.href = '/?action=changeEmail&email=' + encodeURIComponent(data.newEmail || data.email);
+            } else {
+              window.location.href = '/';
+            }
           } else {
-            window.location.href = '/';
+            document.getElementById('status').innerHTML = '<span class="error">Link expired or invalid. Please use the verification code sent to your email.</span>';
           }
-        } else {
-          document.getElementById('status').innerHTML = '<span class="error">Link expired or invalid. Please use the verification code sent to your email.</span>';
-        }
-      })
-      .catch(err => {
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('status').innerHTML = '<span class="error">Verification failed. Please try again later.</span>';
-        console.error(err);
-      });
+        })
+        .catch(err => {
+          document.getElementById('loader').style.display = 'none';
+          document.getElementById('status').innerHTML = '<span class="error">Verification failed. Please try again later.</span>';
+          console.error(err);
+        });
+    }
   </script>
 </body>
 </html>
