@@ -1,4 +1,4 @@
-/ ==================== 全局配置 ====================
+// ==================== 全局配置 ====================
 const DEEPSEEK_API = "https://api.taropai.com/v1/chat/completions";
 const BACKEND_URL = "https://auth.taropai.com";
 const LANGS = ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh-CN'];
