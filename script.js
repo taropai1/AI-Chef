@@ -1986,6 +1986,52 @@ function renderLanguage() {
   document.getElementById('sendResetCodeBtn').innerText = t('sendCode');
   document.getElementById('sendEmailChangeCodeBtn').innerText = t('sendCode');
 
+    // 订阅页多语言
+  const pricingSubtitle = document.getElementById('pricingSubtitle');
+  if (pricingSubtitle) pricingSubtitle.innerText = t('pricingSubtitle');
+  const pricingTitle = document.getElementById('pricingTitle');
+  if (pricingTitle) pricingTitle.innerText = t('pricingTitle');
+  
+  ['Starter','Pro','Premium','Business'].forEach(type => {
+    const desc = document.getElementById(`plan${type}Desc`);
+    if (desc) desc.innerText = t(`plan${type}Desc`);
+    const period = document.getElementById(`plan${type}Period`);
+    if (period) period.innerText = t(`plan${type}Period`);
+  });
+  
+  ['subscribeStarterBtn','subscribeProBtn','subscribePremiumBtn','subscribeBusinessBtn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.innerText = t('subscribeBtn');
+  });
+  
+  ['planNoticeStarter','planNoticePro','planNoticePremium','planNoticeBusiness'].forEach(id => {
+    const notice = document.getElementById(id);
+    if (notice) notice.innerText = t('planNotice');
+  });
+  
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById(`featureStarter${i}`);
+    if (el) el.innerText = t(`featureStarter${i}`);
+  });
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById(`featurePro${i}`);
+    if (el) el.innerText = t(`featurePro${i}`);
+  });
+  [1,2,3,4,5].forEach(i => {
+    const el = document.getElementById(`featurePremium${i}`);
+    if (el) el.innerText = t(`featurePremium${i}`);
+  });
+  [1,2,3,4,5].forEach(i => {
+    const el = document.getElementById(`featureBusiness${i}`);
+    if (el) el.innerText = t(`featureBusiness${i}`);
+  });
+  
+  // 法律页同步（确保存在）
+  const legalPrivacy5 = document.getElementById('legalPrivacy5');
+  if (legalPrivacy5) legalPrivacy5.innerText = t('legalPrivacy5');
+  const legalTerms1 = document.getElementById('legalTerms1');
+  if (legalTerms1) legalTerms1.innerText = t('legalTerms1');
+  
   // 新订阅页面元素
   document.getElementById('pricingSubtitle').innerText = t('pricingSubtitle');
   document.getElementById('pricingTitle').innerText = t('pricingTitle');
