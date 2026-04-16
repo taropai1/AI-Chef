@@ -1971,6 +1971,44 @@ function renderLanguage() {
   document.getElementById('sendResetCodeBtn').innerText = t('sendCode');
   document.getElementById('sendEmailChangeCodeBtn').innerText = t('sendCode');
 
+  // 新订阅页面元素
+  document.getElementById('pricingSubtitle').innerText = t('pricingSubtitle');
+  document.getElementById('pricingTitle').innerText = t('pricingTitle');
+  document.getElementById('planStarterDesc').innerText = t('planStarterDesc');
+  document.getElementById('planProDesc').innerText = t('planProDesc');
+  document.getElementById('planPremiumDesc').innerText = t('planPremiumDesc');
+  document.getElementById('planBusinessDesc').innerText = t('planBusinessDesc');
+  document.getElementById('planStarterPeriod').innerText = t('planStarterPeriod');
+  document.getElementById('planProPeriod').innerText = t('planProPeriod');
+  document.getElementById('planPremiumPeriod').innerText = t('planPremiumPeriod');
+  document.getElementById('planBusinessPeriod').innerText = t('planBusinessPeriod');
+  document.getElementById('subscribeStarterBtn').innerText = t('subscribeBtn');
+  document.getElementById('subscribeProBtn').innerText = t('subscribeBtn');
+  document.getElementById('subscribePremiumBtn').innerText = t('subscribeBtn');
+  document.getElementById('subscribeBusinessBtn').innerText = t('subscribeBtn');
+  document.getElementById('planNoticeStarter').innerText = t('planNotice');
+  document.getElementById('planNoticePro').innerText = t('planNotice');
+  document.getElementById('planNoticePremium').innerText = t('planNotice');
+  document.getElementById('planNoticeBusiness').innerText = t('planNotice');
+
+  // 特性列表
+  for (let i=1; i<=4; i++) {
+    const el = document.getElementById(`featureStarter${i}`);
+    if (el) el.innerText = t(`featureStarter${i}`);
+  }
+  for (let i=1; i<=4; i++) {
+    const el = document.getElementById(`featurePro${i}`);
+    if (el) el.innerText = t(`featurePro${i}`);
+  }
+  for (let i=1; i<=5; i++) {
+    const el = document.getElementById(`featurePremium${i}`);
+    if (el) el.innerText = t(`featurePremium${i}`);
+  }
+  for (let i=1; i<=5; i++) {
+    const el = document.getElementById(`featureBusiness${i}`);
+    if (el) el.innerText = t(`featureBusiness${i}`);
+  }
+
   populateCuisines();
 }
 
