@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Chef · 智能食谱生成器</title>
   <link rel="manifest" href="/manifest.json">
-  <!-- FingerprintJS 用于设备指纹 -->
   <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.1/dist/fp.min.js"></script>
-  <!-- PayPal SDK (生产环境) 启用订阅功能 -->
   <script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&currency=USD&vault=true&intent=subscription&commit=false"></script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -66,7 +64,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- 生成器页 -->
   <div class="page" id="page-generator">
     <div class="container">
@@ -205,51 +203,64 @@
 
 <!-- 订阅支付页 -->
 <div class="page" id="page-subscribe">
-  <div class="container">
-    <h2 class="section-title" id="sectionSubTitle">Choose your plan</h2>
-    <div class="subscribe-plans">
-      <!-- Starter 套餐 -->
-      <div class="plan-card">
-        <div class="plan-name" id="planStarterName">Starter</div>
-        <div class="plan-price" id="planStarterPrice">$4.99<small>/month</small></div>
-        <ul class="plan-features">
-          <li id="featureStarter1">✅ 10 recipes per day</li>
-          <li id="featureStarter2">✅ 10 AI questions per recipe</li>
-          <li id="featureStarter3">✅ Personal use only</li>
-        </ul>
-        <div id="paypal-button-container-P-1U5765718B789804NNG3MBWQ" class="paypal-button-container"></div>
-        <div class="plan-notice" id="planNoticeStarter">🔒 Secured by PayPal • Auto-renewal</div>
+    <div class="container">
+      <h2 class="section-title" id="sectionSubTitle">Choose your plan</h2>
+      <div class="subscribe-plans">
+        <!-- Starter -->
+        <div class="plan-card">
+          <div class="plan-name" id="planStarterName">Starter</div>
+          <div class="plan-price" id="planStarterPrice">$4.99<small>/month</small></div>
+          <ul class="plan-features">
+            <li id="featureStarter1"> - 10 recipes per day</li>
+            <li id="featureStarter2"> - 5 AI questions per recipe</li>
+            <li id="featureStarter3"> - Personal use only</li>
+          </ul>
+          <div id="paypal-starter-container" class="paypal-button-container"></div>
+          <div class="plan-notice" id="planNoticeStarter">🔒 Secured by PayPal • Auto-renewal</div>
+        </div>
+        <!-- Pro -->
+        <div class="plan-card popular">
+          <div class="plan-badge">Most Popular</div>
+          <div class="plan-name" id="planProName">Pro</div>
+          <div class="plan-price" id="planProPrice">$9.99<small>/month</small></div>
+          <ul class="plan-features">
+            <li id="featurePro1">✅ 30 recipes per day</li>
+            <li id="featurePro2">✅ 5 AI questions per recipe</li>
+            <li id="featurePro3">✅ Full features unlocked</li>
+          </ul>
+          <div id="paypal-pro-container" class="paypal-button-container"></div>
+          <div class="plan-notice" id="planNoticePro">🔒 Secured by PayPal • Auto-renewal</div>
+        </div>
+        <!-- Premium Family -->
+        <div class="plan-card">
+          <div class="plan-name" id="planPremiumName">Premium Family</div>
+          <div class="plan-price" id="planPremiumPrice">$29.99<small>/month</small></div>
+          <ul class="plan-features">
+            <li id="featurePremium1">✅ 80 recipes/day shared</li>
+            <li id="featurePremium2">✅ 5 AI questions per recipe</li>
+            <li id="featurePremium3">✅ Family share (up to 3)</li>
+            <li id="featurePremium4">✅ Shared pool usage</li>
+          </ul>
+          <div id="paypal-premium-container" class="paypal-button-container"></div>
+          <div class="plan-notice" id="planNoticePremium">🔒 Secured by PayPal • Auto-renewal</div>
+        </div>
+        <!-- Business Kitchen -->
+        <div class="plan-card">
+          <div class="plan-name" id="planBusinessName">Business Kitchen</div>
+          <div class="plan-price" id="planBusinessPrice">$49.99<small>/month</small></div>
+          <ul class="plan-features">
+            <li id="featureBusiness1">✅ 300 recipes per day</li>
+            <li id="featureBusiness2">✅ 5 AI questions per recipe</li>
+            <li id="featureBusiness3">✅ Commercial use allowed</li>
+            <li id="featureBusiness4">✅ Priority generation</li>
+          </ul>
+          <div id="paypal-business-container" class="paypal-button-container"></div>
+          <div class="plan-notice" id="planNoticeBusiness">🔒 Secured by PayPal • Auto-renewal</div>
+        </div>
       </div>
-      <!-- Pro 套餐 -->
-      <div class="plan-card popular">
-        <div class="plan-badge">Most Popular</div>
-        <div class="plan-name" id="planProName">Pro</div>
-        <div class="plan-price" id="planProPrice">$9.99<small>/month</small></div>
-        <ul class="plan-features">
-          <li id="featurePro1">✅ 30 recipes per day</li>
-          <li id="featurePro2">✅ 10 AI questions per recipe</li>
-          <li id="featurePro3">✅ Full features unlocked</li>
-        </ul>
-        <div id="paypal-button-container-P-5P885108R60234815NG3MEPY" class="paypal-button-container"></div>
-        <div class="plan-notice" id="planNoticePro">🔒 Secured by PayPal • Auto-renewal</div>
-      </div>
-      <!-- Premium 套餐 -->
-      <div class="plan-card">
-        <div class="plan-name" id="planPremiumName">Premium</div>
-        <div class="plan-price" id="planPremiumPrice">$19.99<small>/month</small></div>
-        <ul class="plan-features">
-          <li id="featurePremium1">✅ Unlimited recipes</li>
-          <li id="featurePremium2">✅ 10 AI questions per recipe</li>
-          <li id="featurePremium3">✅ Family share (up to 3 people)</li>
-          <li id="featurePremium4">✅ Priority generation</li>
-        </ul>
-        <div id="paypal-button-container-P-1880277264176022RNG3MFRA" class="paypal-button-container"></div>
-        <div class="plan-notice" id="planNoticePremium">🔒 Secured by PayPal • Auto-renewal</div>
-      </div>
+      <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
     </div>
-    <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
   </div>
-</div>
 
   <!-- 法律页 -->
   <div class="page" id="page-legal">
