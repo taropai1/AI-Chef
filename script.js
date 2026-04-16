@@ -1768,56 +1768,63 @@ function renderPayPal() {
     { id: 'paypal-business-container', planId: 'P-5MH80426G1517050XNHQAHUA', planType: 'business' }
   ];
 
-if (!userData) {
-  // 绑定页面已有的订阅按钮
-  const planButtons = [
-    { btnId: 'subscribeStarterBtn', planType: 'starter' },
-    { btnId: 'subscribeProBtn', planType: 'pro' },
-    { btnId: 'subscribePremiumBtn', planType: 'premium' },
-    { btnId: 'subscribeBusinessBtn', planType: 'business' }
-  ];
+  if (!userData) {
+    // 未登录：绑定页面已有按钮
+    const planButtons = [
+      { btnId: 'subscribeStarterBtn', planType: 'starter' },
+      { btnId: 'subscribeProBtn', planType: 'pro' },
+      { btnId: 'subscribePremiumBtn', planType: 'premium' },
+      { btnId: 'subscribeBusinessBtn', planType: 'business' }
+    ];
+    planButtons.forEach(({ btnId, planType }) => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.replaceWith(btn.cloneNode(true));
+        const newBtn = document.getElementById(btnId);
+        newBtn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          let bindCode = localStorage.getItem('tempBindCode');
+          if (!bindCode) {
+            const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${planType}`);
+            const data = await resp.json();
+            bindCode = data.bindCode;
+            localStorage.setItem('tempBindCode', bindCode);
+          }
+          window.location.href = `https://paypal.taropai.com/?plan=${planType}&bindCode=${bindCode}`;
+        });
+      }
+    });
+    containers.forEach(c => {
+      const container = document.getElementById(c.id);
+      if (container) container.innerHTML = '';
+    });
+    return;
+  }
 
-  planButtons.forEach(({ btnId, planType }) => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      btn.replaceWith(btn.cloneNode(true)); // 清除原有监听
-      const newBtn = document.getElementById(btnId);
-      newBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        let bindCode = localStorage.getItem('tempBindCode');
-        if (!bindCode) {
-          const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${planType}`);
-          const data = await resp.json();
-          bindCode = data.bindCode;
-          localStorage.setItem('tempBindCode', bindCode);
-        }
-        window.location.href = `https://paypal.taropai.com/?plan=${planType}&bindCode=${bindCode}`;
-      });
-    }
-  });
-
-  // 隐藏所有 PayPal 容器（已登录时才显示）
-  containers.forEach(c => {
-    const container = document.getElementById(c.id);
-    if (container) container.innerHTML = '';
-  });
-
-  return; // 提前退出，不再执行已登录用户的 PayPal 渲染
-}
-
+  // 已登录：渲染 PayPal 按钮
   containers.forEach(c => {
     const container = document.getElementById(c.id);
     if (!container) return;
     container.innerHTML = '';
     paypal.Buttons({
-      style: { shape: 'pill', color: 'gold', label: 'subscribe' },
+      style: {
+        shape: 'pill',
+        color: (c.planType === 'starter' || c.planType === 'premium') ? 'silver' : 'blue',
+        layout: 'horizontal',
+        label: 'subscribe',
+        height: 46
+      },
       createSubscription: (data, actions) => actions.subscription.create({ plan_id: c.planId }),
       onApprove: async (data, actions) => {
         try {
           await initDeviceId();
           await apiCall('/api/subscription/verify', {
             method: 'POST',
-            body: JSON.stringify({ subscriptionId: data.subscriptionID, planType: c.planType, deviceId: deviceId })
+            body: JSON.stringify({
+              subscriptionId: data.subscriptionID,
+              planType: c.planType,
+              deviceId: deviceId
+            })
           });
           userData = await loadUserData();
           showToast(t('paymentSuccess'));
@@ -1830,7 +1837,10 @@ if (!userData) {
           alert('Subscription verification failed: ' + e.message);
         }
       },
-      onError: (err) => { console.error(err); alert('Subscription failed. Please try again.'); }
+      onError: (err) => {
+        console.error(err);
+        alert('Subscription failed. Please try again.');
+      }
     }).render(`#${c.id}`);
   });
 }
