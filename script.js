@@ -1769,11 +1769,39 @@ function renderPayPal() {
   ];
 
   if (!userData) {
-    containers.forEach(c => {
-      const container = document.getElementById(c.id);
-      if (!container) return;
-      container.innerHTML = `<button class="btn btn-primary subscribe-guest-btn" data-plan="${c.planType}" style="width:100%;">Subscribe Now</button>`;
-    });
+  // 绑定页面已有的订阅按钮
+  const planButtons = [
+    { btnId: 'subscribeStarterBtn', planType: 'starter' },
+    { btnId: 'subscribeProBtn', planType: 'pro' },
+    { btnId: 'subscribePremiumBtn', planType: 'premium' },
+    { btnId: 'subscribeBusinessBtn', planType: 'business' }
+  ];
+  planButtons.forEach(({ btnId, planType }) => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      // 移除原有监听器（通过克隆替换）
+      btn.replaceWith(btn.cloneNode(true));
+      const newBtn = document.getElementById(btnId);
+      newBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        let bindCode = localStorage.getItem('tempBindCode');
+        if (!bindCode) {
+          const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${planType}`);
+          const data = await resp.json();
+          bindCode = data.bindCode;
+          localStorage.setItem('tempBindCode', bindCode);
+        }
+        window.location.href = `https://paypal.taropai.com/?plan=${planType}&bindCode=${bindCode}`;
+      });
+    }
+  });
+  // 隐藏所有 PayPal 容器（已登录时才显示）
+  containers.forEach(c => {
+    const container = document.getElementById(c.id);
+    if (container) container.innerHTML = '';
+  });
+  return;
+}
     document.querySelectorAll('.subscribe-guest-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const plan = e.target.dataset.plan;
