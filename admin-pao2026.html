@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Tool</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 480px; margin: 50px auto; padding: 20px; }
+    h2 { margin-bottom: 24px; }
+    input, select, button { width: 100%; padding: 12px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+    button { background: #2563eb; color: white; border: none; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    #result { padding: 12px; border-radius: 8px; }
+    .success { background: #d1fae5; color: #065f46; }
+    .error { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <h2>订阅人工绑定</h2>
+  <div id="authSection">
+    <input type="password" id="accessPwd" placeholder="入口访问密码" />
+    <button onclick="checkAccess()">验证</button>
+  </div>
+  <div id="mainSection" style="display:none;">
+    <input type="email" id="email" placeholder="用户邮箱" />
+    <input type="text" id="subId" placeholder="PayPal 订阅 ID" />
+    <select id="plan">
+      <option value="starter">Starter</option>
+      <option value="pro">Pro</option>
+      <option value="premium">Premium Family</option>
+      <option value="business">Business</option>
+    </select>
+    <input type="password" id="adminKey" placeholder="管理员操作密钥 (ADMIN_KEY)" />
+    <button onclick="submitBind()">提交绑定</button>
+    <div id="result"></div>
+  </div>
+  <script>
+    // 入口保护密码（可自行修改）
+    const ACCESS_PASSWORD = 'staff2026';
+    
+    function checkAccess() {
+      if (document.getElementById('accessPwd').value === ACCESS_PASSWORD) {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('mainSection').style.display = 'block';
+      } else {
+        alert('密码错误');
+      }
+    }
+    
+    async function submitBind() {
+      const email = document.getElementById('email').value.trim();
+      const subscriptionId = document.getElementById('subId').value.trim();
+      const planType = document.getElementById('plan').value;
+      const adminKey = document.getElementById('adminKey').value.trim();
+      const resultDiv = document.getElementById('result');
+      
+      if (!email || !subscriptionId || !adminKey) {
+        resultDiv.className = 'error';
+        resultDiv.innerText = '请填写所有字段';
+        return;
+      }
+      
+      resultDiv.className = '';
+      resultDiv.innerText = '提交中...';
+      
+      try {
+        const res = await fetch('https://auth.taropai.com/api/admin/manual-bind', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Key': adminKey
+          },
+          body: JSON.stringify({ email, subscriptionId, planType })
+        });
+        const data = await res.json();
+        if (data.success) {
+          resultDiv.className = 'success';
+          resultDiv.innerText = '✅ 绑定成功';
+        } else {
+          throw new Error(data.error || '未知错误');
+        }
+      } catch (err) {
+        resultDiv.className = 'error';
+        resultDiv.innerText = '❌ ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
