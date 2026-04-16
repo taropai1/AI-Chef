@@ -213,3 +213,14 @@ input, select, textarea { font-size: 16px; }
     max-width: 100%;
   }
 }
+/* 四列套餐布局优化 */
+@media (min-width: 1200px) {
+  .subscribe-plans {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .plan-card {
+    max-width: 100%;
+  }
+}
