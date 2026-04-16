@@ -1800,21 +1800,6 @@ function renderPayPal() {
     const container = document.getElementById(c.id);
     if (container) container.innerHTML = '';
   });
-  return;
-}
-    document.querySelectorAll('.subscribe-guest-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const plan = e.target.dataset.plan;
-        let bindCode = localStorage.getItem('tempBindCode');
-        if (!bindCode) {
-          const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${plan}`);
-          const data = await resp.json();
-          bindCode = data.bindCode;
-          localStorage.setItem('tempBindCode', bindCode);
-        }
-        window.location.href = `https://paypal.taropai.com/?plan=${plan}&bindCode=${bindCode}`;
-      });
-    });
     return;
   }
 
