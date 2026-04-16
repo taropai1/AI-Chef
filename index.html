@@ -214,7 +214,7 @@
         <h3 class="plan-name" id="planStarterName">Starter</h3>
         <p class="plan-desc" id="planStarterDesc">Your personal cooking assistant</p>
         <div class="plan-price-wrapper"><div class="plan-price">$4.99 <span id="planStarterPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-light" id="subscribeStarterBtn">Subscribe Now</button>
+        <button class="plan-btn btn-light" id="subscribeStarterBtn" onclick="toggleSelect(this)">Subscribe Now</button>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeStarter">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list" id="featuresStarter">
           <li id="featureStarter1">10 recipes daily</li>
@@ -229,7 +229,7 @@
         <h3 class="plan-name" id="planProName">Pro</h3>
         <p class="plan-desc" id="planProDesc">Most popular among food lovers</p>
         <div class="plan-price-wrapper"><div class="plan-price">$9.99 <span id="planProPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-paypal" id="subscribeProBtn">Subscribe Now</button>
+        <button class="plan-btn btn-paypal" id="subscribeProBtn" onclick="toggleSelect(this)">Subscribe Now</button>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePro">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list" id="featuresPro">
           <li id="featurePro1">30 recipes daily</li>
@@ -244,7 +244,7 @@
         <h3 class="plan-name" id="planPremiumName">Premium</h3>
         <p class="plan-desc" id="planPremiumDesc">Suitable for multi-user sharing</p>
         <div class="plan-price-wrapper"><div class="plan-price">$29.99 <span id="planPremiumPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-light" id="subscribePremiumBtn">Subscribe Now</button>
+        <button class="plan-btn btn-light" id="subscribePremiumBtn" onclick="toggleSelect(this)">Subscribe Now</button>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePremium">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list" id="featuresPremium">
           <li id="featurePremium1">80 recipes daily</li>
@@ -260,7 +260,7 @@
         <h3 class="plan-name" id="planBusinessName">Business</h3>
         <p class="plan-desc" id="planBusinessDesc">For commercial kitchens & catering</p>
         <div class="plan-price-wrapper"><div class="plan-price">$49.99 <span id="planBusinessPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-paypal" id="subscribeBusinessBtn">Subscribe Now</button>
+        <button class="plan-btn btn-paypal" id="subscribeBusinessBtn" onclick="toggleSelect(this)">Subscribe Now</button>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeBusiness">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list" id="featuresBusiness">
           <li id="featureBusiness1">300 daily generations</li>
