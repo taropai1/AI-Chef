@@ -1768,7 +1768,7 @@ function renderPayPal() {
     { id: 'paypal-business-container', planId: 'P-5MH80426G1517050XNHQAHUA', planType: 'business' }
   ];
 
-  if (!userData) {
+if (!userData) {
   // 绑定页面已有的订阅按钮
   const planButtons = [
     { btnId: 'subscribeStarterBtn', planType: 'starter' },
@@ -1776,11 +1776,11 @@ function renderPayPal() {
     { btnId: 'subscribePremiumBtn', planType: 'premium' },
     { btnId: 'subscribeBusinessBtn', planType: 'business' }
   ];
+
   planButtons.forEach(({ btnId, planType }) => {
     const btn = document.getElementById(btnId);
     if (btn) {
-      // 移除原有监听器（通过克隆替换）
-      btn.replaceWith(btn.cloneNode(true));
+      btn.replaceWith(btn.cloneNode(true)); // 清除原有监听
       const newBtn = document.getElementById(btnId);
       newBtn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -1795,13 +1795,15 @@ function renderPayPal() {
       });
     }
   });
+
   // 隐藏所有 PayPal 容器（已登录时才显示）
   containers.forEach(c => {
     const container = document.getElementById(c.id);
     if (container) container.innerHTML = '';
   });
-    return;
-  }
+
+  return; // 提前退出，不再执行已登录用户的 PayPal 渲染
+}
 
   containers.forEach(c => {
     const container = document.getElementById(c.id);
