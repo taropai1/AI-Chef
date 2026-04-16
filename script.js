@@ -2095,6 +2095,11 @@ function showToast(msg) {
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
+function toggleSelect(btn) {
+  document.querySelectorAll('.plan-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
 function switchLegalTab(tab) {
   document.getElementById('legal-privacy-content').style.display = tab==='privacy'?'block':'none';
   document.getElementById('legal-terms-content').style.display = tab==='terms'?'block':'none';
