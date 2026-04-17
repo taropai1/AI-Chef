@@ -1861,11 +1861,12 @@ function populateCuisines() {
 }
 
 function renderLanguage() {
+  // ========== 首页 ==========
   document.getElementById('heroSubtitle').innerText = t('heroSubtitle');
   document.getElementById('sectionFeatures').innerText = t('sectionFeatures');
-  for (let i=1;i<=6;i++) {
-    const el = document.getElementById(`feat${i}`); if(el) el.innerText = t(`feat${i}`);
-    const sub = document.getElementById(`feat${i}Sub`); if(sub) sub.innerText = t(`feat${i}Sub`);
+  for (let i = 1; i <= 6; i++) {
+    const el = document.getElementById(`feat${i}`); if (el) el.innerText = t(`feat${i}`);
+    const sub = document.getElementById(`feat${i}Sub`); if (sub) sub.innerText = t(`feat${i}Sub`);
   }
   document.getElementById('sectionSubscribe').innerText = t('sectionSubscribe');
   document.getElementById('subText').innerText = t('subText');
@@ -1874,6 +1875,7 @@ function renderLanguage() {
   document.getElementById('familySub').innerText = t('familySub');
   document.getElementById('linkLegal').innerText = t('legalLink');
 
+  // ========== 生成器页 ==========
   document.getElementById('genTitle').innerText = t('genTitle');
   document.getElementById('genMealType').innerText = t('genMealType');
   document.getElementById('genCuisine').innerText = t('genCuisine');
@@ -1883,12 +1885,13 @@ function renderLanguage() {
   document.getElementById('optPregnancy').innerText = t('optPregnancy');
   document.getElementById('btnGenerate').innerText = t('generate');
   document.getElementById('aiAssistTitle').innerText = t('aiAssistTitle');
-  document.getElementById('qaInput').placeholder = t('enterQuestion');
+  const qaInput = document.getElementById('qaInput'); if (qaInput) qaInput.placeholder = t('enterQuestion');
   document.getElementById('askBtn').innerText = t('ask');
   document.getElementById('dishNameHint').innerText = t('dishNameHint');
   document.getElementById('openVideoBtn').innerHTML = '🎬 ' + t('watchVideo');
   document.getElementById('addToHomeBtn').innerHTML = '📱 ' + t('addToHome');
 
+  // ========== 登录/注册页 ==========
   document.getElementById('tabLogin').innerText = t('signIn');
   document.getElementById('tabRegister').innerText = t('signUp');
   document.getElementById('loginEmail').placeholder = t('email');
@@ -1904,6 +1907,7 @@ function renderLanguage() {
   document.getElementById('haveAccount').innerText = t('haveAccount');
   document.getElementById('switchToLogin').innerText = t('signIn');
 
+  // ========== 个人信息页 ==========
   document.getElementById('profileNicknameLabel').innerText = t('profileNickname');
   document.getElementById('profileEmailLabel').innerText = t('profileEmail');
   document.getElementById('profilePlanLabel').innerText = t('profilePlan');
@@ -1915,32 +1919,51 @@ function renderLanguage() {
   document.getElementById('editNicknameBtn').innerText = t('edit');
   document.getElementById('editEmailBtn').innerText = t('change');
 
-  document.getElementById('sectionSubTitle').innerText = t('sectionSubscribe');
-  document.getElementById('planStarterName').innerText = t('planStarterName');
-  document.getElementById('planProName').innerHTML = t('planProName');
-  document.getElementById('planPremiumName').innerHTML = t('planPremiumName');
-  document.getElementById('planBusinessName').innerHTML = t('planBusinessName');
-  document.getElementById('featureStarter1').innerText = t('featureStarter1');
-  document.getElementById('featureStarter2').innerText = t('featureStarter2');
-  document.getElementById('featureStarter3').innerText = t('featureStarter3');
-  document.getElementById('featurePro1').innerText = t('featurePro1');
-  document.getElementById('featurePro2').innerText = t('featurePro2');
-  document.getElementById('featurePro3').innerText = t('featurePro3');
-  document.getElementById('featurePremium1').innerText = t('featurePremium1');
-  document.getElementById('featurePremium2').innerText = t('featurePremium2');
-  document.getElementById('featurePremium3').innerText = t('featurePremium3');
-  document.getElementById('featurePremium4').innerText = t('featurePremium4');
-  document.getElementById('featureBusiness1').innerText = t('featureBusiness1');
-  document.getElementById('featureBusiness2').innerText = t('featureBusiness2');
-  document.getElementById('featureBusiness3').innerText = t('featureBusiness3');
-  document.getElementById('featureBusiness4').innerText = t('featureBusiness4');
-  document.getElementById('finePrint').innerHTML = t('finePrint') + ' <a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
+  // ========== 订阅页（精简统一，仅更新实际存在的元素） ==========
+  const pricingSub = document.getElementById('pricingSubtitle');
+  if (pricingSub) pricingSub.innerText = t('pricingSubtitle');
+  const pricingTitle = document.getElementById('pricingTitle');
+  if (pricingTitle) pricingTitle.innerText = t('pricingTitle');
 
-  document.getElementById('planStarterPrice').innerHTML = '$4.99<small>/month</small>';
-  document.getElementById('planProPrice').innerHTML = '$9.99<small>/month</small>';
-  document.getElementById('planPremiumPrice').innerHTML = '$29.99<small>/month</small>';
-  document.getElementById('planBusinessPrice').innerHTML = '$49.99<small>/month</small>';
+  // 套餐名称、描述、周期
+  ['Starter', 'Pro', 'Premium', 'Business'].forEach(type => {
+    const nameEl = document.getElementById(`plan${type}Name`);
+    if (nameEl) nameEl.innerText = t(`plan${type}Name`);
+    const descEl = document.getElementById(`plan${type}Desc`);
+    if (descEl) descEl.innerText = t(`plan${type}Desc`);
+    const periodEl = document.getElementById(`plan${type}Period`);
+    if (periodEl) periodEl.innerText = t(`plan${type}Period`);
+  });
 
+  // 安全提示
+  ['planNoticeStarter', 'planNoticePro', 'planNoticePremium', 'planNoticeBusiness'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = t('planNotice');
+  });
+
+  // 特性列表
+  [1, 2, 3, 4].forEach(i => {
+    const el = document.getElementById(`featureStarter${i}`);
+    if (el) el.innerText = t(`featureStarter${i}`);
+  });
+  [1, 2, 3, 4].forEach(i => {
+    const el = document.getElementById(`featurePro${i}`);
+    if (el) el.innerText = t(`featurePro${i}`);
+  });
+  [1, 2, 3, 4, 5].forEach(i => {
+    const el = document.getElementById(`featurePremium${i}`);
+    if (el) el.innerText = t(`featurePremium${i}`);
+  });
+  [1, 2, 3, 4, 5].forEach(i => {
+    const el = document.getElementById(`featureBusiness${i}`);
+    if (el) el.innerText = t(`featureBusiness${i}`);
+  });
+
+  // 底部条款
+  const finePrint = document.getElementById('finePrint');
+  if (finePrint) finePrint.innerHTML = t('finePrint') + ' <a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
+
+  // ========== 法律页 ==========
   document.querySelectorAll('.legal-tab')[0].innerText = t('legalPrivacyTitle');
   document.querySelectorAll('.legal-tab')[1].innerText = t('legalTermsTitle');
   document.getElementById('legalPrivacyTitle').innerText = t('legalPrivacyTitle');
@@ -1968,11 +1991,12 @@ function renderLanguage() {
   document.getElementById('legalTermsLaw').innerText = t('legalTermsLaw');
   document.getElementById('legalTerms5').innerText = t('legalTerms5');
   document.getElementById('legalTermsSubRules').innerText = t('legalTermsSubRules');
-  for (let i=1;i<=10;i++) {
+  for (let i = 1; i <= 10; i++) {
     const el = document.getElementById(`legalTermsSub${i}`);
-    if(el) el.innerText = t(`legalTermsSub${i}`);
+    if (el) el.innerText = t(`legalTermsSub${i}`);
   }
 
+  // ========== 弹窗及按钮 ==========
   document.getElementById('forgotTitle').innerText = t('forgotTitle');
   document.getElementById('cancelForgot').innerText = t('cancel');
   document.getElementById('resetPwdBtn').innerText = t('reset');
@@ -1989,86 +2013,7 @@ function renderLanguage() {
   document.getElementById('sendResetCodeBtn').innerText = t('sendCode');
   document.getElementById('sendEmailChangeCodeBtn').innerText = t('sendCode');
 
-   // ========== 订阅页多语言同步 ==========
-  const pricingSubtitle = document.getElementById('pricingSubtitle');
-  if (pricingSubtitle) pricingSubtitle.innerText = t('pricingSubtitle');
-  const pricingTitle = document.getElementById('pricingTitle');
-  if (pricingTitle) pricingTitle.innerText = t('pricingTitle');
-  
-  ['Starter','Pro','Premium','Business'].forEach(type => {
-    const desc = document.getElementById(`plan${type}Desc`);
-    if (desc) desc.innerText = t(`plan${type}Desc`);
-    const period = document.getElementById(`plan${type}Period`);
-    if (period) period.innerText = t(`plan${type}Period`);
-  });
-  
-  ['planNoticeStarter','planNoticePro','planNoticePremium','planNoticeBusiness'].forEach(id => {
-    const notice = document.getElementById(id);
-    if (notice) notice.innerText = t('planNotice');
-  });
-  
-  // 特性列表
-  [1,2,3,4].forEach(i => {
-    const el = document.getElementById(`featureStarter${i}`);
-    if (el) el.innerText = t(`featureStarter${i}`);
-  });
-  [1,2,3,4].forEach(i => {
-    const el = document.getElementById(`featurePro${i}`);
-    if (el) el.innerText = t(`featurePro${i}`);
-  });
-  [1,2,3,4,5].forEach(i => {
-    const el = document.getElementById(`featurePremium${i}`);
-    if (el) el.innerText = t(`featurePremium${i}`);
-  });
-  [1,2,3,4,5].forEach(i => {
-    const el = document.getElementById(`featureBusiness${i}`);
-    if (el) el.innerText = t(`featureBusiness${i}`);
-  });
-  
-  // 法律页
-  const legalPrivacy5 = document.getElementById('legalPrivacy5');
-  if (legalPrivacy5) legalPrivacy5.innerText = t('legalPrivacy5');
-  const legalTerms1 = document.getElementById('legalTerms1');
-  if (legalTerms1) legalTerms1.innerText = t('legalTerms1');
-  
-  // 新订阅页面元素
-  document.getElementById('pricingSubtitle').innerText = t('pricingSubtitle');
-  document.getElementById('pricingTitle').innerText = t('pricingTitle');
-  document.getElementById('planStarterDesc').innerText = t('planStarterDesc');
-  document.getElementById('planProDesc').innerText = t('planProDesc');
-  document.getElementById('planPremiumDesc').innerText = t('planPremiumDesc');
-  document.getElementById('planBusinessDesc').innerText = t('planBusinessDesc');
-  document.getElementById('planStarterPeriod').innerText = t('planStarterPeriod');
-  document.getElementById('planProPeriod').innerText = t('planProPeriod');
-  document.getElementById('planPremiumPeriod').innerText = t('planPremiumPeriod');
-  document.getElementById('planBusinessPeriod').innerText = t('planBusinessPeriod');
-  document.getElementById('subscribeStarterBtn').innerText = t('subscribeBtn');
-  document.getElementById('subscribeProBtn').innerText = t('subscribeBtn');
-  document.getElementById('subscribePremiumBtn').innerText = t('subscribeBtn');
-  document.getElementById('subscribeBusinessBtn').innerText = t('subscribeBtn');
-  document.getElementById('planNoticeStarter').innerText = t('planNotice');
-  document.getElementById('planNoticePro').innerText = t('planNotice');
-  document.getElementById('planNoticePremium').innerText = t('planNotice');
-  document.getElementById('planNoticeBusiness').innerText = t('planNotice');
-
-  // 特性列表
-  for (let i=1; i<=4; i++) {
-    const el = document.getElementById(`featureStarter${i}`);
-    if (el) el.innerText = t(`featureStarter${i}`);
-  }
-  for (let i=1; i<=4; i++) {
-    const el = document.getElementById(`featurePro${i}`);
-    if (el) el.innerText = t(`featurePro${i}`);
-  }
-  for (let i=1; i<=5; i++) {
-    const el = document.getElementById(`featurePremium${i}`);
-    if (el) el.innerText = t(`featurePremium${i}`);
-  }
-  for (let i=1; i<=5; i++) {
-    const el = document.getElementById(`featureBusiness${i}`);
-    if (el) el.innerText = t(`featureBusiness${i}`);
-  }
-
+  // 菜系下拉框刷新
   populateCuisines();
 }
 
