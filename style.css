@@ -596,20 +596,3 @@ input, select, textarea { font-size: 16px; }
 .modal-actions-new .auth-btn-primary {
   flex: 1;
 }
-
-/* 移除原有冲突样式（可保留，但新样式会覆盖） */
-.auth-card,
-.tabs,
-.tab,
-.auth-input,
-.auth-btn,
-.modal-overlay,
-.modal-card {
-  /* 原有样式将被子元素的类覆盖，无需删除 */
-}
-
-/* 保证多语言切换时按钮文本不折行 */
-#sendCodeBtn,
-#sendResetCodeBtn {
-  white-space: nowrap;
-}
