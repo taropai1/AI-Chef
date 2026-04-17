@@ -1674,7 +1674,7 @@ function togglePassword(fieldId) {
 }
 
 /**
- * 切换密码可见性并同步更新眼睛图标
+ * 切换密码可见性并同步更新眼睛图标（睁眼/闭眼）
  * @param {string} fieldId - 输入框元素 ID
  * @param {HTMLElement} toggleElement - 被点击的切换元素（span）
  */
@@ -1685,23 +1685,20 @@ function togglePasswordWithIcon(fieldId, toggleElement) {
   const isPassword = field.type === 'password';
   field.type = isPassword ? 'text' : 'password';
   
-  // 切换图标
   const svg = toggleElement.querySelector('svg');
   if (svg) {
     if (isPassword) {
-      // 切换到睁眼（文本可见）
+      // 切换到睁眼（密码可见）
       svg.innerHTML = `
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
         <circle cx="12" cy="12" r="3"></circle>
       `;
-      svg.setAttribute('class', 'eye-icon eye-open');
     } else {
       // 切换到闭眼（密码隐藏）
       svg.innerHTML = `
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
         <line x1="1" y1="1" x2="23" y2="23" stroke="#6b7280" stroke-width="2" stroke-linecap="round"></line>
       `;
-      svg.setAttribute('class', 'eye-icon eye-closed');
     }
   }
 }
