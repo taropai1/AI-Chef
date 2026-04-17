@@ -110,46 +110,105 @@
     </div>
   </div>
 
-  <!-- 登录/注册页 -->
-  <div class="page" id="page-login-register">
-    <div class="container">
-      <div class="auth-card">
-        <div class="tabs">
-          <div class="tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
-          <div class="tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
+<!-- 登录/注册页 -->
+<div class="page" id="page-login-register">
+  <div class="auth-container">
+    <div class="auth-card-new">
+      <!-- Tab 切换 -->
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
+        <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
+      </div>
+
+      <!-- 登录面板 -->
+      <div class="auth-panel active" id="loginForm">
+        <div class="auth-input-wrapper">
+          <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email address">
         </div>
-        <div id="loginForm">
-          <input type="email" class="auth-input" id="loginEmail" placeholder="Email">
-          <div class="password-wrapper" style="position: relative;">
-            <input type="password" class="auth-input" id="loginPassword" placeholder="Password" style="padding-right: 40px;">
-            <span class="password-toggle" onclick="togglePassword('loginPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
-          </div>
-          <div style="text-align:right;"><span class="edit-btn" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span></div>
-          <button class="auth-btn primary" id="btnLoginSubmit" onclick="login()">Login</button>
-          <div class="auth-footer"><span id="noAccount">Don't have an account?</span> <span class="auth-link" id="switchToRegister" onclick="switchAuthTab('register')">Sign Up</span></div>
+        <div class="auth-input-wrapper pwd-wrapper">
+          <input type="password" class="auth-input-new" id="loginPassword" placeholder="Password">
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('loginPassword', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon eye-open">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </span>
         </div>
-        <div id="registerForm" style="display:none;">
-          <input type="email" class="auth-input" id="registerEmail" placeholder="Email">
-          <div style="display: flex; gap: 8px;">
-            <input type="text" class="auth-input" id="registerCode" placeholder="Verification code" style="flex: 1;">
-            <button id="sendCodeBtn" class="btn btn-outline" style="width: 120px;">Send code</button>
-          </div>
-          <div class="password-wrapper" style="position: relative;">
-            <input type="password" class="auth-input" id="registerPassword" placeholder="Password" style="padding-right: 40px;">
-            <span class="password-toggle" onclick="togglePassword('registerPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
-          </div>
-          <div class="password-wrapper" style="position: relative;">
-            <input type="password" class="auth-input" id="registerConfirmPwd" placeholder="Confirm Password" style="padding-right: 40px;">
-            <span class="password-toggle" onclick="togglePassword('registerConfirmPwd')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
-          </div>
-          <button class="auth-btn primary" id="btnRegisterSubmit" onclick="register()">Sign Up</button>
-          <div class="auth-footer"><span id="haveAccount">Already have an account?</span> <span class="auth-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span></div>
+        <div class="auth-link-row">
+          <span class="auth-link-text" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span>
+        </div>
+        <button class="auth-btn-primary" id="btnLoginSubmit" onclick="login()">Login</button>
+        <div class="auth-swap">
+          <span class="auth-swap-label" id="noAccount">Don't have an account?</span>
+          <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Register</span>
         </div>
       </div>
-      <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
+
+      <!-- 注册面板 -->
+      <div class="auth-panel" id="registerForm" style="display:none;">
+        <div class="auth-input-wrapper">
+          <input type="email" class="auth-input-new" id="registerEmail" placeholder="Email address">
+        </div>
+        <div class="auth-row">
+          <input type="text" class="auth-input-new auth-code-input" id="registerCode" placeholder="Verification code">
+          <button class="auth-btn-secondary" id="sendCodeBtn">Send Code</button>
+        </div>
+        <div class="auth-input-wrapper pwd-wrapper">
+          <input type="password" class="auth-input-new" id="registerPassword" placeholder="Password">
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerPassword', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon eye-open">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </span>
+        </div>
+        <div class="auth-input-wrapper pwd-wrapper">
+          <input type="password" class="auth-input-new" id="registerConfirmPwd" placeholder="Confirm password">
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerConfirmPwd', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon eye-open">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </span>
+        </div>
+        <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Register</button>
+        <div class="auth-swap">
+          <span class="auth-swap-label" id="haveAccount">Already have an account?</span>
+          <span class="auth-swap-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span>
+        </div>
+      </div>
     </div>
   </div>
+  <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
+</div>
 
+<!-- 忘记密码弹窗（新设计） -->
+<div class="modal-overlay-new" id="forgotModal">
+  <div class="modal-card-new">
+    <h3 class="modal-title-new" id="forgotTitle">Reset Password</h3>
+    <div class="auth-input-wrapper">
+      <input type="email" class="auth-input-new" id="forgotEmail" placeholder="Email address">
+    </div>
+    <div class="auth-row">
+      <input type="text" class="auth-input-new auth-code-input" id="forgotCode" placeholder="Verification code">
+      <button class="auth-btn-secondary" id="sendResetCodeBtn">Send Code</button>
+    </div>
+    <div class="auth-input-wrapper pwd-wrapper">
+      <input type="password" class="auth-input-new" id="forgotNewPwd" placeholder="New password">
+      <span class="pwd-toggle" onclick="togglePasswordWithIcon('forgotNewPwd', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon eye-open">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </span>
+    </div>
+    <div class="modal-actions-new">
+      <button class="auth-btn-secondary" id="cancelForgot" onclick="closeModal('forgotModal')">Cancel</button>
+      <button class="auth-btn-primary" id="resetPwdBtn" onclick="resetPassword()">Reset</button>
+    </div>
+  </div>
+</div>
+  
   <!-- 个人信息页 -->
   <div class="page" id="page-profile">
     <div class="container">
