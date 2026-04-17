@@ -1989,7 +1989,7 @@ function renderLanguage() {
   document.getElementById('sendResetCodeBtn').innerText = t('sendCode');
   document.getElementById('sendEmailChangeCodeBtn').innerText = t('sendCode');
 
-    // 订阅页多语言
+   // ========== 订阅页多语言同步 ==========
   const pricingSubtitle = document.getElementById('pricingSubtitle');
   if (pricingSubtitle) pricingSubtitle.innerText = t('pricingSubtitle');
   const pricingTitle = document.getElementById('pricingTitle');
@@ -2002,16 +2002,12 @@ function renderLanguage() {
     if (period) period.innerText = t(`plan${type}Period`);
   });
   
-  ['subscribeStarterBtn','subscribeProBtn','subscribePremiumBtn','subscribeBusinessBtn'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) btn.innerText = t('subscribeBtn');
-  });
-  
   ['planNoticeStarter','planNoticePro','planNoticePremium','planNoticeBusiness'].forEach(id => {
     const notice = document.getElementById(id);
     if (notice) notice.innerText = t('planNotice');
   });
   
+  // 特性列表
   [1,2,3,4].forEach(i => {
     const el = document.getElementById(`featureStarter${i}`);
     if (el) el.innerText = t(`featureStarter${i}`);
@@ -2029,7 +2025,7 @@ function renderLanguage() {
     if (el) el.innerText = t(`featureBusiness${i}`);
   });
   
-  // 法律页同步（确保存在）
+  // 法律页
   const legalPrivacy5 = document.getElementById('legalPrivacy5');
   if (legalPrivacy5) legalPrivacy5.innerText = t('legalPrivacy5');
   const legalTerms1 = document.getElementById('legalTerms1');
