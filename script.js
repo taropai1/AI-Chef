@@ -1762,46 +1762,43 @@ function checkOAuthCallback() {
 function renderPayPal() {
   if (!window.paypal) return;
   const containers = [
-    { id: 'paypal-starter-container', planId: 'P-1U5765718B789804NNG3MBWQ', planType: 'starter' },
-    { id: 'paypal-pro-container', planId: 'P-5P885108R60234815NG3MEPY', planType: 'pro' },
-    { id: 'paypal-premium-container', planId: 'P-1880277264176022RNG3MFRA', planType: 'premium' },
-    { id: 'paypal-business-container', planId: 'P-5MH80426G1517050XNHQAHUA', planType: 'business' }
+    { id: 'paypal-starter-container', planId: 'P-1U5765718B789804NNG3MBWQ', planType: 'starter', color: 'silver' },
+    { id: 'paypal-pro-container', planId: 'P-5P885108R60234815NG3MEPY', planType: 'pro', color: 'blue' },
+    { id: 'paypal-premium-container', planId: 'P-1880277264176022RNG3MFRA', planType: 'premium', color: 'silver' },
+    { id: 'paypal-business-container', planId: 'P-5MH80426G1517050XNHQAHUA', planType: 'business', color: 'blue' }
   ];
 
   if (!userData) {
-    // 未登录：绑定页面已有按钮
-    const planButtons = [
-      { btnId: 'subscribeStarterBtn', planType: 'starter' },
-      { btnId: 'subscribeProBtn', planType: 'pro' },
-      { btnId: 'subscribePremiumBtn', planType: 'premium' },
-      { btnId: 'subscribeBusinessBtn', planType: 'business' }
-    ];
-    planButtons.forEach(({ btnId, planType }) => {
-      const btn = document.getElementById(btnId);
-      if (btn) {
-        btn.replaceWith(btn.cloneNode(true));
-        const newBtn = document.getElementById(btnId);
-        newBtn.addEventListener('click', async (e) => {
-          e.preventDefault();
-          let bindCode = localStorage.getItem('tempBindCode');
-          if (!bindCode) {
-            const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${planType}`);
-            const data = await resp.json();
-            bindCode = data.bindCode;
-            localStorage.setItem('tempBindCode', bindCode);
-          }
-          window.location.href = `https://paypal.taropai.com/?plan=${planType}&bindCode=${bindCode}`;
-        });
-      }
-    });
+    // 未登录：渲染外观相同的模拟按钮
     containers.forEach(c => {
       const container = document.getElementById(c.id);
-      if (container) container.innerHTML = '';
+      if (!container) return;
+      const btn = document.createElement('button');
+      btn.className = `mock-paypal-btn ${c.color}`;
+      btn.innerText = t('subscribeBtn');
+      btn.dataset.plan = c.planType;
+      btn.onclick = async (e) => {
+        e.preventDefault();
+        // 选中动效
+        document.querySelectorAll('.mock-paypal-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        // 跳转逻辑
+        let bindCode = localStorage.getItem('tempBindCode');
+        if (!bindCode) {
+          const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${c.planType}`);
+          const data = await resp.json();
+          bindCode = data.bindCode;
+          localStorage.setItem('tempBindCode', bindCode);
+        }
+        window.location.href = `https://paypal.taropai.com/?plan=${c.planType}&bindCode=${bindCode}`;
+      };
+      container.innerHTML = '';
+      container.appendChild(btn);
     });
     return;
   }
 
-  // 已登录：渲染 PayPal 按钮
+  // 已登录：渲染官方 PayPal 按钮
   containers.forEach(c => {
     const container = document.getElementById(c.id);
     if (!container) return;
@@ -1809,10 +1806,11 @@ function renderPayPal() {
     paypal.Buttons({
       style: {
         shape: 'pill',
-        color: (c.planType === 'starter' || c.planType === 'premium') ? 'silver' : 'blue',
+        color: c.color,
         layout: 'horizontal',
         label: 'subscribe',
-        height: 46
+        height: 46,
+        tagline: false
       },
       createSubscription: (data, actions) => actions.subscription.create({ plan_id: c.planId }),
       onApprove: async (data, actions) => {
@@ -1843,7 +1841,7 @@ function renderPayPal() {
       }
     }).render(`#${c.id}`);
   });
-}
+}   
 
 async function bindInvite() {
   if (!userData) { alert('Please login'); showPage('page-login-register'); return; }
