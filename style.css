@@ -294,52 +294,13 @@ input, select, textarea { font-size: 16px; }
   font-weight: 400;
 }
 
-.plan-btn {
-  width: 100%;
-  padding: 0;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
+/* 按钮容器 */
+.paypal-button-container {
   margin: 12px 0 6px 0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-  text-align: center;
-  line-height: 1.4;
-  height: 46px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.btn-light {
-  background: #f3f4f6;
-  color: #111827;
-  border-color: #e5e7eb;
-}
-.btn-paypal {
-  background: #3b82f6;
-  color: white;
-  border-color: #2563eb;
-}
-.btn-paypal:hover {
-  background: #2563eb;
+  min-height: 46px;
 }
 
-/* 选中状态 */
-.plan-btn.selected {
-  border-color: #7dd3fc !important;
-  background-color: #f0f9ff !important;
-  color: #0369a1 !important;
-  box-shadow: 0 0 0 1px #7dd3fc;
-}
-.btn-paypal.selected {
-  background-color: #2563eb !important;
-  border-color: #7dd3fc !important;
-  color: white !important;
-  box-shadow: 0 0 0 1px #7dd3fc;
-}
-
+/* PayPal 安全提示 */
 .paypal-security {
   font-size: 10px;
   color: #6b7280;
@@ -359,6 +320,7 @@ input, select, textarea { font-size: 16px; }
   flex-shrink: 0;
 }
 
+/* 特性列表 */
 .features-list {
   list-style: none;
   flex-grow: 0;
@@ -390,11 +352,44 @@ input, select, textarea { font-size: 16px; }
   margin-right: 8px;
 }
 
-.paypal-button-container {
-  margin: 12px 0 6px 0;
-  min-height: 46px;
+/* 模拟按钮（未登录） */
+.mock-paypal-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.mock-paypal-btn.silver {
+  background: #eeeeee;
+  color: #111827;
+  border-color: #cccccc;
+}
+.mock-paypal-btn.blue {
+  background: #0070ba;
+  color: white;
+  border-color: #005ea6;
+}
+.mock-paypal-btn.selected {
+  border-color: #7dd3fc !important;
+  box-shadow: 0 0 0 1px #7dd3fc;
+}
+.mock-paypal-btn.silver.selected {
+  background-color: #f0f9ff !important;
+  color: #0369a1 !important;
+}
+.mock-paypal-btn.blue.selected {
+  background-color: #005ea6 !important;
 }
 
+/* 底部条款 */
 .fine-print {
   text-align: center;
   margin: 24px 0;
@@ -413,4 +408,9 @@ input, select, textarea { font-size: 16px; }
 }
 @media (max-width: 640px) {
   .plans-grid { grid-template-columns: 1fr; }
+}
+
+/* 语言下拉菜单层级修复 */
+.lang-dropdown {
+  z-index: 1000 !important;
 }
