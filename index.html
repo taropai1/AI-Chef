@@ -214,7 +214,7 @@
         <h3 class="plan-name" id="planStarterName">Starter</h3>
         <p class="plan-desc" id="planStarterDesc">Your personal cooking assistant</p>
         <div class="plan-price-wrapper"><div class="plan-price">$4.99 <span id="planStarterPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-light" id="subscribeStarterBtn" onclick="toggleSelect(this)">Subscribe Now</button>
+        <div id="paypal-starter-container" class="paypal-button-container"></div>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeStarter">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list">
           <li id="featureStarter1">10 recipes daily</li>
@@ -222,14 +222,13 @@
           <li id="featureStarter3">For personal use only</li>
           <li id="featureStarter4">Generate recipes from any ingredients</li>
         </ul>
-        <div id="paypal-starter-container" class="paypal-button-container"></div>
       </div>
       <!-- Pro -->
       <div class="plan-card">
         <h3 class="plan-name" id="planProName">Pro</h3>
         <p class="plan-desc" id="planProDesc">Most popular among food lovers</p>
         <div class="plan-price-wrapper"><div class="plan-price">$9.99 <span id="planProPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-paypal" id="subscribeProBtn" onclick="toggleSelect(this)">Subscribe Now</button>
+        <div id="paypal-pro-container" class="paypal-button-container"></div>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePro">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list">
           <li id="featurePro1">30 recipes daily</li>
@@ -237,14 +236,13 @@
           <li id="featurePro3">All features unlocked</li>
           <li id="featurePro4">Advanced recipe customization</li>
         </ul>
-        <div id="paypal-pro-container" class="paypal-button-container"></div>
       </div>
       <!-- Premium -->
       <div class="plan-card">
         <h3 class="plan-name" id="planPremiumName">Premium</h3>
         <p class="plan-desc" id="planPremiumDesc">Suitable for multi-user sharing</p>
         <div class="plan-price-wrapper"><div class="plan-price">$29.99 <span id="planPremiumPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-light" id="subscribePremiumBtn" onclick="toggleSelect(this)">Subscribe Now</button>
+        <div id="paypal-premium-container" class="paypal-button-container"></div>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePremium">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list">
           <li id="featurePremium1">80 recipes daily</li>
@@ -253,14 +251,13 @@
           <li id="featurePremium4">Shared usage pool</li>
           <li id="featurePremium5">Health & nutrition analysis</li>
         </ul>
-        <div id="paypal-premium-container" class="paypal-button-container"></div>
       </div>
       <!-- Business -->
       <div class="plan-card">
         <h3 class="plan-name" id="planBusinessName">Business</h3>
         <p class="plan-desc" id="planBusinessDesc">For commercial kitchens & catering</p>
         <div class="plan-price-wrapper"><div class="plan-price">$49.99 <span id="planBusinessPeriod">/ month</span></div></div>
-        <button class="plan-btn btn-paypal" id="subscribeBusinessBtn" onclick="toggleSelect(this)">Subscribe Now</button>
+        <div id="paypal-business-container" class="paypal-button-container"></div>
         <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeBusiness">Secured by PayPal · Auto-renewal</span></div>
         <ul class="features-list">
           <li id="featureBusiness1">300 daily generations</li>
@@ -269,13 +266,12 @@
           <li id="featureBusiness4">Commercial usage rights</li>
           <li id="featureBusiness5">Extended recipe permissions</li>
         </ul>
-        <div id="paypal-business-container" class="paypal-button-container"></div>
       </div>
     </div>
     <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
   </div>
 </div>
-
+  
   <!-- 法律页 -->
   <div class="page" id="page-legal">
     <div class="container">
