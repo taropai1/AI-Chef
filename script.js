@@ -1768,37 +1768,7 @@ function renderPayPal() {
     { id: 'paypal-business-container', planId: 'P-5MH80426G1517050XNHQAHUA', planType: 'business', color: 'blue' }
   ];
 
-  if (!userData) {
-    // 未登录：渲染外观相同的模拟按钮
-    containers.forEach(c => {
-      const container = document.getElementById(c.id);
-      if (!container) return;
-      const btn = document.createElement('button');
-      btn.className = `mock-paypal-btn ${c.color}`;
-      btn.innerText = t('subscribeBtn');
-      btn.dataset.plan = c.planType;
-      btn.onclick = async (e) => {
-        e.preventDefault();
-        // 选中动效
-        document.querySelectorAll('.mock-paypal-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        // 跳转逻辑
-        let bindCode = localStorage.getItem('tempBindCode');
-        if (!bindCode) {
-          const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${c.planType}`);
-          const data = await resp.json();
-          bindCode = data.bindCode;
-          localStorage.setItem('tempBindCode', bindCode);
-        }
-        window.location.href = `https://paypal.taropai.com/?plan=${c.planType}&bindCode=${bindCode}`;
-      };
-      container.innerHTML = '';
-      container.appendChild(btn);
-    });
-    return;
-  }
-
-  // 已登录：渲染官方 PayPal 按钮
+  // 统一渲染官方 PayPal 按钮（未登录与已登录相同）
   containers.forEach(c => {
     const container = document.getElementById(c.id);
     if (!container) return;
@@ -1812,10 +1782,35 @@ function renderPayPal() {
         height: 46,
         tagline: false
       },
-      createSubscription: (data, actions) => actions.subscription.create({ plan_id: c.planId }),
+      createSubscription: (data, actions) => {
+        // 未登录时无法获取用户信息，但 PayPal 按钮仍可创建订阅
+        // 订阅验证将在 onApprove 中通过后端绑定 bindCode（若未登录则走临时绑定逻辑）
+        return actions.subscription.create({ plan_id: c.planId });
+      },
       onApprove: async (data, actions) => {
         try {
           await initDeviceId();
+          // 获取当前用户状态
+          const token = localStorage.getItem('authToken');
+          const bindCode = localStorage.getItem('tempBindCode');
+          
+          if (!token && !bindCode) {
+            // 未登录且无 bindCode，理论上不应该发生
+            alert('Please refresh and try again.');
+            return;
+          }
+          
+          if (!token) {
+            // 未登录用户：走临时绑定流程
+            const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${c.planType}`);
+            const data = await resp.json();
+            localStorage.setItem('tempBindCode', data.bindCode);
+            // 重定向到 PayPal 支付页
+            window.location.href = `https://paypal.taropai.com/?plan=${c.planType}&bindCode=${data.bindCode}`;
+            return;
+          }
+          
+          // 已登录用户：调用后端验证订阅
           await apiCall('/api/subscription/verify', {
             method: 'POST',
             body: JSON.stringify({
@@ -1841,7 +1836,7 @@ function renderPayPal() {
       }
     }).render(`#${c.id}`);
   });
-}   
+} 
 
 async function bindInvite() {
   if (!userData) { alert('Please login'); showPage('page-login-register'); return; }
