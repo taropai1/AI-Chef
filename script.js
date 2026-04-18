@@ -1673,7 +1673,7 @@ function togglePassword(fieldId) {
   field.type = field.type === 'password' ? 'text' : 'password';
 }
 /**
- * 切换密码可见性并同步更新眼睛图标（睁眼/闭眼）
+ * 切换密码可见性并同步更新后部开放式图标
  * @param {string} fieldId - 输入框元素 ID
  * @param {HTMLElement} toggleElement - 被点击的切换元素（span）
  */
@@ -1687,16 +1687,18 @@ function togglePasswordWithIcon(fieldId, toggleElement) {
   const svg = toggleElement.querySelector('svg');
   if (svg) {
     if (isPassword) {
-      // 睁眼状态（密码可见）
+      // 密码可见状态（开放式图标，表示“隐藏密码”）
       svg.innerHTML = `
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-        <circle cx="12" cy="12" r="3"></circle>
+        <circle cx="12" cy="12" r="4" fill="none" stroke="#6b7280" stroke-width="2"></circle>
+        <path d="M18 6 L6 18" stroke="#6b7280" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M2 12 C2 12, 5 4, 12 4" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round"></path>
       `;
     } else {
-      // 闭眼状态（密码隐藏，加斜线）
+      // 密码隐藏状态（开放式图标，表示“显示密码”）
       svg.innerHTML = `
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-        <line x1="1" y1="1" x2="23" y2="23" stroke="#6b7280" stroke-width="2" stroke-linecap="round"></line>
+        <circle cx="12" cy="12" r="4" fill="none" stroke="#6b7280" stroke-width="2"></circle>
+        <path d="M2 12 C2 12, 5 20, 12 20 C19 20, 22 12, 22 12" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M2 12 C2 12, 5 4, 12 4 C19 4, 22 12, 22 12" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round"></path>
       `;
     }
   }
