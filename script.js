@@ -1688,13 +1688,13 @@ function togglePasswordWithIcon(fieldId, toggleElement) {
   const svg = toggleElement.querySelector('svg');
   if (svg) {
     if (isPassword) {
-      // 切换到睁眼（密码可见）
+      // 睁眼状态（密码可见）
       svg.innerHTML = `
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
         <circle cx="12" cy="12" r="3"></circle>
       `;
     } else {
-      // 切换到闭眼（密码隐藏）
+      // 闭眼状态（密码隐藏，加斜线）
       svg.innerHTML = `
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
         <line x1="1" y1="1" x2="23" y2="23" stroke="#6b7280" stroke-width="2" stroke-linecap="round"></line>
