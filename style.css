@@ -378,11 +378,11 @@ input, select, textarea { font-size: 16px; }
   z-index: 1000 !important;
 }
 
-/* ==================== 登录/注册页新样式（修正版） ==================== */
+/* ==================== 登录/注册页新样式（严格匹配设计稿） ==================== */
 .auth-container {
   max-width: 400px;
   width: 100%;
-  margin: 10px auto;          /* 缩小上下边距，避免顶到导航栏 */
+  margin: 40px auto;          /* 增大上边距，增加与导航栏的留白 */
   padding: 0 16px;
 }
 
@@ -408,6 +408,7 @@ input, select, textarea { font-size: 16px; }
   color: #9ca3af;
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
 }
 
 .auth-tab.active {
@@ -427,6 +428,7 @@ input, select, textarea { font-size: 16px; }
   border: 1px solid #e5e7eb;
   font-size: 15px;
   outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .auth-input-new:focus { border-color: #b3d9ff; }
@@ -455,6 +457,7 @@ input, select, textarea { font-size: 16px; }
   font-size: 13px;
   color: #6b7280;
   cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .auth-link-text:hover { color: #2d7dff; }
@@ -469,6 +472,7 @@ input, select, textarea { font-size: 16px; }
   font-weight: 600;
   border: none;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .auth-btn-primary:hover { background: #2563eb; }
@@ -483,6 +487,7 @@ input, select, textarea { font-size: 16px; }
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .auth-btn-secondary:hover { background: #e5e7eb; color: #2d7dff; }
@@ -497,14 +502,18 @@ input, select, textarea { font-size: 16px; }
   color: #6b7280;
 }
 
+.auth-swap-label {
+  color: #6b7280;
+  margin-right: 4px;
+}
+
 .auth-swap-link {
   color: #2d7dff;
   cursor: pointer;
-  margin-left: 4px;
   font-weight: 500;
 }
 
-/* 弹窗样式保持不变 */
+/* 弹窗样式 */
 .modal-overlay-new {
   position: fixed;
   inset: 0;
@@ -526,12 +535,14 @@ input, select, textarea { font-size: 16px; }
   padding: 28px;
   width: 90%;
   max-width: 360px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
 
 .modal-title-new {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 16px;
+  color: #111827;
 }
 
 .modal-actions-new { display: flex; gap: 12px; margin-top: 8px; }
