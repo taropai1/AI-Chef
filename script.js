@@ -595,7 +595,14 @@ const translations = {
     featureBusiness2: '5 consultas IA por receta',
     featureBusiness3: 'Cola de generación prioritaria',
     featureBusiness4: 'Derechos de uso comercial',
-    featureBusiness5: 'Permisos extendidos de recetas'
+    featureBusiness5: 'Permisos extendidos de recetas',
+    freeTierDesc: 'Estás en el nivel gratuito.',
+    promoTitle: 'Hazte Premium',
+    promoSub: 'Desbloquea todo para tu cocina',
+    promoFeature1: 'Recetas ilimitadas',
+    promoFeature2: 'Compartir en familia',
+    promoFeature3: 'Información nutricional',
+    promoFeature4: 'Sin anuncios',
   },
 
   fr: {
@@ -768,7 +775,14 @@ const translations = {
     featureBusiness2: '5 questions IA par recette',
     featureBusiness3: 'File de génération prioritaire',
     featureBusiness4: 'Droits d\'utilisation commerciale',
-    featureBusiness5: 'Autorisations étendues sur les recettes'
+    featureBusiness5: 'Autorisations étendues sur les recettes',
+    freeTierDesc: 'Vous êtes sur le niveau gratuit.',
+    promoTitle: 'Passer à Premium',
+    promoSub: 'Débloquez tout pour votre cuisine',
+    promoFeature1: 'Recettes illimitées',
+    promoFeature2: 'Partage familial',
+    promoFeature3: 'Informations nutritionnelles',
+    promoFeature4: 'Sans publicité',
   },
 
   de: {
