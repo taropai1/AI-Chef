@@ -110,19 +110,19 @@
     </div>
   </div>
 
-<!-- 登录/注册页 -->
+  <!-- 登录/注册页 -->
 <div class="page" id="page-login-register">
   <div class="auth-container">
     <div class="auth-card-new">
       <div class="auth-tabs">
         <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
-        <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Sign Up</div>
+        <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
       </div>
 
       <!-- 登录面板 -->
       <div class="auth-panel active" id="loginForm">
         <div class="auth-input-wrapper">
-          <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email">
+          <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email address">
         </div>
         <div class="auth-input-wrapper pwd-wrapper">
           <input type="password" class="auth-input-new" id="loginPassword" placeholder="Password">
@@ -138,15 +138,15 @@
         </div>
         <button class="auth-btn-primary" id="btnLoginSubmit" onclick="login()">Login</button>
         <div class="auth-swap">
-          <span class="auth-swap-label" id="noAccount">Don't have an account?</span>
-          <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Sign Up</span>
+          <span class="auth-swap-label" id="noAccount">New?</span>
+          <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Register</span>
         </div>
       </div>
 
       <!-- 注册面板 -->
       <div class="auth-panel" id="registerForm" style="display:none;">
         <div class="auth-input-wrapper">
-          <input type="email" class="auth-input-new" id="registerEmail" placeholder="Email">
+          <input type="email" class="auth-input-new" id="registerEmail" placeholder="Email address">
         </div>
         <div class="auth-row">
           <input type="text" class="auth-input-new auth-code-input" id="registerCode" placeholder="Verification code">
@@ -170,9 +170,9 @@
             </svg>
           </span>
         </div>
-        <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Sign Up</button>
+        <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Register</button>
         <div class="auth-swap">
-          <span class="auth-swap-label" id="haveAccount">Already have an account?</span>
+          <span class="auth-swap-label" id="haveAccount">Have account?</span>
           <span class="auth-swap-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span>
         </div>
       </div>
@@ -186,7 +186,7 @@
   <div class="modal-card-new">
     <h3 class="modal-title-new" id="forgotTitle">Reset Password</h3>
     <div class="auth-input-wrapper">
-      <input type="email" class="auth-input-new" id="forgotEmail" placeholder="Email">
+      <input type="email" class="auth-input-new" id="forgotEmail" placeholder="Email address">
     </div>
     <div class="auth-row">
       <input type="text" class="auth-input-new auth-code-input" id="forgotCode" placeholder="Verification code">
