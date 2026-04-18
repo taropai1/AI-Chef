@@ -378,23 +378,27 @@ input, select, textarea { font-size: 16px; }
   z-index: 1000 !important;
 }
 
-/* ==================== 登录/注册页新样式 ==================== */
+/* ==================== 登录/注册页新样式（修正版） ==================== */
 .auth-container {
   max-width: 400px;
   width: 100%;
-  margin: 20px auto;
+  margin: 10px auto;          /* 缩小上下边距，避免顶到导航栏 */
+  padding: 0 16px;
 }
+
 .auth-card-new {
   background: #fff;
   border-radius: 20px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   padding: 32px 28px;
 }
+
 .auth-tabs {
   display: flex;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 24px;
 }
+
 .auth-tab {
   flex: 1;
   text-align: center;
@@ -405,13 +409,17 @@ input, select, textarea { font-size: 16px; }
   cursor: pointer;
   border-bottom: 2px solid transparent;
 }
+
 .auth-tab.active {
   color: #2d7dff;
   border-bottom-color: #2d7dff;
 }
+
 .auth-panel { display: none; }
 .auth-panel.active { display: block; }
+
 .auth-input-wrapper { margin-bottom: 16px; }
+
 .auth-input-new {
   width: 100%;
   padding: 14px 16px;
@@ -420,9 +428,12 @@ input, select, textarea { font-size: 16px; }
   font-size: 15px;
   outline: none;
 }
+
 .auth-input-new:focus { border-color: #b3d9ff; }
+
 .pwd-wrapper { position: relative; }
 .pwd-wrapper .auth-input-new { padding-right: 44px; }
+
 .pwd-toggle {
   position: absolute;
   right: 14px;
@@ -435,14 +446,19 @@ input, select, textarea { font-size: 16px; }
   align-items: center;
   justify-content: center;
 }
+
 .pwd-toggle svg { width: 20px; height: 20px; }
+
 .auth-link-row { text-align: right; margin-bottom: 16px; }
+
 .auth-link-text {
   font-size: 13px;
   color: #6b7280;
   cursor: pointer;
 }
+
 .auth-link-text:hover { color: #2d7dff; }
+
 .auth-btn-primary {
   width: 100%;
   padding: 14px;
@@ -454,7 +470,9 @@ input, select, textarea { font-size: 16px; }
   border: none;
   cursor: pointer;
 }
+
 .auth-btn-primary:hover { background: #2563eb; }
+
 .auth-btn-secondary {
   background: #f3f4f6;
   color: #6b7280;
@@ -466,21 +484,27 @@ input, select, textarea { font-size: 16px; }
   cursor: pointer;
   white-space: nowrap;
 }
+
 .auth-btn-secondary:hover { background: #e5e7eb; color: #2d7dff; }
+
 .auth-row { display: flex; gap: 12px; margin-bottom: 16px; }
 .auth-code-input { flex: 2; }
+
 .auth-swap {
   text-align: center;
   margin-top: 18px;
   font-size: 14px;
   color: #6b7280;
 }
+
 .auth-swap-link {
   color: #2d7dff;
   cursor: pointer;
   margin-left: 4px;
   font-weight: 500;
 }
+
+/* 弹窗样式保持不变 */
 .modal-overlay-new {
   position: fixed;
   inset: 0;
@@ -493,7 +517,9 @@ input, select, textarea { font-size: 16px; }
   opacity: 0;
   transition: 0.2s;
 }
+
 .modal-overlay-new.show { visibility: visible; opacity: 1; }
+
 .modal-card-new {
   background: #fff;
   border-radius: 20px;
@@ -501,11 +527,13 @@ input, select, textarea { font-size: 16px; }
   width: 90%;
   max-width: 360px;
 }
+
 .modal-title-new {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 16px;
 }
+
 .modal-actions-new { display: flex; gap: 12px; margin-top: 8px; }
 .modal-actions-new .auth-btn-secondary,
 .modal-actions-new .auth-btn-primary { flex: 1; }
