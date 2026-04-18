@@ -2073,28 +2073,67 @@ function renderLanguage() {
 
 function renderProfile() {
   if (!userData) {
-    document.getElementById('profileNickname').innerText = 'Not logged in';
+    document.getElementById('profileNickname').innerText = 'Gourmet';
     document.getElementById('profileEmail').innerText = '';
-    document.getElementById('profilePlan').innerText = '';
     document.getElementById('profileJoined').innerText = '';
-    document.getElementById('subStatus').innerText = '';
-    document.getElementById('subExpiry').innerText = '';
+    document.getElementById('subStatus').innerText = 'Free';
+    document.getElementById('subExpiryText').innerText = 'You’re on the free tier.';
     document.getElementById('familyArea').style.display = 'none';
     document.getElementById('setPasswordArea').style.display = 'none';
     return;
   }
-  document.getElementById('profileNickname').innerText = userData.nickname || userData.email.split('@')[0];
-  document.getElementById('profileEmail').innerText = userData.email;
-  const planDisplay = { free:'Free', starter:'Starter', pro:'Pro', premium:'Premium Family', business:'Business' }[userData.plan] || userData.plan;
-  document.getElementById('profilePlan').innerText = planDisplay;
-  document.getElementById('profileJoined').innerText = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A';
-  document.getElementById('subStatus').innerText = planDisplay;
-  document.getElementById('subExpiry').innerText = userData.expireAt ? new Date(userData.expireAt).toLocaleDateString() : '';
-  document.getElementById('familyArea').style.display = userData.plan === 'premium' ? 'block' : 'none';
-  if (userData.plan === 'premium') {
-    document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || '');
+
+  const savedAvatar = localStorage.getItem(`avatar_${userData.email}`);
+  const avatarImg = document.getElementById('profileAvatarImg');
+  if (avatarImg) {
+    avatarImg.src = savedAvatar || '/images/default-avatar.png';
+    const navAvatar = document.getElementById('navAvatar');
+    if (navAvatar) navAvatar.src = avatarImg.src;
   }
+
+  document.getElementById('profileNickname').innerText = userData.nickname || 'Gourmet';
+  document.getElementById('profileEmail').innerText = userData.email;
+  
+  const joinedDate = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'N/A';
+  document.getElementById('profileJoined').innerText = joinedDate;
+
+  const plan = userData.plan || 'free';
+  const planDisplay = { free:'Free', starter:'Starter', pro:'Pro', premium:'Premium Family', business:'Business' }[plan] || plan;
+  document.getElementById('subStatus').innerText = planDisplay;
+
+  const subExpiryEl = document.getElementById('subExpiryText');
+  if (plan === 'free') {
+    subExpiryEl.innerText = t('freeTierDesc') || 'You’re on the free tier.';
+  } else {
+    const expireStr = userData.expireAt ? new Date(userData.expireAt).toLocaleDateString() : '';
+    subExpiryEl.innerText = expireStr ? `${planDisplay} · Expires ${expireStr}` : planDisplay;
+  }
+
+  const familyArea = document.getElementById('familyArea');
+  if (plan === 'premium') {
+    familyArea.style.display = 'block';
+    document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || '');
+  } else {
+    familyArea.style.display = 'none';
+  }
+
   document.getElementById('setPasswordArea').style.display = userData.hasPassword ? 'none' : 'block';
+
+  // 多语言更新
+  document.getElementById('profileNicknameLabel').innerText = t('profileNickname');
+  document.getElementById('profileEmailLabel').innerText = t('profileEmail');
+  document.getElementById('profileJoinedLabel').innerText = t('profileJoined');
+  document.getElementById('profileSubTitle').innerText = t('profileSub');
+  document.getElementById('logoutBtn').innerText = t('logout');
+  document.getElementById('editNicknameBtn').innerText = t('edit');
+  document.getElementById('editEmailBtn').innerText = t('change');
+  document.getElementById('promoTitle').innerText = t('promoTitle');
+  document.getElementById('promoSub').innerText = t('promoSub');
+  document.getElementById('promoFeature1').innerText = t('promoFeature1');
+  document.getElementById('promoFeature2').innerText = t('promoFeature2');
+  document.getElementById('promoFeature3').innerText = t('promoFeature3');
+  document.getElementById('promoFeature4').innerText = t('promoFeature4');
+  document.getElementById('goSubscribeBtn').innerText = t('subscribeBtn');
 }
 
 async function showPage(pageId) {
