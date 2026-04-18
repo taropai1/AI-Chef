@@ -236,8 +236,6 @@ const translations = {
     featureBusiness3: 'Priority generation queue',
     featureBusiness4: 'Commercial usage rights',
     featureBusiness5: 'Extended recipe permissions',
-
-    // 个人信息页新增
     freeTierDesc: 'You’re on the free tier.',
     promoTitle: 'Go Premium',
     promoSub: 'Unlock everything for your cooking',
@@ -418,8 +416,6 @@ const translations = {
     featureBusiness3: '优先生成队列',
     featureBusiness4: '商业使用授权',
     featureBusiness5: '扩展食谱权限',
-    
-    // 个人信息页新增
     freeTierDesc: '您当前为免费用户。',
     promoTitle: '升级高级版',
     promoSub: '解锁全部烹饪功能',
