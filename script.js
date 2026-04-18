@@ -243,6 +243,11 @@ const translations = {
     promoFeature2: 'Family sharing',
     promoFeature3: 'Nutrition insights',
     promoFeature4: 'Ad-free experience',
+    // 英文 (en) 修改部分
+    noAccount: 'New?',
+    haveAccount: 'Have account?',
+    edit: 'Edit',
+    logout: 'Sign Out',
   },
 
   'zh-CN': {
@@ -423,6 +428,14 @@ const translations = {
     promoFeature2: '家庭共享',
     promoFeature3: '营养分析',
     promoFeature4: '无广告体验',
+    // 中文 (zh-CN) 修改部分
+    noAccount: '新账户？',
+    haveAccount: '有账户吗？',
+    edit: '编辑',
+    logout: '退出账号',
+    // 生成器页文案
+    genTitle: 'AI 食谱生成器',
+    dishNameHint: '可输入食材、菜名、食品名称等关键词',
 },
 
   es: {
