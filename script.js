@@ -1672,7 +1672,6 @@ function togglePassword(fieldId) {
   const field = document.getElementById(fieldId);
   field.type = field.type === 'password' ? 'text' : 'password';
 }
-
 /**
  * 切换密码可见性并同步更新眼睛图标（睁眼/闭眼）
  * @param {string} fieldId - 输入框元素 ID
