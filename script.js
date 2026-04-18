@@ -955,7 +955,14 @@ const translations = {
     featureBusiness2: '5 KI-Fragen pro Rezept',
     featureBusiness3: 'Priorisierte Generierungswarteschlange',
     featureBusiness4: 'Kommerzielle Nutzungsrechte',
-    featureBusiness5: 'Erweiterte Rezeptberechtigungen'
+    featureBusiness5: 'Erweiterte Rezeptberechtigungen',
+    freeTierDesc: 'Sie befinden sich in der kostenlosen Stufe.',
+    promoTitle: 'Premium werden',
+    promoSub: 'Alles für Ihre Küche freischalten',
+    promoFeature1: 'Unbegrenzte Rezepte',
+    promoFeature2: 'Familienfreigabe',
+    promoFeature3: 'Nährwertinformationen',
+    promoFeature4: 'Werbefrei',
   },
 
   it: {
@@ -1128,7 +1135,14 @@ const translations = {
     featureBusiness2: '5 domande IA per ricetta',
     featureBusiness3: 'Coda di generazione prioritaria',
     featureBusiness4: 'Diritti di utilizzo commerciale',
-    featureBusiness5: 'Permessi estesi sulle ricette'
+    featureBusiness5: 'Permessi estesi sulle ricette',
+    freeTierDesc: 'Sei nel livello gratuito.',
+    promoTitle: 'Passa a Premium',
+    promoSub: 'Sblocca tutto per la tua cucina',
+    promoFeature1: 'Ricette illimitate',
+    promoFeature2: 'Condivisione familiare',
+    promoFeature3: 'Informazioni nutrizionali',
+    promoFeature4: 'Senza pubblicità',
   },
 
   pt: {
@@ -1301,7 +1315,14 @@ const translations = {
     featureBusiness2: '5 perguntas IA por receita',
     featureBusiness3: 'Fila de geração prioritária',
     featureBusiness4: 'Direitos de uso comercial',
-    featureBusiness5: 'Permissões estendidas de receitas'
+    featureBusiness5: 'Permissões estendidas de receitas',
+    freeTierDesc: 'Você está no nível gratuito.',
+    promoTitle: 'Seja Premium',
+    promoSub: 'Desbloqueie tudo para sua cozinha',
+    promoFeature1: 'Receitas ilimitadas',
+    promoFeature2: 'Compartilhamento familiar',
+    promoFeature3: 'Informações nutricionais',
+    promoFeature4: 'Sem anúncios',
   }
 };
 
