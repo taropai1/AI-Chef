@@ -2362,3 +2362,77 @@ if ('serviceWorker' in navigator) {
   handleUrlParams();
   if (userData?.email) updateLimitInfo();
 })();
+// ==================== 头像裁剪功能 ====================
+(function initAvatarCrop() {
+  const avatarInput = document.getElementById('avatarInput');
+  const cropModal = document.getElementById('cropModal');
+  const cropImg = document.getElementById('cropImg');
+  const cropWrap = document.getElementById('cropWrap');
+  const cropCancel = document.getElementById('cropCancel');
+  const cropConfirm = document.getElementById('cropConfirm');
+  
+  let scale = 1, x = 0, y = 0, startX, startY, dragging = false, tempSrc = '';
+
+  if (!avatarInput) return;
+
+  avatarInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      tempSrc = ev.target.result;
+      cropImg.src = tempSrc;
+      cropModal.classList.add('show');
+      cropImg.onload = () => {
+        const size = 240;
+        scale = cropImg.naturalWidth > cropImg.naturalHeight 
+          ? size / cropImg.naturalHeight 
+          : size / cropImg.naturalWidth;
+        x = (size - cropImg.naturalWidth * scale) / 2;
+        y = (size - cropImg.naturalHeight * scale) / 2;
+        updateCrop();
+      };
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function updateCrop() {
+    cropImg.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+  }
+
+  cropWrap.addEventListener('mousedown', (e) => { e.preventDefault(); dragging = true; startX = e.clientX - x; startY = e.clientY - y; });
+  cropWrap.addEventListener('touchstart', (e) => { e.preventDefault(); dragging = true; const t = e.touches[0]; startX = t.clientX - x; startY = t.clientY - y; });
+  window.addEventListener('mousemove', (e) => { if(!dragging) return; x = e.clientX - startX; y = e.clientY - startY; updateCrop(); });
+  window.addEventListener('touchmove', (e) => { if(!dragging) return; e.preventDefault(); const t = e.touches[0]; x = t.clientX - startX; y = t.clientY - startY; updateCrop(); });
+  window.addEventListener('mouseup', () => dragging = false);
+  window.addEventListener('touchend', () => dragging = false);
+  cropWrap.addEventListener('wheel', (e) => { e.preventDefault(); scale = Math.max(0.8, Math.min(3, scale + (e.deltaY>0?-0.1:0.1))); updateCrop(); });
+
+  cropCancel.addEventListener('click', () => { cropModal.classList.remove('show'); avatarInput.value = ''; });
+  cropConfirm.addEventListener('click', () => {
+    const size = 240;
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = tempSrc;
+    img.onload = () => {
+      ctx.beginPath(); ctx.arc(size/2, size/2, size/2, 0, Math.PI*2); ctx.clip();
+      ctx.drawImage(img, x, y, img.width*scale, img.height*scale);
+      const base64 = canvas.toDataURL('image/jpeg', 0.9);
+      document.getElementById('profileAvatarImg').src = base64;
+      const navAvatar = document.getElementById('navAvatar');
+      if (navAvatar) navAvatar.src = base64;
+      // 存储到 localStorage
+      if (userData && userData.email) {
+        localStorage.setItem(`avatar_${userData.email}`, base64);
+      }
+      cropModal.classList.remove('show');
+      avatarInput.value = '';
+    };
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === cropModal) cropModal.classList.remove('show');
+  });
+})();
