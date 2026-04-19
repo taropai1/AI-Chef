@@ -1406,35 +1406,20 @@ async function refreshUserData() {
 }
 
 function updateNavButton() {
-  const existingAvatar = document.getElementById('navAvatar');
+  const avatar = document.getElementById('navAvatar');
   const loginBtn = document.getElementById('btnLogin');
   const getStartedBtn = document.getElementById('btnGetStarted');
   
-  if (!loginBtn) return;
+  if (!avatar || !loginBtn) return;
 
   if (userData && userData.email) {
-    // 已登录：显示头像，隐藏登录按钮
     const savedAvatar = localStorage.getItem(`avatar_${userData.email}`);
-    const avatarUrl = savedAvatar || '/images/default-avatar.png';
-    
-    if (existingAvatar) {
-      existingAvatar.src = avatarUrl;
-      existingAvatar.style.display = 'inline-block';
-    } else {
-      const avatar = document.createElement('img');
-      avatar.id = 'navAvatar';
-      avatar.className = 'nav-avatar';
-      avatar.src = avatarUrl;
-      avatar.onclick = () => showPage('page-profile');
-      avatar.title = userData.nickname || userData.email;
-      // 插入到 loginBtn 之前
-      loginBtn.parentNode.insertBefore(avatar, loginBtn);
-    }
+    avatar.src = savedAvatar || '/images/default-avatar.png';
+    avatar.style.display = 'inline-block';
     loginBtn.style.display = 'none';
     if (getStartedBtn) getStartedBtn.style.display = 'flex';
   } else {
-    // 未登录：隐藏头像，显示登录按钮
-    if (existingAvatar) existingAvatar.style.display = 'none';
+    avatar.style.display = 'none';
     loginBtn.style.display = 'flex';
     if (getStartedBtn) getStartedBtn.style.display = 'flex';
   }
