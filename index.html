@@ -89,7 +89,7 @@
         <label style="font-size:14px;margin-bottom:6px;display:block" id="genCuisine">Cuisine</label>
         <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="cuisine"></select>
         <label style="font-size:14px;margin-bottom:6px;display:block" id="genDishName">What to eat?</label>
-        <input id="dishName" placeholder="e.g. chicken, tomato, cake, latte..." maxlength="100" ...>
+        <input id="dishName" placeholder="e.g. chicken, tomato, cake, latte..." maxlength="100" style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0">
         <div class="small-note" id="dishNameHint">Enter keywords like ingredients, dish names, or food items.</div>
         <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
       </div>
@@ -259,13 +259,8 @@
         <div class="label">Set Password (for email login)</div>
         <div class="pwd-wrapper" style="margin-bottom:12px;">
           <input type="password" id="newPasswordInput" class="auth-input-new" placeholder="New password">
-          <span class="pwd-toggle" onclick="togglePasswordWithIcon('loginPassword', this)">
-  <i class="pwd-icon pwd-icon-eye"></i>
-</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('newPasswordInput', this)">
+            <i class="pwd-icon pwd-icon-eye"></i>
           </span>
         </div>
         <div class="pwd-wrapper" style="margin-bottom:12px;">
@@ -445,46 +440,46 @@
   </div>
 
   <!-- 弹窗 -->
-  <div class="modal-overlay" id="forgotModal">
+  <div class="modal-overlay" id="forgotModalOld">
     <div class="modal-card">
-      <h3 id="forgotTitle">Reset Password</h3>
-      <input class="auth-input" placeholder="Email" id="forgotEmail">
+      <h3 id="forgotTitleOld">Reset Password</h3>
+      <input class="auth-input" placeholder="Email" id="forgotEmailOld">
       <div style="display: flex; gap: 8px;">
-        <input class="auth-input" id="forgotCode" placeholder="Verification code" style="flex: 1;">
-        <button id="sendResetCodeBtn" class="btn btn-outline" style="width: 120px;">Send code</button>
+        <input class="auth-input" id="forgotCodeOld" placeholder="Verification code" style="flex: 1;">
+        <button id="sendResetCodeBtnOld" class="btn btn-outline" style="width: 120px;">Send code</button>
       </div>
       <div class="password-wrapper" style="position: relative;">
-        <input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwd" style="padding-right: 40px;">
-        <span class="password-toggle" onclick="togglePassword('forgotNewPwd')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+        <input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwdOld" style="padding-right: 40px;">
+        <span class="password-toggle" onclick="togglePassword('forgotNewPwdOld')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-outline" id="cancelForgot" onclick="closeModal('forgotModal')">Cancel</button>
-        <button class="btn btn-primary" id="resetPwdBtn" onclick="resetPassword()">Reset</button>
+        <button class="btn btn-outline" id="cancelForgotOld" onclick="closeModal('forgotModalOld')">Cancel</button>
+        <button class="btn btn-primary" id="resetPwdBtnOld" onclick="resetPassword()">Reset</button>
       </div>
     </div>
   </div>
-  <div class="modal-overlay" id="nicknameModal">
+  <div class="modal-overlay" id="nicknameModalOld">
     <div class="modal-card">
-      <h3 id="nicknameTitle">Change Nickname</h3>
-      <input class="auth-input" id="newNicknameInput" maxlength="12" placeholder="New nickname (max 12 chars)">
+      <h3 id="nicknameTitleOld">Change Nickname</h3>
+      <input class="auth-input" id="newNicknameInputOld" maxlength="12" placeholder="New nickname (max 12 chars)">
       <div class="modal-actions">
-        <button class="btn btn-outline" id="cancelNickname" onclick="closeModal('nicknameModal')">Cancel</button>
-        <button class="btn btn-primary" id="saveNicknameBtn" onclick="saveNickname()">Save</button>
+        <button class="btn btn-outline" id="cancelNicknameOld" onclick="closeModal('nicknameModalOld')">Cancel</button>
+        <button class="btn btn-primary" id="saveNicknameBtnOld" onclick="saveNickname()">Save</button>
       </div>
     </div>
   </div>
-  <div class="modal-overlay" id="emailModal">
+  <div class="modal-overlay" id="emailModalOld">
     <div class="modal-card">
-      <h3 id="emailTitle">Change Email</h3>
-      <input class="auth-input" id="newEmailInput" placeholder="New Email">
+      <h3 id="emailTitleOld">Change Email</h3>
+      <input class="auth-input" id="newEmailInputOld" placeholder="New Email">
       <div style="display: flex; gap: 8px;">
-        <input class="auth-input" id="emailChangeCode" placeholder="Verification code" style="flex: 1;">
-        <button id="sendEmailChangeCodeBtn" class="btn btn-outline" style="width: 120px;">Send code</button>
+        <input class="auth-input" id="emailChangeCodeOld" placeholder="Verification code" style="flex: 1;">
+        <button id="sendEmailChangeCodeBtnOld" class="btn btn-outline" style="width: 120px;">Send code</button>
       </div>
       <div class="small-note">Please use a valid email for account recovery.</div>
       <div class="modal-actions">
-        <button class="btn btn-outline" id="cancelEmail" onclick="closeModal('emailModal')">Cancel</button>
-        <button class="btn btn-primary" id="saveEmailBtn" onclick="saveEmail()">Save</button>
+        <button class="btn btn-outline" id="cancelEmailOld" onclick="closeModal('emailModalOld')">Cancel</button>
+        <button class="btn btn-primary" id="saveEmailBtnOld" onclick="saveEmail()">Save</button>
       </div>
     </div>
   </div>
