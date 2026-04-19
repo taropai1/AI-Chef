@@ -28,8 +28,10 @@
             <div class="lang-option" data-lang="zh-CN">简体中文</div>
           </div>
         </div>
-        <button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
-        <button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
+       <!-- 导航栏右侧，原 #btnLogin 按钮位置 -->
+<img src="/images/default-avatar.png" class="nav-avatar" id="navAvatar" onclick="showPage('page-profile')" style="display:none;">
+<button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
+<button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
       </div>
     </div>
   </div>
@@ -87,8 +89,8 @@
         <label style="font-size:14px;margin-bottom:6px;display:block" id="genCuisine">Cuisine</label>
         <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="cuisine"></select>
         <label style="font-size:14px;margin-bottom:6px;display:block" id="genDishName">What to eat?</label>
-        <input id="dishName" placeholder="e.g. chicken, tomato" maxlength="100" style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0">
-        <div class="small-note" id="dishNameHint">You can enter one or more ingredients.</div>
+        <input id="dishName" placeholder="e.g. chicken, tomato, cake, latte..." maxlength="100" ...>
+        <div class="small-note" id="dishNameHint">Enter keywords like ingredients, dish names, or food items.</div>
         <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
       </div>
       <div class="card">
@@ -257,7 +259,9 @@
         <div class="label">Set Password (for email login)</div>
         <div class="pwd-wrapper" style="margin-bottom:12px;">
           <input type="password" id="newPasswordInput" class="auth-input-new" placeholder="New password">
-          <span class="pwd-toggle" onclick="togglePasswordWithIcon('newPasswordInput', this)">
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('loginPassword', this)">
+  <i class="pwd-icon pwd-icon-eye"></i>
+</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
