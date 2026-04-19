@@ -2119,7 +2119,7 @@ function renderProfile() {
     document.getElementById('profileEmail').innerText = '';
     document.getElementById('profileJoined').innerText = '';
     document.getElementById('subStatus').innerText = 'Free';
-    document.getElementById('subExpiryText').innerText = 'You’re on the free tier.';
+    document.getElementById('subExpiryText').innerText = "You're on the free tier.";
     document.getElementById('familyArea').style.display = 'none';
     document.getElementById('setPasswordArea').style.display = 'none';
     return;
