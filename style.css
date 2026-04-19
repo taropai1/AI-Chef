@@ -717,3 +717,44 @@ input, select, textarea { font-size: 16px; }
   cursor: pointer;
   border: 1px solid #e5e7eb;
 }
+
+/* ==================== 导航栏头像 ==================== */
+.nav-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+#btnLogin, #btnGetStarted {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-right {
+  gap: 8px;
+  align-items: center;
+}
+
+/* ==================== 密码显隐图标（极简线条） ==================== */
+.pwd-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.pwd-icon-eye {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'%3E%3C/path%3E%3Ccircle cx='12' cy='12' r='3'%3E%3C/circle%3E%3C/svg%3E");
+}
+.pwd-icon-eye-slash {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'%3E%3C/path%3E%3Cline x1='1' y1='1' x2='23' y2='23'%3E%3C/line%3E%3C/svg%3E");
+}
+
+/* 调整个人信息页弹窗层级，确保可点击 */
+.modal-overlay-new {
+  z-index: 300;
+}
