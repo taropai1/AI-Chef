@@ -1406,37 +1406,30 @@ async function refreshUserData() {
 }
 
 function updateNavButton() {
-  const btn = document.getElementById('btnLogin');
-  if (!btn) return;
+  const existingAvatar = document.getElementById('navAvatar');
+  const loginBtn = document.getElementById('btnLogin');
   
   if (userData && userData.email) {
-    // 已登录：替换为头像
+    // 已登录：显示头像，隐藏登录按钮
     const savedAvatar = localStorage.getItem(`avatar_${userData.email}`);
     const avatarUrl = savedAvatar || '/images/default-avatar.png';
-    // 创建新的 img 元素
-    const avatarImg = document.createElement('img');
-    avatarImg.src = avatarUrl;
-    avatarImg.className = 'nav-avatar';
-    avatarImg.id = 'navAvatar';
-    avatarImg.alt = userData.nickname || userData.email;
-    avatarImg.title = userData.nickname || userData.email;
-    avatarImg.onclick = () => showPage('page-profile');
-    // 替换原有按钮
-    btn.parentNode.replaceChild(avatarImg, btn);
-  } else {
-    // 未登录：如果当前是头像，替换回按钮
-    const existingAvatar = document.getElementById('navAvatar');
     if (existingAvatar) {
-      const newBtn = document.createElement('button');
-      newBtn.className = 'btn btn-outline';
-      newBtn.id = 'btnLogin';
-      newBtn.onclick = handleLoginClick;
-      newBtn.innerText = t('signIn');
-      existingAvatar.parentNode.replaceChild(newBtn, existingAvatar);
+      existingAvatar.src = avatarUrl;
+      existingAvatar.style.display = 'inline-block';
     } else {
-      // 本来就是按钮，更新文字
-      btn.innerText = t('signIn');
+      const avatar = document.createElement('img');
+      avatar.id = 'navAvatar';
+      avatar.className = 'nav-avatar';
+      avatar.src = avatarUrl;
+      avatar.onclick = () => showPage('page-profile');
+      avatar.title = userData.nickname || userData.email;
+      loginBtn.parentNode.insertBefore(avatar, loginBtn);
     }
+    loginBtn.style.display = 'none';
+  } else {
+    // 未登录：隐藏头像，显示登录按钮
+    if (existingAvatar) existingAvatar.style.display = 'none';
+    loginBtn.style.display = 'flex';
   }
 }
 
