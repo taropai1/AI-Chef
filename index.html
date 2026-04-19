@@ -17,22 +17,24 @@
         <img src="images/logo-120x40.png" alt="AI Chef">
       </div>
       <div class="nav-right">
-        <div class="lang-selector">
-          <div class="lang-btn" id="currentLang">English ▼</div>
-          <div class="lang-dropdown" id="langDropdown">
-            <div class="lang-option" data-lang="en">English</div>
-            <div class="lang-option" data-lang="es">Español</div>
-            <div class="lang-option" data-lang="fr">Français</div>
-            <div class="lang-option" data-lang="de">Deutsch</div>
-            <div class="lang-option" data-lang="it">Italiano</div>
-            <div class="lang-option" data-lang="pt">Português</div>
-            <div class="lang-option" data-lang="zh-CN">简体中文</div>
-          </div>
-        </div>
-       <!-- 导航栏右侧，原 #btnLogin 按钮位置 -->
-<img src="/images/default-avatar.png" class="nav-avatar" id="navAvatar" onclick="showPage('page-profile')" style="display:none;">
-<button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
-<button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
+  <div class="lang-selector">
+    <div class="lang-btn" id="currentLang">English ▼</div>
+    <div class="lang-dropdown" id="langDropdown">
+      <div class="lang-option" data-lang="en">English</div>
+      <div class="lang-option" data-lang="es">Español</div>
+      <div class="lang-option" data-lang="fr">Français</div>
+      <div class="lang-option" data-lang="de">Deutsch</div>
+      <div class="lang-option" data-lang="it">Italiano</div>
+      <div class="lang-option" data-lang="pt">Português</div>
+      <div class="lang-option" data-lang="zh-CN">简体中文</div>
+    </div>
+  </div>
+  <!-- 头像（登录后显示） -->
+  <img src="/images/default-avatar.png" class="nav-avatar" id="navAvatar" onclick="showPage('page-profile')" style="display:none;">
+  <!-- 登录按钮（未登录显示） -->
+  <button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
+  <button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
+</div>
       </div>
     </div>
   </div>
