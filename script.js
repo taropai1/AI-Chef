@@ -705,28 +705,47 @@ async function generateRecipe() {
 
 function parseRecipeToUI(recipeText) {
   const lines = recipeText.split('\n');
-  const sections = { name: '', ingredients: [], instructions: [], nutrition: [], warnings: [] };
+  const sections = { name: '', ingredients: [], instructions: [], nutrition: [], warnings: [], time: '' };
   let currentSection = '';
   for (let line of lines) {
     line = line.trim();
     if (!line) continue;
-    if (line.includes('食材准备') || line.includes('Ingredients')) { currentSection = 'ingredients'; continue; }
-    if (line.includes('制作方法') || line.includes('Instructions')) { currentSection = 'instructions'; continue; }
-    if (line.includes('营养参数') || line.includes('Nutrition')) { currentSection = 'nutrition'; continue; }
-    if (line.includes('风险提示') || line.includes('Allergens') || line.includes('Warnings')) { currentSection = 'warnings'; continue; }
+
+    // 放宽匹配条件，兼容中英文及冒号
+    if (line.includes('食材准备') || line.toLowerCase().includes('ingredients')) { currentSection = 'ingredients'; continue; }
+    if (line.includes('制作方法') || line.toLowerCase().includes('instructions')) {
+      currentSection = 'instructions';
+      // 提取总时间，例如 "制作方法 (总时间: 25分钟)" 或 "Instructions (25 mins)"
+      const timeMatch = line.match(/\([^)]*(\d+)[^)]*分钟|\((\d+)\s*mins?\)/i);
+      if (timeMatch) sections.time = timeMatch[0].replace(/[()]/g, '');
+      continue;
+    }
+    if (line.includes('营养参数') || line.toLowerCase().includes('nutrition')) { currentSection = 'nutrition'; continue; }
+    if (line.includes('风险提示') || line.includes('建议') || line.toLowerCase().includes('allergens') || line.toLowerCase().includes('warnings')) {
+      currentSection = 'warnings';
+      continue;
+    }
     if (!currentSection && !sections.name) { sections.name = line; continue; }
+
     if (currentSection === 'ingredients' && line.startsWith('-')) sections.ingredients.push(line.substring(1).trim());
     else if (currentSection === 'instructions' && /^\d+\./.test(line)) sections.instructions.push(line.replace(/^\d+\./, '').trim());
     else if (currentSection === 'nutrition' && line.startsWith('-')) sections.nutrition.push(line.substring(1).trim());
     else if (currentSection === 'warnings' && line.startsWith('-')) sections.warnings.push(line.substring(1).trim());
   }
-  document.getElementById('recipeNameDisplay').innerText = sections.name || 'Recipe';
+
+  document.getElementById('recipeNameDisplay').innerText = sections.name || '';
   document.getElementById('ingredientsList').innerHTML = sections.ingredients.map(i => `<li>${i}</li>`).join('');
   document.getElementById('ingredientsSection').style.display = sections.ingredients.length ? 'block' : 'none';
+
+  // 制作方法标题附带时间
+  const instructionsTitle = document.getElementById('instructionsTitle');
+  instructionsTitle.innerText = sections.time ? `Instructions (${sections.time})` : 'Instructions';
   document.getElementById('instructionsList').innerHTML = sections.instructions.map(i => `<li>${i}</li>`).join('');
   document.getElementById('instructionsSection').style.display = sections.instructions.length ? 'block' : 'none';
+
   document.getElementById('nutritionList').innerHTML = sections.nutrition.map(i => `<li>${i}</li>`).join('');
   document.getElementById('nutritionSection').style.display = sections.nutrition.length ? 'block' : 'none';
+
   document.getElementById('warningsList').innerHTML = sections.warnings.map(i => `<li>${i}</li>`).join('');
   document.getElementById('warningsSection').style.display = sections.warnings.length ? 'block' : 'none';
 }
