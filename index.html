@@ -69,50 +69,136 @@
     </div>
   </div>
   
-  <!-- 生成器页 -->
-  <div class="page" id="page-generator">
-    <div class="container">
-      <div class="card">
-        <div class="generator-header">
-          <h2 id="genTitle">AI Recipe Generator</h2>
-          <button class="add-home-btn" id="addToHomeBtn" onclick="addToHome()">📱 Add</button>
-          <div class="nav-history">
-            <button class="history-btn" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>← Prev</button>
-            <button class="history-btn" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>Next →</button>
-          </div>
+<!-- 生成器页 - 最终整合版（视频：YouTube主通道 + Worker兜底） -->
+<div class="page" id="page-generator">
+  <div class="generator-wrap">
+    <!-- 卡片一：生成器（固定高度） -->
+    <div class="card-generator">
+      <div class="gen-header">
+        <div>
+          <div class="gen-title" id="genTitle">AI Recipe Generator</div>
+          <div class="gen-sub" id="limitInfo">Please log in to continue</div>
         </div>
-        <div id="limitInfo"></div>
-        <label style="font-size:14px;margin-bottom:6px;display:block" id="genMealType">Category</label>
-        <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="mealType">
-          <option value="standard" id="optStandard">Standard</option>
-          <option value="baby" id="optBaby">Baby</option>
-          <option value="pregnancy" id="optPregnancy">Pregnancy</option>
-        </select>
-        <label style="font-size:14px;margin-bottom:6px;display:block" id="genCuisine">Cuisine</label>
-        <select style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0" id="cuisine"></select>
-        <label style="font-size:14px;margin-bottom:6px;display:block" id="genDishName">What to eat?</label>
-        <input id="dishName" placeholder="e.g. chicken, tomato, cake, latte..." maxlength="100" style="width:100%;padding:12px;margin-bottom:12px;border-radius:8px;border:1px solid #e2e8f0">
-        <div class="small-note" id="dishNameHint">Enter keywords like ingredients, dish names, or food items.</div>
-        <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
+        <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" title="Add to Home">+</button>
       </div>
-      <div class="card">
-        <div id="recipeResult" class="recipe-result">Please generate a recipe first</div>
-      </div>
-      <div class="card">
-        <h4 style="margin:0 0 8px;font-size:14px" id="aiAssistTitle">AI Assistant</h4>
-        <div class="qa-box">
-          <div class="qa-history" id="qaHistory"></div>
-          <input class="qa-input" id="qaInput" placeholder="Ask about this recipe..." disabled>
-          <button class="btn btn-primary" style="width:100%" id="askBtn" onclick="askQuestion()" disabled>Ask</button>
-          <div class="small-note" id="qaLimitNote"></div>
+      <div class="form">
+        <div class="row">
+          <div class="label" id="genMealType">Category</div>
+          <select id="mealType">
+            <option value="standard" id="optStandard">Standard</option>
+            <option value="baby" id="optBaby">Baby</option>
+            <option value="pregnancy" id="optPregnancy">Pregnancy</option>
+          </select>
         </div>
-        <button class="btn btn-video" id="openVideoBtn" onclick="showVideo()">🎬 Watch Video Guides</button>
-        <div id="videoContainer" class="video-container" style="display: none; margin-top:12px;">
-          <iframe id="videoFrame" src="" allowfullscreen></iframe>
+        <div class="row">
+          <div class="label" id="genCuisine">Cuisine</div>
+          <select id="cuisine"></select>
+        </div>
+        <div class="row">
+          <div class="label" id="genDishName">What to eat?</div>
+          <input type="text" id="dishName" placeholder="Ingredients, dish names...">
+          <div class="hint" id="dishNameHint">Enter ingredients, dish names or food items</div>
+        </div>
+      </div>
+      <div class="help-trigger">
+        <button class="help-btn" id="howToUseBtn">How to use</button>
+      </div>
+      <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
+    </div>
+
+    <!-- 卡片二：食谱内容（可滚动） -->
+    <div class="card-content">
+      <div class="content-header">
+        <div class="recipe-banner" id="personalizedGreeting">Dear Gourmet! Enjoy your meal!</div>
+        <div class="content-nav">
+          <button class="nav-icon" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>←</button>
+          <button class="nav-icon" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>→</button>
+        </div>
+      </div>
+      <div class="recipe-body" id="recipeResultArea">
+        <div class="recipe-title" id="recipeNameDisplay">Please generate a recipe first</div>
+        <div class="sec" id="ingredientsSection" style="display:none;">
+          <h4 id="ingredientsTitle">Ingredients</h4>
+          <ul id="ingredientsList"></ul>
+        </div>
+        <div class="sec" id="instructionsSection" style="display:none;">
+          <h4 id="instructionsTitle">Instructions</h4>
+          <ul id="instructionsList"></ul>
+        </div>
+        <div class="sec" id="nutritionSection" style="display:none;">
+          <h4 id="nutritionTitle">Nutrition</h4>
+          <ul id="nutritionList"></ul>
+        </div>
+        <div class="sec" id="warningsSection" style="display:none;">
+          <h4 id="warningsTitle">Allergens & Warnings</h4>
+          <ul id="warningsList"></ul>
+        </div>
+      </div>
+      <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()">↻ Recover last 3</button>
+    </div>
+
+    <!-- 卡片三：AI助手 -->
+    <div class="card-ai">
+      <div class="ai-title" id="aiAssistTitle">AI Assistant</div>
+      <div class="qa-list" id="qaHistory"></div>
+      <div class="ai-row">
+        <input class="ai-input" id="qaInput" placeholder="Ask about this recipe..." disabled>
+        <button class="btn-ask" id="askBtn" onclick="askQuestion()" disabled>Ask</button>
+      </div>
+      <div class="ai-bottom">
+        <div class="limit" id="qaLimitNote"></div>
+        <button class="btn-video" id="openVideoBtn">Watch Video Guides</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 视频网格弹窗 -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-modal-card">
+      <div class="video-modal-head">
+        <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
+        <button class="video-modal-close" id="closeVideoModal">×</button>
+      </div>
+      <div class="video-grid" id="videoGrid"></div>
+    </div>
+  </div>
+
+  <!-- 底部视频播放器 -->
+  <div class="video-player" id="videoPlayer">
+    <div class="video-player-container">
+      <div class="video-frame" id="videoFrameContainer"></div>
+      <div class="video-row">
+        <div class="video-thumb" id="videoThumb">Video</div>
+        <div class="video-info">
+          <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
+          <div class="video-info-desc">Step-by-step cooking</div>
+        </div>
+        <div class="video-controls">
+          <button class="video-control-btn" id="togglePlayer">⤢</button>
+          <button class="video-control-btn" id="closePlayer">×</button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- 使用说明弹窗 -->
+  <div class="modal-overlay" id="howToModal">
+    <div class="modal">
+      <h4 id="howToTitle">How to use</h4>
+      <ul id="howToList">
+        <li>You can enter one or more ingredients, such as potatoes, spinach, chicken breast, salmon.</li>
+        <li>You can search for classic dishes and meals, such as grilled steak, roasted veggies, omelette, pasta.</li>
+        <li>You can look up desserts and baked treats, such as cheesecake, vanilla ice cream, croissant, muffin.</li>
+        <li>You can find recipes for soups, drinks & homemade beverages, such as tomato soup, iced coffee, cocktail, fresh juice.</li>
+        <li>Filter by taste and style: comfort food, savory dishes, spicy meals, sweet treats and healthy options.</li>
+        <li>Discover global cuisines and make dishes from around the world.</li>
+        <li>If you dislike a recipe, tap Generate again for brand-new cooking ideas.</li>
+      </ul>
+      <p class="modal-highlight-text" id="howToHighlight">Type any food-related words to explore countless recipes. Get popular, authentic dishes from worldwide cuisines with AI.</p>
+      <button class="close-btn" onclick="closeHowToModal()">Got it</button>
+    </div>
+  </div>
+</div>
 
   <!-- 登录/注册页 -->
 <div class="page" id="page-login-register">
