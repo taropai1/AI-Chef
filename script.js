@@ -1050,5 +1050,5 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
   populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
   document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
-  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
+  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
 })();
