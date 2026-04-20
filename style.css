@@ -1269,3 +1269,86 @@ input:focus, select:focus {
 @media (max-width: 640px) {
   .video-grid { grid-template-columns: 1fr; }
 }
+
+/* ==================== 生成器页样式修正 ==================== */
+.generator-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  gap: 16px;
+}
+
+/* 生成卡片：固定高度，内部留白充足 */
+.card-generator {
+  height: 520px;
+  padding: 28px 24px;
+  justify-content: space-between; /* 改善上下留白分布 */
+}
+
+/* 标题与副标题间距 */
+.gen-header { margin-bottom: 20px; }
+.gen-title { font-size: 22px; line-height: 1.3; }
+.gen-sub { font-size: 13px; line-height: 1.4; }
+
+/* 表单间距 */
+.form { gap: 14px; margin-bottom: 8px; }
+.label { font-size: 13px; margin-bottom: 4px; }
+input, select {
+  height: 46px;
+  padding: 0 14px;
+  font-size: 15px;
+  border-radius: 12px;
+  background: #fff;
+}
+input { background: #f9fafb; }
+select { background: #eef1f5; } /* 稍深于输入框 */
+.hint { font-size: 12px; line-height: 1.4; margin-top: 2px; }
+
+/* How to use 按钮 */
+.help-trigger { margin-bottom: 8px; }
+.help-btn { font-size: 13px; }
+
+/* 生成按钮 */
+.generate-btn { height: 48px; font-size: 16px; margin-top: 6px; }
+
+/* 内容卡片 */
+.card-content { padding: 24px; }
+.recipe-banner { font-size: 14px; line-height: 1.4; }
+.recipe-body {
+  padding: 20px;
+  min-height: 300px;   /* 无内容时占位 */
+  height: auto;        /* 有内容时自动撑开 */
+  max-height: none;
+  overflow-y: visible;
+}
+.recipe-title { font-size: 20px; line-height: 1.3; margin-bottom: 18px; }
+.sec h4 { font-size: 16px; line-height: 1.3; margin-bottom: 8px; }
+.sec li { font-size: 14px; line-height: 1.5; margin-bottom: 4px; }
+.recover { font-size: 13px; margin-top: 8px; }
+
+/* AI 助手卡片 */
+.card-ai { padding: 24px; gap: 14px; }
+.ai-title { font-size: 18px; line-height: 1.3; }
+.qa-list {
+  max-height: 280px;    /* 固定高度，超长滚动 */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.qa {
+  background: #f7f9fc;  /* 气泡背景 */
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+.qa q, .qa a { font-size: 13px; line-height: 1.45; }
+.ai-input { height: 44px; font-size: 14px; }
+.btn-ask { width: 80px; height: 44px; font-size: 16px; }
+.limit { font-size: 12px; }
+
+/* 视频按钮移除伪元素图标 */
+.btn-video::before { display: none; }
+.btn-video { padding: 0 18px; font-weight: 600; }
+
+/* 响应式保持不变 */
+@media (max-width: 640px) {
+  .video-grid { grid-template-columns: 1fr; }
+}
