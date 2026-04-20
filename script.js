@@ -1147,4 +1147,3 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   });
   document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
 })();
-```
