@@ -570,21 +570,25 @@ function updateNavButton() {
   }
 }
 
-// ==================== 生成器相关 ====================
+// ==================== 生成器核心 ====================
 async function generateRecipe() {
   if (!userData) { alert(t('pleaseLogin')); showPage('page-login-register'); return; }
   const plan = userData.plan;
   if (plan === 'free' && userData.freeUsed >= 3) { alert(t('alertNoPermission')); showPage('page-subscribe'); return; }
   const limit = PLANS[plan]?.dailyLimit || 0;
   if (plan !== 'free' && userData.dailyUsed >= limit) { alert(t('alertDailyLimit')); showPage('page-subscribe'); return; }
+
   const dish = document.getElementById('dishName').value.trim();
   if (!dish) { alert(t('alertInvalidFood')); return; }
+
   const mealType = document.getElementById('mealType').value;
   const cuisine = document.getElementById('cuisine').value;
-  const resultEl = document.getElementById('recipeResult');
   const genBtn = document.getElementById('btnGenerate');
-  genBtn.disabled = true; genBtn.innerText = t('generating');
+  genBtn.disabled = true;
+  genBtn.innerText = t('generating');
+
   const systemPrompt = `你是专业营养厨师，只输出纯净食谱文本，无任何符号、无星号、无加粗、无特殊格式。\n严格按以下结构输出，每个标题之间空一行：\n\n菜名（单独一行）\n\n食材准备:\n- 食材 用量\n\n制作方法 (总时间: X分钟)\n1. 步骤\n2. 步骤\n\n营养参数:\n- 热量: 约X千卡\n- 蛋白质: X克\n- 碳水化合物: X克\n- 脂肪: X克\n- 膳食纤维: X克\n\n风险提示与建议:\n1. 食材安全与搭配风险\n2. 额外营养建议\n\n语言：${currentLang === 'zh-CN' ? '中文' : 'English'}\n人群：${mealType === 'baby' ? '婴幼儿（无盐无糖）' : mealType === 'pregnancy' ? '孕妇' : '普通人群'}`;
+
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -603,61 +607,82 @@ async function generateRecipe() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     let recipe = data.choices[0].message.content;
+
+    // 解析并展示到新UI
+    parseRecipeToUI(recipe);
+
+    // 个性化问候
     if (plan !== 'free') {
       let displayName = userData.nickname || userData.email.split('@')[0];
       if (displayName.length > 8) displayName = displayName.slice(0, 6) + '…';
-      recipe = t('personalizedGreeting', { name: displayName }) + '\n\n' + recipe;
+      document.getElementById('personalizedGreeting').innerText = t('personalizedGreeting', { name: displayName });
+    } else {
+      document.getElementById('personalizedGreeting').innerText = t('personalizedGreeting', { name: 'Gourmet' });
     }
-    resultEl.innerText = recipe;
+
     addToHistory(recipe);
     userData.lastRecipeText = recipe;
+
     await initDeviceId();
     const res = await apiCall('/api/user/record-generation', { method: 'POST', body: JSON.stringify({ deviceId }) });
     if (plan === 'free') { userData.freeUsed = res.freeUsed; }
-    else { userData.dailyUsed = res.dailyUsed; userData.qLeft = res.qLeft; document.getElementById('qaInput').disabled = false; document.getElementById('askBtn').disabled = false; document.getElementById('qaHistory').innerText = ''; document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft; }
+    else {
+      userData.dailyUsed = res.dailyUsed;
+      userData.qLeft = res.qLeft;
+      document.getElementById('qaInput').disabled = false;
+      document.getElementById('askBtn').disabled = false;
+      document.getElementById('qaHistory').innerHTML = '';
+      document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
+    }
     updateLimitInfo();
   } catch (error) {
     console.error(error);
-    if (error.message.includes('Free trial expired') || error.message.includes('limit reached')) { alert(t('alertNoPermission')); showPage('page-subscribe'); }
-    else { resultEl.innerText = `生成失败：${error.message}`; }
+    if (error.message.includes('Free trial expired') || error.message.includes('limit reached')) {
+      alert(t('alertNoPermission')); showPage('page-subscribe');
+    } else {
+      document.getElementById('recipeNameDisplay').innerText = '生成失败：' + error.message;
+    }
   } finally { genBtn.disabled = false; genBtn.innerText = t('generate'); }
 }
 
-async function askQuestion() {
-  if (!userData || !userData.lastRecipeText) { alert(t('alertNoRecipe')); return; }
-  if (userData.qLeft <= 0) { alert(t('qLimitReached') + ' ' + t('alertNoPoints')); return; }
-  const question = document.getElementById('qaInput').value.trim();
-  if (!question) return;
-  const askBtn = document.getElementById('askBtn'); askBtn.disabled = true;
-  const historyEl = document.getElementById('qaHistory'); historyEl.innerText += `${t('q')}: ${question}\n`;
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const response = await fetch(DEEPSEEK_API, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'deepseek-chat', temperature: 0.3, max_tokens: 300,
-        messages: [
-          { role: 'system', content: `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。\n食谱：\n${userData.lastRecipeText}` },
-          { role: 'user', content: question }
-        ]
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    let answer = data.choices[0].message.content.replace(/\*/g, '');
-    const lines = answer.split('\n'); if (lines.length > 5) answer = lines.slice(0,5).join('\n');
-    historyEl.innerText += `${t('a')}: ${answer}\n\n`;
-    const res = await apiCall('/api/user/record-question', { method: 'POST' });
-    userData.qLeft = res.qLeft; document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
-  } catch (error) { historyEl.innerText += `${t('a')}: Error, please try again.\n\n`; }
-  finally { askBtn.disabled = false; document.getElementById('qaInput').value = ''; }
+function parseRecipeToUI(recipeText) {
+  const lines = recipeText.split('\n');
+  const sections = { name: '', ingredients: [], instructions: [], nutrition: [], warnings: [] };
+  let currentSection = '';
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    if (line.includes('食材准备') || line.includes('Ingredients')) { currentSection = 'ingredients'; continue; }
+    if (line.includes('制作方法') || line.includes('Instructions')) { currentSection = 'instructions'; continue; }
+    if (line.includes('营养参数') || line.includes('Nutrition')) { currentSection = 'nutrition'; continue; }
+    if (line.includes('风险提示') || line.includes('Allergens') || line.includes('Warnings')) { currentSection = 'warnings'; continue; }
+    if (!currentSection && !sections.name) { sections.name = line; continue; }
+    if (currentSection === 'ingredients' && line.startsWith('-')) sections.ingredients.push(line.substring(1).trim());
+    else if (currentSection === 'instructions' && /^\d+\./.test(line)) sections.instructions.push(line.replace(/^\d+\./, '').trim());
+    else if (currentSection === 'nutrition' && line.startsWith('-')) sections.nutrition.push(line.substring(1).trim());
+    else if (currentSection === 'warnings' && line.startsWith('-')) sections.warnings.push(line.substring(1).trim());
+  }
+  document.getElementById('recipeNameDisplay').innerText = sections.name || 'Recipe';
+  const ingredientsList = document.getElementById('ingredientsList');
+  ingredientsList.innerHTML = sections.ingredients.map(i => `<li>${i}</li>`).join('');
+  document.getElementById('ingredientsSection').style.display = sections.ingredients.length ? 'block' : 'none';
+  
+  const instructionsList = document.getElementById('instructionsList');
+  instructionsList.innerHTML = sections.instructions.map(i => `<li>${i}</li>`).join('');
+  document.getElementById('instructionsSection').style.display = sections.instructions.length ? 'block' : 'none';
+  
+  const nutritionList = document.getElementById('nutritionList');
+  nutritionList.innerHTML = sections.nutrition.map(i => `<li>${i}</li>`).join('');
+  document.getElementById('nutritionSection').style.display = sections.nutrition.length ? 'block' : 'none';
+  
+  const warningsList = document.getElementById('warningsList');
+  warningsList.innerHTML = sections.warnings.map(i => `<li>${i}</li>`).join('');
+  document.getElementById('warningsSection').style.display = sections.warnings.length ? 'block' : 'none';
 }
 
 function updateLimitInfo() {
-  const el = document.getElementById('limitInfo'); if (!el) return;
+  const el = document.getElementById('limitInfo');
+  if (!el) return;
   if (!userData) { el.innerText = t('pleaseLogin'); return; }
   const plan = userData.plan;
   if (plan === 'free') { el.innerText = t('freeLimitInfo', { used: userData.freeUsed }); }
