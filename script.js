@@ -613,12 +613,10 @@ async function generateRecipe() {
 
     // 个性化问候
     if (plan !== 'free') {
-      let displayName = userData.nickname || userData.email.split('@')[0];
-      if (displayName.length > 8) displayName = displayName.slice(0, 6) + '…';
-      document.getElementById('personalizedGreeting').innerText = t('personalizedGreeting', { name: displayName });
-    } else {
-      document.getElementById('personalizedGreeting').innerText = t('personalizedGreeting', { name: 'Gourmet' });
-    }
+      let displayName = 'Gourmet';
+      if (userData && userData.nickname) displayName = userData.nickname;
+      else if (userData && userData.email) displayName = userData.email.split('@')[0];
+      document.getElementById('personalizedGreeting').innerText = `Dear ${displayName}! Enjoy your meal!`;
 
     addToHistory(recipe);
     userData.lastRecipeText = recipe;
