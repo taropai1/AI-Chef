@@ -664,6 +664,111 @@ function updateLimitInfo() {
   else { const used = userData.dailyUsed || 0; const qLeft = userData.qLeft || 0; el.innerText = t(plan + 'Info', { used, qLeft }); }
 }
 
+// ==================== 视频模块（YouTube主通道 + Worker兜底） ====================
+const VIDEO_API = "https://vid.taropai.com";
+
+async function showVideo() {
+  const dishNameEl = document.getElementById('recipeNameDisplay');
+  let dish = dishNameEl ? dishNameEl.innerText.trim() : '';
+  if (!dish || dish === 'Please generate a recipe first') {
+    dish = document.getElementById('dishName').value.trim() || 'cooking';
+  }
+
+  // 先尝试加载 YouTube 主通道 (模拟超时兜底)
+  const youtubePromise = new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('timeout')), 3000);
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(dish + ' cooking recipe')}`;
+    iframe.onload = () => { clearTimeout(timeout); resolve(); };
+    iframe.onerror = () => { clearTimeout(timeout); reject(new Error('load failed')); };
+    document.body.appendChild(iframe);
+    setTimeout(() => document.body.removeChild(iframe), 100);
+  });
+
+  try {
+    await youtubePromise;
+    // 主通道可用：直接用YouTube搜索列表（旧方式，我们改为打开网格弹窗）
+    // 但为了统一体验，我们仍然走网格弹窗，从Worker获取数据（可包含YouTube结果）
+    // 实际生产中，这里可以直接用Worker聚合，无需单独判断YouTube
+    const res = await fetch(`${VIDEO_API}?dish=${encodeURIComponent(dish)}`);
+    const data = await res.json();
+    renderVideoGrid(data.videos || []);
+  } catch (e) {
+    // 主通道超时或失败，走兜底Worker
+    try {
+      const res = await fetch(`${VIDEO_API}?dish=${encodeURIComponent(dish)}`);
+      const data = await res.json();
+      renderVideoGrid(data.videos || []);
+    } catch (err) {
+      renderVideoGrid([]);
+    }
+  }
+  document.getElementById('videoModal').classList.add('show');
+}
+
+function renderVideoGrid(videos) {
+  const grid = document.getElementById('videoGrid');
+  if (!videos.length) {
+    grid.innerHTML = '<div style="padding:20px;text-align:center;color:#6b7280;">暂无相关视频</div>';
+    return;
+  }
+  grid.innerHTML = videos.map(v => `
+    <div class="video-card" onclick="playVideoFromGrid('${v.platform}','${v.id}','${v.title.replace(/'/g, "\\'")}')">
+      <img class="video-card-img" src="${v.cover}" alt="${v.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 160 90\\'%3E%3Crect width=\\'160\\' height=\\'90\\' fill=\\'%23e5e7eb\\'/%3E%3Ctext x=\\'10\\' y=\\'50\\' font-size=\\'12\\' fill=\\'%236b7280\\'%3EPreview%3C/text%3E%3C/svg%3E'">
+      <div class="video-card-text">
+        <div class="video-card-name">${v.title}</div>
+        <div class="video-card-meta">${v.views || 0} 次播放 • ${v.platform}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.playVideoFromGrid = function(platform, videoId, title) {
+  document.getElementById('videoModal').classList.remove('show');
+  document.getElementById('bottomVideoTitle').innerText = title;
+  const player = document.getElementById('videoPlayer');
+  const frameContainer = document.getElementById('videoFrameContainer');
+  if (platform === 'bilibili') {
+    frameContainer.innerHTML = `<iframe width="100%" height="100%" src="https://player.bilibili.com/player.html?bvid=${videoId}&autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+  } else if (platform === 'youtube') {
+    frameContainer.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+  } else if (platform === 'tiktok') {
+    window.open(`https://www.tiktok.com/video/${videoId}`, '_blank');
+    return;
+  } else if (platform === 'promo') {
+    // 兜底宣传视频（您预设的）
+    frameContainer.innerHTML = `<video width="100%" height="100%" controls autoplay src="${videoId}"></video>`;
+  }
+  player.classList.add('show', 'expanded');
+  player.classList.remove('mini');
+};
+
+function initVideoPlayerControls() {
+  document.getElementById('closeVideoModal').addEventListener('click', () => {
+    document.getElementById('videoModal').classList.remove('show');
+  });
+  document.getElementById('togglePlayer').addEventListener('click', () => {
+    const player = document.getElementById('videoPlayer');
+    player.classList.toggle('expanded');
+    player.classList.toggle('mini');
+  });
+  document.getElementById('closePlayer').addEventListener('click', () => {
+    const player = document.getElementById('videoPlayer');
+    player.classList.remove('show', 'expanded', 'mini');
+    document.getElementById('videoFrameContainer').innerHTML = '';
+  });
+  document.getElementById('videoModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('videoModal')) {
+      document.getElementById('videoModal').classList.remove('show');
+    }
+  });
+}
+
+// 在 init 函数末尾调用 initVideoPlayerControls();
+// 确保 openVideoBtn 绑定到 showVideo
+document.getElementById('openVideoBtn').onclick = showVideo;
+
 // ==================== 登录/注册 ====================
 function switchAuthTab(tab) {
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
