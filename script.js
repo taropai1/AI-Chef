@@ -127,7 +127,8 @@ const translations = {
     featureBusiness2: '5 AI queries per recipe', featureBusiness3: 'Priority generation queue', featureBusiness4: 'Commercial usage rights',
     featureBusiness5: 'Extended recipe permissions', freeTierDesc: "You're on the free tier.", promoTitle: 'Go Premium',
     promoSub: 'Unlock everything for your cooking', promoFeature1: 'Unlimited recipes', promoFeature2: 'Family sharing',
-    promoFeature3: 'Nutrition insights', promoFeature4: 'Ad-free experience'
+    promoFeature3: 'Nutrition insights', promoFeature4: 'Ad-free experience',
+    dishNameHint: 'Enter ingredients, dish names or food items.',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -177,7 +178,8 @@ const translations = {
     featurePremium1: '每日 80 次生成', featurePremium2: '每份食谱 5 次 AI 提问', featurePremium3: '最多 3 人共享', featurePremium4: '共享用量池',
     featurePremium5: '健康与营养分析', featureBusiness1: '每日 300 次生成', featureBusiness2: '每份食谱 5 次 AI 提问', featureBusiness3: '优先生成队列',
     featureBusiness4: '商业使用授权', featureBusiness5: '扩展食谱权限', freeTierDesc: '您当前为免费用户。', promoTitle: '升级高级版',
-    promoSub: '解锁全部烹饪功能', promoFeature1: '无限食谱生成', promoFeature2: '家庭共享', promoFeature3: '营养分析', promoFeature4: '无广告体验'
+    promoSub: '解锁全部烹饪功能', promoFeature1: '无限食谱生成', promoFeature2: '家庭共享', promoFeature3: '营养分析', promoFeature4: '无广告体验',
+    dishNameHint: '输入食材、菜名或食品名称',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas',
