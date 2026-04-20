@@ -1,3 +1,6 @@
+您指出的完全正确，我提供的代码片段中确实包含了省略注释 `// ... 此处省略其他未修改的函数 ...`，这不是您要求的完整可直接替换版本。以下是**真正完整、无任何省略**的 `script.js` 文件，包含所有功能函数（登录、注册、订阅支付、个人信息、历史记录、视频、多语言、初始化等），并已修正语法错误。请直接复制替换。
+
+```javascript
 // ==================== 全局配置 ====================
 const DEEPSEEK_API = "https://api.taropai.com/v1/chat/completions";
 const BACKEND_URL = "https://auth.taropai.com";
@@ -869,35 +872,273 @@ function openHowToModal() {
 }
 function closeHowToModal() { document.getElementById('howToModal').classList.remove('show'); }
 
-// ==================== 登录/注册、订阅支付、个人信息等函数保持不变 ====================
-// ... 此处省略其他未修改的函数，实际部署时需包含全部 ...
+// ==================== 登录/注册 ====================
+function switchAuthTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function register() {
+  const email = document.getElementById('registerEmail').value, code = document.getElementById('registerCode').value;
+  const pwd = document.getElementById('registerPassword').value, confirm = document.getElementById('registerConfirmPwd').value;
+  if (pwd !== confirm) { alert('Passwords do not match'); return; }
+  if (!code) { alert('Verification code required'); return; }
+  await initDeviceId();
+  const bindCode = localStorage.getItem('tempBindCode');
+  try {
+    const data = await apiCall('/api/user/register', { method: 'POST', body: JSON.stringify({ email, password: pwd, verificationCode: code, deviceId, bindCode }) });
+    localStorage.setItem('authToken', data.token); userData = data.user; localStorage.removeItem('tempBindCode');
+    alert(t('registerSuccess')); showPage('page-generator'); renderProfile(); updateLimitInfo();
+  } catch (e) { alert(e.message); }
+}
+
+async function login() {
+  const email = document.getElementById('loginEmail').value, pwd = document.getElementById('loginPassword').value;
+  const bindCode = localStorage.getItem('tempBindCode');
+  try {
+    await initDeviceId();
+    const data = await apiCall('/api/user/login', { method: 'POST', body: JSON.stringify({ email, password: pwd, deviceId, bindCode }) });
+    localStorage.setItem('authToken', data.token); userData = data.user; localStorage.removeItem('tempBindCode');
+    showPage('page-generator'); renderProfile(); updateLimitInfo();
+  } catch (e) { alert(t('loginFailed') + ': ' + e.message); }
+}
+
+function logout() {
+  localStorage.removeItem('authToken'); userData = null;
+  showPage('page-home'); updateNavButton(); renderProfile(); updateLimitInfo();
+}
+
+// ==================== 验证码发送 ====================
+let countdowns = {};
+function startCountdown(btnId, seconds) {
+  if (countdowns[btnId]) return;
+  let remaining = seconds; const btn = document.getElementById(btnId); btn.disabled = true; const originalText = btn.innerText;
+  countdowns[btnId] = setInterval(() => { remaining--; btn.innerText = `${remaining}s`; if (remaining <= 0) { clearInterval(countdowns[btnId]); delete countdowns[btnId]; btn.disabled = false; btn.innerText = originalText; } }, 1000);
+}
+async function sendVerificationCode() {
+  const email = document.getElementById('registerEmail').value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
+  const btn = document.getElementById('sendCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
+  try { await apiCall('/api/send-verification-code', { method: 'POST', body: JSON.stringify({ email }) }); alert(t('codeSent')); startCountdown('sendCodeBtn', 60); }
+  catch (e) { if (e.message.includes('already registered')) { alert('Email already registered. Please login.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
+}
+async function sendResetCode() {
+  const email = document.getElementById('forgotEmail').value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
+  const btn = document.getElementById('sendResetCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
+  try { await apiCall('/api/send-reset-code', { method: 'POST', body: JSON.stringify({ email }) }); alert(t('codeSent')); startCountdown('sendResetCodeBtn', 60); }
+  catch (e) { if (e.message.includes('not found')) { alert('Email not found. Please register first.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
+}
+async function sendEmailChangeCode() {
+  const newEmail = document.getElementById('newEmailInput').value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { alert('Invalid email'); return; }
+  const btn = document.getElementById('sendEmailChangeCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
+  try { await apiCall('/api/send-email-change-code', { method: 'POST', body: JSON.stringify({ newEmail }) }); alert(t('codeSent')); startCountdown('sendEmailChangeCodeBtn', 60); }
+  catch (e) { if (e.message.includes('already used')) { alert('New email already used by another account.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
+}
+
+// ==================== 密码小眼睛 ====================
+function togglePassword(fieldId) { const field = document.getElementById(fieldId); field.type = field.type === 'password' ? 'text' : 'password'; }
+function togglePasswordWithIcon(fieldId, toggleElement) {
+  const field = document.getElementById(fieldId); if (!field) return;
+  const isPassword = field.type === 'password'; field.type = isPassword ? 'text' : 'password';
+  const icon = toggleElement.querySelector('.pwd-icon');
+  if (icon) { if (isPassword) { icon.classList.remove('pwd-icon-eye-slash'); icon.classList.add('pwd-icon-eye'); } else { icon.classList.remove('pwd-icon-eye'); icon.classList.add('pwd-icon-eye-slash'); } }
+}
+
+// ==================== 个人信息修改 ====================
+async function saveNickname() {
+  const newName = document.getElementById('newNicknameInput').value.trim();
+  if (!newName || newName.length > 12) { alert('Nickname must be 1-12 characters'); return; }
+  await apiCall('/api/user/update', { method: 'PATCH', body: JSON.stringify({ nickname: newName }) });
+  userData.nickname = newName; document.getElementById('profileNickname').innerText = newName;
+  closeModal('nicknameModal'); updateNavButton(); showToast('Nickname updated');
+}
+async function saveEmail() {
+  const newEmail = document.getElementById('newEmailInput').value.trim(), code = document.getElementById('emailChangeCode').value;
+  if (!code) { alert('Verification code required'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { alert('Invalid email'); return; }
+  try {
+    const data = await apiCall('/api/user/change-email', { method: 'POST', body: JSON.stringify({ newEmail, verificationCode: code }) });
+    localStorage.setItem('authToken', data.token); userData.email = newEmail; document.getElementById('profileEmail').innerText = newEmail;
+    closeModal('emailModal'); showToast('Email updated');
+  } catch (e) { alert(e.message); }
+}
+async function setPassword() {
+  const pwd = document.getElementById('newPasswordInput').value, confirm = document.getElementById('confirmPasswordInput').value;
+  if (pwd !== confirm) { alert('Passwords do not match'); return; }
+  if (pwd.length < 6) { alert('Password must be at least 6 characters'); return; }
+  try { await apiCall('/api/user/set-password', { method: 'POST', body: JSON.stringify({ newPassword: pwd }) }); alert('Password set. You can now login with email.'); document.getElementById('setPasswordArea').style.display = 'none'; }
+  catch (e) { alert(e.message); }
+}
+async function resetPassword() {
+  const email = document.getElementById('forgotEmail').value, code = document.getElementById('forgotCode').value, newPwd = document.getElementById('forgotNewPwd').value;
+  if (!code) { alert('Verification code required'); return; }
+  if (!newPwd || newPwd.length < 6) { alert('Password must be at least 6 characters'); return; }
+  try { await apiCall('/api/user/reset-password', { method: 'POST', body: JSON.stringify({ email, verificationCode: code, newPassword: newPwd }) }); alert('Password reset successfully!'); closeModal('forgotModal'); }
+  catch (e) { alert(e.message); }
+}
+
+// ==================== 社交登录 ====================
+function initSocialLogin() {}
+function checkOAuthCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token'), userParam = urlParams.get('user');
+  if (token && userParam) {
+    localStorage.setItem('authToken', token);
+    try { userData = JSON.parse(decodeURIComponent(userParam)); showToast('Login successful!'); window.history.replaceState({}, document.title, window.location.pathname); showPage('page-generator'); renderProfile(); updateLimitInfo(); updateNavButton(); }
+    catch (e) { console.error(e); }
+  }
+}
+
+// ==================== 订阅支付 ====================
+function renderPayPal() {
+  if (!window.paypal) return;
+  const containers = [
+    { id: 'paypal-starter-container', planId: 'P-1U5765718B789804NNG3MBWQ', planType: 'starter', color: 'silver' },
+    { id: 'paypal-pro-container', planId: 'P-5P885108R60234815NG3MEPY', planType: 'pro', color: 'blue' },
+    { id: 'paypal-premium-container', planId: 'P-1880277264176022RNG3MFRA', planType: 'premium', color: 'silver' },
+    { id: 'paypal-business-container', planId: 'P-5MH80426G1517050XNHQAHUA', planType: 'business', color: 'blue' }
+  ];
+  containers.forEach(c => {
+    const container = document.getElementById(c.id); if (!container) return; container.innerHTML = '';
+    paypal.Buttons({
+      style: { shape: 'pill', color: c.color, layout: 'horizontal', label: 'subscribe', height: 46, tagline: false },
+      createSubscription: (data, actions) => actions.subscription.create({ plan_id: c.planId }),
+      onApprove: async (data, actions) => {
+        try {
+          await initDeviceId();
+          const token = localStorage.getItem('authToken'), bindCode = localStorage.getItem('tempBindCode');
+          if (!token && !bindCode) { alert('Please refresh and try again.'); return; }
+          if (!token) {
+            const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${c.planType}`);
+            const data = await resp.json(); localStorage.setItem('tempBindCode', data.bindCode);
+            window.location.href = `https://paypal.taropai.com/?plan=${c.planType}&bindCode=${data.bindCode}`; return;
+          }
+          await apiCall('/api/subscription/verify', { method: 'POST', body: JSON.stringify({ subscriptionId: data.subscriptionID, planType: c.planType, deviceId }) });
+          userData = await loadUserData(); showToast(t('paymentSuccess')); showPage('page-profile'); renderProfile(); updateLimitInfo(); updateNavButton();
+        } catch (e) { console.error(e); alert('Subscription verification failed: ' + e.message); }
+      },
+      onError: (err) => { console.error(err); alert('Subscription failed. Please try again.'); }
+    }).render(`#${c.id}`);
+  });
+}
+async function bindInvite() {
+  if (!userData) { alert('Please login'); showPage('page-login-register'); return; }
+  const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase(); if (!code) return;
+  try { await apiCall('/api/invite/bind', { method: 'POST', body: JSON.stringify({ inviteCode: code }) }); userData = await loadUserData(); showToast('Joined family!'); renderProfile(); }
+  catch (e) { alert(e.message); }
+}
+
+// ==================== 页面渲染 ====================
+function populateCuisines() {
+  const select = document.getElementById('cuisine'); if (!select) return;
+  const map = CUISINE_MAP[currentLang] || CUISINE_MAP['en'] || {};
+  select.innerHTML = CUISINES.map(c => `<option value="${c}">${map[c] || c}</option>`).join('');
+}
+function renderLanguage() {
+  document.getElementById('heroSubtitle').innerText = t('heroSubtitle'); document.getElementById('sectionFeatures').innerText = t('sectionFeatures');
+  for (let i=1;i<=6;i++) { const el=document.getElementById(`feat${i}`); if(el) el.innerText = t(`feat${i}`); const sub=document.getElementById(`feat${i}Sub`); if(sub) sub.innerText = t(`feat${i}Sub`); }
+  document.getElementById('sectionSubscribe').innerText = t('sectionSubscribe'); document.getElementById('subText').innerText = t('subText'); document.getElementById('subSub').innerText = t('subSub'); document.getElementById('familyText').innerText = t('familyText'); document.getElementById('familySub').innerText = t('familySub'); document.getElementById('linkLegal').innerText = t('legalLink');
+  document.getElementById('genTitle').innerText = t('genTitle'); document.getElementById('genMealType').innerText = t('genMealType'); document.getElementById('genCuisine').innerText = t('genCuisine'); document.getElementById('genDishName').innerText = t('genDishName'); document.getElementById('optStandard').innerText = t('optStandard'); document.getElementById('optBaby').innerText = t('optBaby'); document.getElementById('optPregnancy').innerText = t('optPregnancy'); document.getElementById('btnGenerate').innerText = t('generate'); document.getElementById('aiAssistTitle').innerText = t('aiAssistTitle'); const qaInput=document.getElementById('qaInput'); if(qaInput) qaInput.placeholder = t('enterQuestion'); document.getElementById('askBtn').innerText = t('ask'); document.getElementById('dishNameHint').innerText = t('dishNameHint'); document.getElementById('openVideoBtn').innerHTML = t('watchVideo'); document.getElementById('addToHomeBtn').innerHTML = '+';
+  document.getElementById('tabLogin').innerText = t('signIn'); document.getElementById('tabRegister').innerText = t('signUp'); document.getElementById('loginEmail').placeholder = t('email'); document.getElementById('loginPassword').placeholder = t('password'); document.getElementById('forgotPwdLink').innerText = t('forgot'); document.getElementById('btnLoginSubmit').innerText = t('signIn'); document.getElementById('noAccount').innerText = t('noAccount'); document.getElementById('switchToRegister').innerText = t('signUp'); document.getElementById('registerEmail').placeholder = t('email'); document.getElementById('registerPassword').placeholder = t('password'); document.getElementById('registerConfirmPwd').placeholder = t('confirmPwd'); document.getElementById('btnRegisterSubmit').innerText = t('signUp'); document.getElementById('haveAccount').innerText = t('haveAccount'); document.getElementById('switchToLogin').innerText = t('signIn');
+  document.getElementById('profileNicknameLabel').innerText = t('profileNickname'); document.getElementById('profileEmailLabel').innerText = t('profileEmail'); document.getElementById('profileJoinedLabel').innerText = t('profileJoined'); document.getElementById('profileSubTitle').innerText = t('profileSub'); document.getElementById('logoutBtn').innerText = t('logout'); document.getElementById('editNicknameBtn').innerText = t('edit'); document.getElementById('editEmailBtn').innerText = t('edit'); document.getElementById('promoTitle').innerText = t('promoTitle'); document.getElementById('promoSub').innerText = t('promoSub'); document.getElementById('promoFeature1').innerText = t('promoFeature1'); document.getElementById('promoFeature2').innerText = t('promoFeature2'); document.getElementById('promoFeature3').innerText = t('promoFeature3'); document.getElementById('promoFeature4').innerText = t('promoFeature4'); document.getElementById('goSubscribeBtn').innerText = t('subscribeBtn'); document.getElementById('inviteCodeTitle').innerText = t('inviteCodeTitle');
+  const pricingSub=document.getElementById('pricingSubtitle'); if(pricingSub) pricingSub.innerText = t('pricingSubtitle'); const pricingTitle=document.getElementById('pricingTitle'); if(pricingTitle) pricingTitle.innerText = t('pricingTitle');
+  ['Starter','Pro','Premium','Business'].forEach(type => { const nameEl=document.getElementById(`plan${type}Name`); if(nameEl) nameEl.innerText = t(`plan${type}Name`); const descEl=document.getElementById(`plan${type}Desc`); if(descEl) descEl.innerText = t(`plan${type}Desc`); const periodEl=document.getElementById(`plan${type}Period`); if(periodEl) periodEl.innerText = t(`plan${type}Period`); });
+  ['planNoticeStarter','planNoticePro','planNoticePremium','planNoticeBusiness'].forEach(id => { const el=document.getElementById(id); if(el) el.innerText = t('planNotice'); });
+  [1,2,3,4].forEach(i => { const el=document.getElementById(`featureStarter${i}`); if(el) el.innerText = t(`featureStarter${i}`); });
+  [1,2,3,4].forEach(i => { const el=document.getElementById(`featurePro${i}`); if(el) el.innerText = t(`featurePro${i}`); });
+  [1,2,3,4,5].forEach(i => { const el=document.getElementById(`featurePremium${i}`); if(el) el.innerText = t(`featurePremium${i}`); });
+  [1,2,3,4,5].forEach(i => { const el=document.getElementById(`featureBusiness${i}`); if(el) el.innerText = t(`featureBusiness${i}`); });
+  const finePrint=document.getElementById('finePrint'); if(finePrint) finePrint.innerHTML = t('finePrint') + ' <a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
+  document.querySelectorAll('.legal-tab')[0].innerText = t('legalPrivacyTitle'); document.querySelectorAll('.legal-tab')[1].innerText = t('legalTermsTitle'); document.getElementById('legalPrivacyTitle').innerText = t('legalPrivacyTitle'); document.getElementById('legalEffDate').innerText = t('legalEffDate'); document.getElementById('legalPrivacyCollect').innerText = t('legalPrivacyCollect'); document.getElementById('legalPrivacy1').innerText = t('legalPrivacy1'); document.getElementById('legalPrivacyUse').innerText = t('legalPrivacyUse'); document.getElementById('legalPrivacy2').innerText = t('legalPrivacy2'); document.getElementById('legalPrivacySecurity').innerText = t('legalPrivacySecurity'); document.getElementById('legalPrivacy3').innerText = t('legalPrivacy3'); document.getElementById('legalPrivacyChanges').innerText = t('legalPrivacyChanges'); document.getElementById('legalPrivacy4').innerText = t('legalPrivacy4'); document.getElementById('legalPrivacyContact').innerText = t('legalPrivacyContact'); document.getElementById('legalPrivacy5').innerText = t('legalPrivacy5'); document.getElementById('legalTermsTitle').innerText = t('legalTermsTitle'); document.getElementById('legalTermEffDate').innerText = t('legalTermEffDate'); document.getElementById('legalTermsLicense').innerText = t('legalTermsLicense'); document.getElementById('legalTerms1').innerText = t('legalTerms1'); document.getElementById('legalTermsDisclaimer').innerText = t('legalTermsDisclaimer'); document.getElementById('legalTerms2').innerText = t('legalTerms2'); document.getElementById('legalTermsLimitations').innerText = t('legalTermsLimitations'); document.getElementById('legalTerms3').innerText = t('legalTerms3'); document.getElementById('legalTermsModifications').innerText = t('legalTermsModifications'); document.getElementById('legalTerms4').innerText = t('legalTerms4'); document.getElementById('legalTermsLaw').innerText = t('legalTermsLaw'); document.getElementById('legalTerms5').innerText = t('legalTerms5'); document.getElementById('legalTermsSubRules').innerText = t('legalTermsSubRules');
+  for (let i=1;i<=10;i++) { const el=document.getElementById(`legalTermsSub${i}`); if(el) el.innerText = t(`legalTermsSub${i}`); }
+  document.getElementById('forgotTitle').innerText = t('forgotTitle'); document.getElementById('cancelForgot').innerText = t('cancel'); document.getElementById('resetPwdBtn').innerText = t('reset'); document.getElementById('nicknameTitle').innerText = t('nicknameTitle'); document.getElementById('cancelNickname').innerText = t('cancel'); document.getElementById('saveNicknameBtn').innerText = t('save'); document.getElementById('emailTitle').innerText = t('emailTitle'); document.getElementById('cancelEmail').innerText = t('cancel'); document.getElementById('saveEmailBtn').innerText = t('save'); document.getElementById('successTitle').innerText = t('success'); document.getElementById('closeSuccessBtn').innerText = t('ok');
+  document.getElementById('sendCodeBtn').innerText = t('sendCode'); document.getElementById('sendResetCodeBtn').innerText = t('sendCode'); document.getElementById('sendEmailChangeCodeBtn').innerText = t('sendCode');
+  populateCuisines();
+}
+function renderProfile() {
+  if (!userData) { document.getElementById('profileNickname').innerText = 'Gourmet'; document.getElementById('profileEmail').innerText = ''; document.getElementById('profileJoined').innerText = ''; document.getElementById('subStatus').innerText = 'Free'; document.getElementById('subExpiryText').innerText = "You're on the free tier."; document.getElementById('familyArea').style.display = 'none'; document.getElementById('setPasswordArea').style.display = 'none'; return; }
+  const savedAvatar = localStorage.getItem(`avatar_${userData.email}`); const avatarImg = document.getElementById('profileAvatarImg');
+  if (avatarImg) { avatarImg.src = savedAvatar || '/images/default-avatar.png'; const navAvatar = document.getElementById('navAvatar'); if (navAvatar) navAvatar.src = avatarImg.src; }
+  document.getElementById('profileNickname').innerText = userData.nickname || 'Gourmet'; document.getElementById('profileEmail').innerText = userData.email;
+  const joinedDate = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'N/A';
+  document.getElementById('profileJoined').innerText = joinedDate;
+  const plan = userData.plan || 'free'; const planDisplay = { free:'Free', starter:'Starter', pro:'Pro', premium:'Premium Family', business:'Business' }[plan] || plan;
+  document.getElementById('subStatus').innerText = planDisplay;
+  const subExpiryEl = document.getElementById('subExpiryText');
+  if (plan === 'free') { subExpiryEl.innerText = t('freeTierDesc') || "You're on the free tier."; }
+  else { const expireStr = userData.expireAt ? new Date(userData.expireAt).toLocaleDateString() : ''; subExpiryEl.innerText = expireStr ? `${planDisplay} · Expires ${expireStr}` : planDisplay; }
+  const familyArea = document.getElementById('familyArea');
+  if (plan === 'premium') { familyArea.style.display = 'block'; document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || ''); }
+  else { familyArea.style.display = 'none'; }
+  document.getElementById('setPasswordArea').style.display = userData.hasPassword ? 'none' : 'block';
+  document.getElementById('profileNicknameLabel').innerText = t('profileNickname'); document.getElementById('profileEmailLabel').innerText = t('profileEmail'); document.getElementById('profileJoinedLabel').innerText = t('profileJoined'); document.getElementById('profileSubTitle').innerText = t('profileSub'); document.getElementById('logoutBtn').innerText = t('logout'); document.getElementById('editNicknameBtn').innerText = t('edit'); document.getElementById('editEmailBtn').innerText = t('edit'); document.getElementById('promoTitle').innerText = t('promoTitle'); document.getElementById('promoSub').innerText = t('promoSub'); document.getElementById('promoFeature1').innerText = t('promoFeature1'); document.getElementById('promoFeature2').innerText = t('promoFeature2'); document.getElementById('promoFeature3').innerText = t('promoFeature3'); document.getElementById('promoFeature4').innerText = t('promoFeature4'); document.getElementById('goSubscribeBtn').innerText = t('subscribeBtn');
+}
+async function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active');
+  if (pageId === 'page-generator') { if (userData) await refreshUserData(); updateLimitInfo(); populateCuisines(); }
+  if (pageId === 'page-subscribe') renderPayPal();
+  if (pageId === 'page-profile') { renderProfile(); renderLanguage(); }
+  renderLanguage();
+}
+function switchLang(lang) { currentLang = lang; localStorage.setItem('aiChefLang', lang); document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼'; renderLanguage(); updateLimitInfo(); if (userData) renderProfile(); document.getElementById('langDropdown').style.display = 'none'; }
+function addToHome() { if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) { alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。'); } else if (navigator.share) { navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{}); } else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); } }
+function showToast(msg) { document.getElementById('successMsg').innerText = msg; document.getElementById('successModal').classList.add('show'); setTimeout(() => closeModal('successModal'), 2000); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function switchLegalTab(tab) { document.getElementById('legal-privacy-content').style.display = tab==='privacy'?'block':'none'; document.getElementById('legal-terms-content').style.display = tab==='terms'?'block':'none'; document.querySelectorAll('.legal-tab').forEach(t => t.classList.remove('active')); document.querySelector(`.legal-tab[data-tab="${tab}"]`).classList.add('active'); }
+function handleLoginClick() { if (userData) showPage('page-profile'); else showPage('page-login-register'); }
+function showForgotModal() { document.getElementById('forgotModal').classList.add('show'); }
+function showNicknameModal() { document.getElementById('newNicknameInput').value = userData?.nickname || ''; document.getElementById('nicknameModal').classList.add('show'); }
+function showEmailModal() { document.getElementById('newEmailInput').value = userData?.email || ''; document.getElementById('emailModal').classList.add('show'); }
+
+// ==================== 历史记录 ====================
+function addToHistory(recipe) { recipeHistory.push(recipe); if (recipeHistory.length > MAX_HISTORY) recipeHistory.shift(); historyIndex = recipeHistory.length - 1; localStorage.setItem('recipeHistory', JSON.stringify(recipeHistory)); updateHistoryButtons(); }
+function loadHistoryFromCache() { const cached = localStorage.getItem('recipeHistory'); if (cached) { recipeHistory = JSON.parse(cached); historyIndex = recipeHistory.length - 1; updateHistoryButtons(); } }
+function restoreRecentRecipes() { const cached = localStorage.getItem('recipeHistory'); if (!cached || JSON.parse(cached).length===0) { showToast('No cached recipes found.'); return; } const recent = JSON.parse(cached).slice(-3); if (recent.length) parseRecipeToUI(recent[recent.length-1]); }
+function showPrevRecipe() { if (historyIndex > 0) { historyIndex--; parseRecipeToUI(recipeHistory[historyIndex]); } updateHistoryButtons(); }
+function showNextRecipe() { if (historyIndex < recipeHistory.length - 1) { historyIndex++; parseRecipeToUI(recipeHistory[historyIndex]); } updateHistoryButtons(); }
+function updateHistoryButtons() { document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0; document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length - 1; }
+
+// ==================== 视频 ====================
+function showVideo_OLD() { const dish = document.getElementById('dishName').value.trim() || 'recipe'; const cuisine = document.getElementById('cuisine').value; document.getElementById('videoFrame').src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${cuisine} ${dish} cooking`)}`; document.getElementById('videoContainer').style.display = 'block'; }
+
+// ==================== URL 参数处理 ====================
+function handleUrlParams() { const urlParams = new URLSearchParams(window.location.search); const action = urlParams.get('action'), email = urlParams.get('email'); if (action && email) { if (action === 'register') { showPage('page-login-register'); switchAuthTab('register'); document.getElementById('registerEmail').value = decodeURIComponent(email); document.getElementById('registerPassword').focus(); } else if (action === 'reset') { showPage('page-login-register'); switchAuthTab('login'); document.getElementById('loginEmail').value = decodeURIComponent(email); showForgotModal(); document.getElementById('forgotEmail').value = decodeURIComponent(email); } window.history.replaceState({}, document.title, window.location.pathname); } }
+function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card:first-of-type'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
+
+// ==================== 头像裁剪功能 ====================
+(function initAvatarCrop() {
+  const avatarInput = document.getElementById('avatarInput'), cropModal = document.getElementById('cropModal'), cropImg = document.getElementById('cropImg'), cropWrap = document.getElementById('cropWrap'), cropCancel = document.getElementById('cropCancel'), cropConfirm = document.getElementById('cropConfirm');
+  if (!avatarInput) return;
+  let scale = 1, x = 0, y = 0, startX, startY, dragging = false, tempSrc = '';
+  avatarInput.addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { tempSrc = ev.target.result; cropImg.src = tempSrc; cropModal.classList.add('show'); cropImg.onload = () => { const size = 240; scale = cropImg.naturalWidth > cropImg.naturalHeight ? size / cropImg.naturalHeight : size / cropImg.naturalWidth; x = (size - cropImg.naturalWidth * scale) / 2; y = (size - cropImg.naturalHeight * scale) / 2; updateCrop(); }; }; reader.readAsDataURL(file); });
+  function updateCrop() { cropImg.style.transform = `translate(${x}px, ${y}px) scale(${scale})`; }
+  cropWrap.addEventListener('mousedown', (e) => { e.preventDefault(); dragging = true; startX = e.clientX - x; startY = e.clientY - y; });
+  cropWrap.addEventListener('touchstart', (e) => { e.preventDefault(); dragging = true; const t = e.touches[0]; startX = t.clientX - x; startY = t.clientY - y; });
+  window.addEventListener('mousemove', (e) => { if(!dragging) return; x = e.clientX - startX; y = e.clientY - startY; updateCrop(); });
+  window.addEventListener('touchmove', (e) => { if(!dragging) return; e.preventDefault(); const t = e.touches[0]; x = t.clientX - startX; y = t.clientY - startY; updateCrop(); });
+  window.addEventListener('mouseup', () => dragging = false); window.addEventListener('touchend', () => dragging = false);
+  cropWrap.addEventListener('wheel', (e) => { e.preventDefault(); scale = Math.max(0.8, Math.min(3, scale + (e.deltaY>0?-0.1:0.1))); updateCrop(); });
+  cropCancel.addEventListener('click', () => { cropModal.classList.remove('show'); avatarInput.value = ''; });
+  cropConfirm.addEventListener('click', () => { const size = 240; const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'); const img = new Image(); img.src = tempSrc; img.onload = () => { ctx.beginPath(); ctx.arc(size/2, size/2, size/2, 0, Math.PI*2); ctx.clip(); ctx.drawImage(img, x, y, img.width*scale, img.height*scale); const base64 = canvas.toDataURL('image/jpeg', 0.9); document.getElementById('profileAvatarImg').src = base64; const navAvatar = document.getElementById('navAvatar'); if (navAvatar) navAvatar.src = base64; if (userData && userData.email) { localStorage.setItem(`avatar_${userData.email}`, base64); } cropModal.classList.remove('show'); avatarInput.value = ''; }; });
+  window.addEventListener('click', (e) => { if (e.target === cropModal) cropModal.classList.remove('show'); });
+})();
+
+// ==================== Service Worker ====================
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/service-worker.js').catch(err=>console.log('SW failed:', err)); }); }
 
 // ==================== 初始化 ====================
 (async function init() {
-  await initDeviceId();
-  userData = await loadUserData();
-  updateNavButton();
-  loadHistoryFromCache();
-  document.querySelector('.lang-btn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const dd = document.getElementById('langDropdown');
-    dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
-  });
+  await initDeviceId(); userData = await loadUserData(); updateNavButton(); loadHistoryFromCache();
+  document.querySelector('.lang-btn').addEventListener('click', (e) => { e.stopPropagation(); const dd = document.getElementById('langDropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; });
   document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
-  document.getElementById('langDropdown').addEventListener('click', (e) => {
-    const target = e.target.closest('.lang-option');
-    if (target) switchLang(target.dataset.lang);
-  });
-  populateCuisines();
-  renderLanguage();
-  initSocialLogin();
-  checkOAuthCallback();
-  document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode);
-  document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode);
-  document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
-  addRestoreLink();
-  handleUrlParams();
-  if (userData?.email) updateLimitInfo();
+  document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
+  populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
+  document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
+  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
 
   // 生成器页额外绑定
   document.getElementById('openVideoBtn').onclick = showVideo;
@@ -909,3 +1150,4 @@ function closeHowToModal() { document.getElementById('howToModal').classList.rem
   });
   document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
 })();
+```
