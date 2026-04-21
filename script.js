@@ -718,7 +718,6 @@ async function generateRecipe() {
   const genBtn = document.getElementById('btnGenerate');
   genBtn.disabled = true; genBtn.innerText = t('generating');
 
-  // 清空旧内容
   document.getElementById('recipeNameDisplay').innerText = '';
   document.getElementById('ingredientsSection').style.display = 'none';
   document.getElementById('instructionsSection').style.display = 'none';
@@ -785,7 +784,6 @@ function parseRecipeToUI(recipeText) {
   for (let line of lines) {
     line = line.trim();
     if (!line) continue;
-
     if (line.includes('食材准备') || line.toLowerCase().includes('ingredients')) { currentSection = 'ingredients'; continue; }
     if (line.includes('制作方法') || line.toLowerCase().includes('instructions')) {
       currentSection = 'instructions';
@@ -799,7 +797,6 @@ function parseRecipeToUI(recipeText) {
       continue;
     }
     if (!currentSection && !sections.name) { sections.name = line; continue; }
-
     if (currentSection === 'ingredients' && line.startsWith('-')) sections.ingredients.push(line.substring(1).trim());
     else if (currentSection === 'instructions' && /^\d+\./.test(line)) sections.instructions.push(line.replace(/^\d+\./, '').trim());
     else if (currentSection === 'nutrition' && line.startsWith('-')) sections.nutrition.push(line.substring(1).trim());
@@ -1038,7 +1035,7 @@ async function saveNickname() {
   if (!newName || newName.length > 20) { alert('Nickname must be 1-20 characters'); return; }
   await apiCall('/api/user/update', { method: 'PATCH', body: JSON.stringify({ nickname: newName }) });
   userData.nickname = newName; document.getElementById('profileNickname').innerText = newName;
-  closeModal('nicknameModal'); updateNavButton(); showToast('Nickname updated');
+  closeModal('nicknameModal'); updateNavButton();
 }
 async function saveEmail() {
   const newEmail = document.getElementById('newEmailInput').value.trim(), code = document.getElementById('emailChangeCode').value;
@@ -1047,7 +1044,7 @@ async function saveEmail() {
   try {
     const data = await apiCall('/api/user/change-email', { method: 'POST', body: JSON.stringify({ newEmail, verificationCode: code }) });
     localStorage.setItem('authToken', data.token); userData.email = newEmail; document.getElementById('profileEmail').innerText = newEmail;
-    closeModal('emailModal'); showToast('Email updated');
+    closeModal('emailModal');
   } catch (e) { alert(e.message); }
 }
 async function setPassword() {
@@ -1118,31 +1115,27 @@ async function bindInvite() {
 
 // ==================== 页面渲染 ====================
 function populateCuisines() {
-  const select = document.getElementById('cuisine');
-  if (!select) return;
+  const select = document.getElementById('cuisine'); if (!select) return;
   const map = CUISINE_MAP[currentLang] || CUISINE_MAP['en'] || {};
   select.innerHTML = CUISINES.map(c => `<option value="${c}">${map[c] || c}</option>`).join('');
 }
+
 function renderLanguage() {
-  // ========== 安全辅助函数 ==========
   const safeText = (id, key) => { const el = document.getElementById(id); if (el) el.innerText = t(key); };
   const safePlaceholder = (id, key) => { const el = document.getElementById(id); if (el) el.placeholder = t(key); };
   const safeHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
 
-  // ========== 首页 ==========
   safeText('heroSubtitle', 'heroSubtitle'); safeText('sectionFeatures', 'sectionFeatures');
   for (let i=1;i<=6;i++) { safeText(`feat${i}`, `feat${i}`); safeText(`feat${i}Sub`, `feat${i}Sub`); }
   safeText('sectionSubscribe', 'sectionSubscribe'); safeText('subText', 'subText'); safeText('subSub', 'subSub');
   safeText('familyText', 'familyText'); safeText('familySub', 'familySub'); safeText('linkLegal', 'legalLink');
 
-  // ========== 生成器页 ==========
   safeText('genTitle', 'genTitle'); safeText('genMealType', 'genMealType'); safeText('genCuisine', 'genCuisine');
   safeText('genDishName', 'genDishName'); safeText('optStandard', 'optStandard'); safeText('optBaby', 'optBaby');
   safeText('optPregnancy', 'optPregnancy'); safeText('btnGenerate', 'generate'); safeText('aiAssistTitle', 'aiAssistTitle');
   safePlaceholder('qaInput', 'enterQuestion'); safeText('askBtn', 'ask'); safeText('dishNameHint', 'dishNameHint');
   safeHtml('openVideoBtn', t('watchVideo')); safeHtml('addToHomeBtn', '+');
 
-  // ========== 登录/注册页 ==========
   safeText('tabLogin', 'signIn'); safeText('tabRegister', 'signUp');
   safePlaceholder('loginEmail', 'email'); safePlaceholder('loginPassword', 'password');
   safeText('forgotPwdLink', 'forgot'); safeText('btnLoginSubmit', 'signIn');
@@ -1151,7 +1144,6 @@ function renderLanguage() {
   safePlaceholder('registerConfirmPwd', 'confirmPwd'); safeText('btnRegisterSubmit', 'signUp');
   safeText('haveAccount', 'haveAccount'); safeText('switchToLogin', 'signIn');
 
-  // ========== 个人信息页 ==========
   safeText('profileNicknameLabel', 'profileNickname'); safeText('profileEmailLabel', 'profileEmail');
   safeText('profileJoinedLabel', 'profileJoined'); safeText('profileSubTitle', 'profileSub');
   safeText('logoutBtn', 'logout'); safeText('editNicknameBtn', 'edit'); safeText('editEmailBtn', 'edit');
@@ -1160,7 +1152,6 @@ function renderLanguage() {
   safeText('promoFeature3', 'promoFeature3'); safeText('promoFeature4', 'promoFeature4');
   safeText('goSubscribeBtn', 'subscribeBtn'); safeText('inviteCodeTitle', 'inviteCodeTitle');
 
-  // ========== 订阅页 ==========
   safeText('pricingSubtitle', 'pricingSubtitle'); safeText('pricingTitle', 'pricingTitle');
   ['Starter','Pro','Premium','Business'].forEach(type => {
     safeText(`plan${type}Name`, `plan${type}Name`); safeText(`plan${type}Desc`, `plan${type}Desc`);
@@ -1174,7 +1165,6 @@ function renderLanguage() {
   const finePrint = document.getElementById('finePrint');
   if (finePrint) finePrint.innerHTML = t('finePrint') + ' <a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
 
-  // ========== 法律页 ==========
   const legalTabs = document.querySelectorAll('.legal-tab');
   if (legalTabs[0]) legalTabs[0].innerText = t('legalPrivacyTitle');
   if (legalTabs[1]) legalTabs[1].innerText = t('legalTermsTitle');
@@ -1193,14 +1183,12 @@ function renderLanguage() {
   safeText('legalTermsSubRules', 'legalTermsSubRules');
   for (let i=1;i<=10;i++) { safeText(`legalTermsSub${i}`, `legalTermsSub${i}`); }
 
-  // ========== 弹窗及按钮 ==========
   safeText('forgotTitle', 'forgotTitle'); safeText('cancelForgot', 'cancel'); safeText('resetPwdBtn', 'reset');
   safeText('nicknameTitle', 'nicknameTitle'); safeText('cancelNickname', 'cancel'); safeText('saveNicknameBtn', 'save');
   safeText('emailTitle', 'emailTitle'); safeText('cancelEmail', 'cancel'); safeText('saveEmailBtn', 'save');
   safeText('successTitle', 'success'); safeText('closeSuccessBtn', 'ok');
   safeText('sendCodeBtn', 'sendCode'); safeText('sendResetCodeBtn', 'sendCode'); safeText('sendEmailChangeCodeBtn', 'sendCode');
 
-  // ========== 营销首页 ==========
   safeText('homeHeroTitle', 'homeHeroTitle'); safeText('homeHeroDesc', 'homeHeroDesc');
   safeText('homeCtaBtn', 'homeCtaBtn'); safeText('homeBottomTitle', 'homeBottomTitle');
   safeText('homeBottomDesc', 'homeBottomDesc'); safeText('homeSubscriptionLink', 'homeSubscriptionLink');
@@ -1218,8 +1206,15 @@ function renderLanguage() {
 
   populateCuisines();
 }
+
 function renderProfile() {
-  if (!userData) { document.getElementById('profileNickname').innerText = 'Gourmet'; document.getElementById('profileEmail').innerText = ''; document.getElementById('profileJoined').innerText = ''; document.getElementById('subStatus').innerText = 'Free'; document.getElementById('subExpiryText').innerText = "You're on the free tier."; document.getElementById('familyArea').style.display = 'none'; document.getElementById('setPasswordArea').style.display = 'none'; return; }
+  if (!userData) {
+    document.getElementById('profileNickname').innerText = 'Gourmet'; document.getElementById('profileEmail').innerText = '';
+    document.getElementById('profileJoined').innerText = ''; document.getElementById('subStatus').innerText = 'Free';
+    document.getElementById('subExpiryText').innerText = "You're on the free tier.";
+    document.getElementById('familyArea').style.display = 'none'; document.getElementById('setPasswordArea').style.display = 'none';
+    return;
+  }
   const savedAvatar = localStorage.getItem(`avatar_${userData.email}`); const avatarImg = document.getElementById('profileAvatarImg');
   if (avatarImg) { avatarImg.src = savedAvatar || '/images/default-avatar.png'; const navAvatar = document.getElementById('navAvatar'); if (navAvatar) navAvatar.src = avatarImg.src; }
   document.getElementById('profileNickname').innerText = userData.nickname || 'Gourmet'; document.getElementById('profileEmail').innerText = userData.email;
@@ -1234,8 +1229,8 @@ function renderProfile() {
   if (plan === 'premium') { familyArea.style.display = 'block'; document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || ''); }
   else { familyArea.style.display = 'none'; }
   document.getElementById('setPasswordArea').style.display = userData.hasPassword ? 'none' : 'block';
-  document.getElementById('profileNicknameLabel').innerText = t('profileNickname'); document.getElementById('profileEmailLabel').innerText = t('profileEmail'); document.getElementById('profileJoinedLabel').innerText = t('profileJoined'); document.getElementById('profileSubTitle').innerText = t('profileSub'); document.getElementById('logoutBtn').innerText = t('logout'); document.getElementById('editNicknameBtn').innerText = t('edit'); document.getElementById('editEmailBtn').innerText = t('edit'); document.getElementById('promoTitle').innerText = t('promoTitle'); document.getElementById('promoSub').innerText = t('promoSub'); document.getElementById('promoFeature1').innerText = t('promoFeature1'); document.getElementById('promoFeature2').innerText = t('promoFeature2'); document.getElementById('promoFeature3').innerText = t('promoFeature3'); document.getElementById('promoFeature4').innerText = t('promoFeature4'); document.getElementById('goSubscribeBtn').innerText = t('subscribeBtn');
 }
+
 async function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active');
   if (pageId === 'page-generator') { if (userData) await refreshUserData(); updateLimitInfo(); populateCuisines(); }
@@ -1244,9 +1239,10 @@ async function showPage(pageId) {
   if (pageId === 'page-home') renderLanguage();
   renderLanguage();
 }
+
 function switchLang(lang) { currentLang = lang; localStorage.setItem('aiChefLang', lang); document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼'; renderLanguage(); updateLimitInfo(); if (userData) renderProfile(); document.getElementById('langDropdown').style.display = 'none'; }
 function addToHome() { if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) { alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。'); } else if (navigator.share) { navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{}); } else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); } }
-function showToast(msg) { document.getElementById('successMsg').innerText = msg; document.getElementById('successModal').classList.add('show'); setTimeout(() => closeModal('successModal'), 2000); }
+function showToast(msg) { alert(msg); } // 简化为alert，无successModal
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 function switchLegalTab(tab) { document.getElementById('legal-privacy-content').style.display = tab==='privacy'?'block':'none'; document.getElementById('legal-terms-content').style.display = tab==='terms'?'block':'none'; document.querySelectorAll('.legal-tab').forEach(t => t.classList.remove('active')); document.querySelector(`.legal-tab[data-tab="${tab}"]`).classList.add('active'); }
 function handleLoginClick() { if (userData) showPage('page-profile'); else showPage('page-login-register'); }
@@ -1262,14 +1258,11 @@ function showPrevRecipe() { if (historyIndex > 0) { historyIndex--; parseRecipeT
 function showNextRecipe() { if (historyIndex < recipeHistory.length - 1) { historyIndex++; parseRecipeToUI(recipeHistory[historyIndex]); } updateHistoryButtons(); }
 function updateHistoryButtons() { document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0; document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length - 1; }
 
-// ==================== 视频 ====================
-function showVideo_OLD() { const dish = document.getElementById('dishName').value.trim() || 'recipe'; const cuisine = document.getElementById('cuisine').value; document.getElementById('videoFrame').src = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${cuisine} ${dish} cooking`)}`; document.getElementById('videoContainer').style.display = 'block'; }
-
 // ==================== URL 参数处理 ====================
 function handleUrlParams() { const urlParams = new URLSearchParams(window.location.search); const action = urlParams.get('action'), email = urlParams.get('email'); if (action && email) { if (action === 'register') { showPage('page-login-register'); switchAuthTab('register'); document.getElementById('registerEmail').value = decodeURIComponent(email); document.getElementById('registerPassword').focus(); } else if (action === 'reset') { showPage('page-login-register'); switchAuthTab('login'); document.getElementById('loginEmail').value = decodeURIComponent(email); showForgotModal(); document.getElementById('forgotEmail').value = decodeURIComponent(email); } window.history.replaceState({}, document.title, window.location.pathname); } }
 function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card:first-of-type'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
 
-// ==================== 头像裁剪功能 ====================
+// ==================== 头像裁剪 ====================
 (function initAvatarCrop() {
   const avatarInput = document.getElementById('avatarInput'), cropModal = document.getElementById('cropModal'), cropImg = document.getElementById('cropImg'), cropWrap = document.getElementById('cropWrap'), cropCancel = document.getElementById('cropCancel'), cropConfirm = document.getElementById('cropConfirm');
   if (!avatarInput) return;
