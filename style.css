@@ -241,3 +241,64 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
 @media (max-width:640px){.plans-grid{grid-template-columns:1fr}.video-grid{grid-template-columns:1fr}}
+
+/* ==================== 食谱内容区排版优化 ==================== */
+
+/* 分项标题：适度缩进，不与卡片边缘齐平 */
+.sec h4 {
+  padding-left: 0;          /* 标题本身通常不额外缩进，由父容器 padding 控制 */
+  margin-bottom: 8px;
+}
+
+/* 食材与营养列表：保留符号缩进，层次分明 */
+.sec li {
+  padding-left: 1.2em;       /* 为项目符号留出空间 */
+  text-indent: -1.2em;       /* 符号悬挂，文字对齐 */
+  margin-bottom: 4px;         /* 紧凑 */
+  line-height: 1.5;           /* 舒适阅读 */
+  list-style: none;           /* 隐藏默认样式，使用自定义符号 */
+}
+
+/* 食材与营养的自定义符号 */
+#ingredientsList li::before,
+#nutritionList li::before {
+  content: "•";
+  color: #4a90e2;
+  font-weight: bold;
+  display: inline-block;
+  width: 1.2em;
+  margin-left: -1.2em;
+}
+
+/* 风险提示列表同样处理 */
+#warningsList li {
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+#warningsList li::before {
+  content: "•";
+  color: #4a90e2;
+  font-weight: bold;
+  display: inline-block;
+  width: 1.2em;
+  margin-left: -1.2em;
+}
+
+/* 制作方法步骤：序号与标题左对齐，无额外缩进 */
+#instructionsList li {
+  padding-left: 0;            /* 顶格，与标题对齐 */
+  text-indent: 0;
+  margin-bottom: 6px;         /* 步骤之间略微区分 */
+  line-height: 1.5;
+  list-style: none;
+}
+
+/* 制作方法步骤序号样式（保持数字，不加额外符号） */
+#instructionsList li {
+  display: block;
+  position: relative;
+}
+
+/* 左右边距由 .recipe-body 的 padding 统一控制，此处不再调整 */
