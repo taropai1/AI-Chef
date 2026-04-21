@@ -221,10 +221,7 @@ const translations = {
     homeBottomTitle: '简单、快捷、美味',
     homeBottomDesc: '输入任意美食关键词，探索无限食谱。AI 带你解锁全球热门地道菜品。',
     homeSubscriptionLink: '订阅'
-  }
-  // 其他语言 (es,fr,de,it,pt) 已在之前的完整版本中提供，此处为节省篇幅省略，实际部署需补全
-};
-
+  },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
     feat2: 'Asistente IA', feat2Sub: '5 preguntas por receta', feat3: 'Nutrición', feat3Sub: 'Peso saludable', feat4: 'Seguro para bebés',
