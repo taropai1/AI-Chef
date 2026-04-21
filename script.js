@@ -779,43 +779,86 @@ async function generateRecipe() {
 
 function parseRecipeToUI(recipeText) {
   const lines = recipeText.split('\n');
-  const sections = { name: '', ingredients: [], instructions: [], nutrition: [], warnings: [], time: '' };
+  const sections = {
+    name: '',
+    ingredients: [],
+    instructions: [],
+    nutrition: [],
+    warnings: [],
+    time: ''
+  };
   let currentSection = '';
+
   for (let line of lines) {
     line = line.trim();
     if (!line) continue;
-    if (line.includes('食材准备') || line.toLowerCase().includes('ingredients')) { currentSection = 'ingredients'; continue; }
-    if (line.includes('制作方法') || line.toLowerCase().includes('instructions')) {
-      currentSection = 'instructions';
-      const timeMatch = line.match(/\([^)]*(\d+)[^)]*分钟|\((\d+)\s*mins?\)/i);
-      if (timeMatch) sections.time = timeMatch[0].replace(/[()]/g, '');
+
+    // 食材准备 / Ingredients
+    if (line.includes('食材准备') || line.toLowerCase().includes('ingredients')) {
+      currentSection = 'ingredients';
       continue;
     }
-    if (line.includes('营养参数') || line.toLowerCase().includes('nutrition')) { currentSection = 'nutrition'; continue; }
-    if (line.includes('风险提示') || line.includes('建议') || line.toLowerCase().includes('allergens') || line.toLowerCase().includes('warnings')) {
+
+    // 制作方法 / Instructions（提取时间）
+    if (line.includes('制作方法') || line.toLowerCase().includes('instructions')) {
+      currentSection = 'instructions';
+      // 匹配 (±X分钟) 或 (总时间: X分钟) 或 (X mins) 等格式
+      const timeMatch = line.match(/[（(][^）)]*(\d+)[^）)]*[分钟mins]+[）)]?/i) || line.match(/[（(](\d+)\s*分钟[）)]?/);
+      if (timeMatch) {
+        sections.time = timeMatch[1]; // 仅提取数字
+      }
+      continue;
+    }
+
+    // 营养参数 / Nutrition
+    if (line.includes('营养参数') || line.toLowerCase().includes('nutrition')) {
+      currentSection = 'nutrition';
+      continue;
+    }
+
+    // 风险提示与建议 / Allergens & Warnings
+    if (line.includes('风险提示') || line.includes('建议') || line.toLowerCase().includes('allergen') || line.toLowerCase().includes('warning')) {
       currentSection = 'warnings';
       continue;
     }
-    if (!currentSection && !sections.name) { sections.name = line; continue; }
-    if (currentSection === 'ingredients' && line.startsWith('-')) sections.ingredients.push(line.substring(1).trim());
-    else if (currentSection === 'instructions' && /^\d+\./.test(line)) sections.instructions.push(line.replace(/^\d+\./, '').trim());
-    else if (currentSection === 'nutrition' && line.startsWith('-')) sections.nutrition.push(line.substring(1).trim());
-    else if (currentSection === 'warnings' && line.startsWith('-')) sections.warnings.push(line.substring(1).trim());
+
+    // 菜名：第一个非空且非标题行
+    if (!currentSection && !sections.name) {
+      sections.name = line;
+      continue;
+    }
+
+    // 内容行处理
+    if (currentSection === 'ingredients' && line.startsWith('-')) {
+      sections.ingredients.push(line.substring(1).trim());
+    } else if (currentSection === 'instructions' && /^\d+\./.test(line)) {
+      sections.instructions.push(line.replace(/^\d+\./, '').trim());
+    } else if (currentSection === 'nutrition' && line.startsWith('-')) {
+      sections.nutrition.push(line.substring(1).trim());
+    } else if (currentSection === 'warnings' && /^\d+\./.test(line)) {
+      sections.warnings.push(line.replace(/^\d+\./, '').trim());
+    }
   }
 
+  // 填充 UI
   document.getElementById('recipeNameDisplay').innerText = sections.name || '';
-  document.getElementById('ingredientsList').innerHTML = sections.ingredients.map(i => `<li>${i}</li>`).join('');
+
+  const ingredientsList = document.getElementById('ingredientsList');
+  ingredientsList.innerHTML = sections.ingredients.map(i => `<li>${i}</li>`).join('');
   document.getElementById('ingredientsSection').style.display = sections.ingredients.length ? 'block' : 'none';
 
   const instructionsTitle = document.getElementById('instructionsTitle');
-  instructionsTitle.innerText = sections.time ? `Instructions (${sections.time})` : 'Instructions';
-  document.getElementById('instructionsList').innerHTML = sections.instructions.map(i => `<li>${i}</li>`).join('');
+  instructionsTitle.innerText = sections.time ? `Instructions (±${sections.time} mins)` : 'Instructions';
+  const instructionsList = document.getElementById('instructionsList');
+  instructionsList.innerHTML = sections.instructions.map(i => `<li>${i}</li>`).join('');
   document.getElementById('instructionsSection').style.display = sections.instructions.length ? 'block' : 'none';
 
-  document.getElementById('nutritionList').innerHTML = sections.nutrition.map(i => `<li>${i}</li>`).join('');
+  const nutritionList = document.getElementById('nutritionList');
+  nutritionList.innerHTML = sections.nutrition.map(i => `<li>${i}</li>`).join('');
   document.getElementById('nutritionSection').style.display = sections.nutrition.length ? 'block' : 'none';
 
-  document.getElementById('warningsList').innerHTML = sections.warnings.map(i => `<li>${i}</li>`).join('');
+  const warningsList = document.getElementById('warningsList');
+  warningsList.innerHTML = sections.warnings.map(i => `<li>${i}</li>`).join('');
   document.getElementById('warningsSection').style.display = sections.warnings.length ? 'block' : 'none';
 }
 
