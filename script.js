@@ -799,14 +799,11 @@ function parseRecipeToUI(recipeText) {
       continue;
     }
 
-    // 制作方法 / Instructions（提取时间）
+    // 制作方法 / Instructions（提取时间数字）
     if (line.includes('制作方法') || line.toLowerCase().includes('instructions')) {
       currentSection = 'instructions';
-      // 匹配 (±X分钟) 或 (总时间: X分钟) 或 (X mins) 等格式
       const timeMatch = line.match(/[（(][^）)]*(\d+)[^）)]*[分钟mins]+[）)]?/i) || line.match(/[（(](\d+)\s*分钟[）)]?/);
-      if (timeMatch) {
-        sections.time = timeMatch[1]; // 仅提取数字
-      }
+      if (timeMatch) sections.time = timeMatch[1];
       continue;
     }
 
