@@ -2,498 +2,435 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AI Chef | AI-Powered Smart Recipe Maker</title>
-<meta name="description" content="Generate custom recipes instantly with AI Chef. Enter ingredients or dish names to get quick, delicious meal ideas.">
+  <meta name="description" content="Generate custom recipes instantly with AI Chef. Enter ingredients or dish names to get quick, delicious meal ideas.">
   <link rel="manifest" href="/manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.1/dist/fp.min.js"></script>
   <script src="https://www.paypal.com/sdk/js?client-id=AS0dPw8lkLxD_RFoHGAvOPnjNa3a_DdiBikNN8RbvlpEVKlJaP-pW40qtF828Q4575XjtInFmWHugUmn&currency=USD&vault=true&intent=subscription&commit=false"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="nav">
-  <div class="container nav-inner">
-    <div class="logo" id="logoText" onclick="showPage('page-home')">
-      <img src="images/logo-120x40.png" alt="AI Chef">
-    </div>
-    <div class="nav-right">
-      <div class="lang-selector">
-        <div class="lang-btn" id="currentLang">English ▼</div>
-        <div class="lang-dropdown" id="langDropdown">
-          <div class="lang-option" data-lang="en">English</div>
-          <div class="lang-option" data-lang="es">Español</div>
-          <div class="lang-option" data-lang="fr">Français</div>
-          <div class="lang-option" data-lang="de">Deutsch</div>
-          <div class="lang-option" data-lang="it">Italiano</div>
-          <div class="lang-option" data-lang="pt">Português</div>
-          <div class="lang-option" data-lang="zh-CN">简体中文</div>
-        </div>
+  <div class="nav">
+    <div class="container nav-inner">
+      <div class="logo" id="logoText" onclick="showPage('page-home')">
+        <img src="images/logo-120x40.png" alt="AI Chef">
       </div>
-      <!-- 头像（登录后显示） -->
-      <img src="/images/default-avatar.png" class="nav-avatar" id="navAvatar" onclick="showPage('page-profile')" style="display:none;">
-      <!-- 登录按钮（未登录显示） -->
-      <button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
-      <button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
+      <div class="nav-right">
+        <div class="lang-selector">
+          <div class="lang-btn" id="currentLang">English ▼</div>
+          <div class="lang-dropdown" id="langDropdown">
+            <div class="lang-option" data-lang="en">English</div>
+            <div class="lang-option" data-lang="es">Español</div>
+            <div class="lang-option" data-lang="fr">Français</div>
+            <div class="lang-option" data-lang="de">Deutsch</div>
+            <div class="lang-option" data-lang="it">Italiano</div>
+            <div class="lang-option" data-lang="pt">Português</div>
+            <div class="lang-option" data-lang="zh-CN">简体中文</div>
+          </div>
+        </div>
+        <img src="/images/default-avatar.png" class="nav-avatar" id="navAvatar" onclick="showPage('page-profile')" style="display:none;">
+        <button class="btn btn-outline" id="btnLogin" onclick="handleLoginClick()">Login</button>
+        <button class="btn btn-primary" id="btnGetStarted" onclick="showPage('page-generator')">Get Started</button>
+      </div>
     </div>
   </div>
-</div>
-    
-  <!-- 首页 -->
+
+  <!-- 营销首页（新设计） -->
   <div class="page active" id="page-home">
-    <div class="container">
+    <div class="home-wrap">
       <div class="hero">
-        <h1 id="heroTitle">AI Chef</h1>
-        <p id="heroSubtitle">Global Cuisines · Smart Pairing</p>
-        <div class="hero-actions">
-          <button class="btn btn-outline" style="background:#fff;color:#2563eb" id="btnTryFree" onclick="showPage('page-generator')">Try Free</button>
-          <button class="btn btn-primary" id="btnSubscribe" onclick="showPage('page-subscribe')">Subscribe Now</button>
-        </div>
+        <h1 id="homeHeroTitle">Discover Endless Recipes with AI</h1>
+        <p id="homeHeroDesc">Type any ingredient, dish, or cuisine. Our AI chef creates authentic, delicious meals from around the world instantly.</p>
+        <a class="cta" id="homeCtaBtn" onclick="showPage('page-generator')">Start Cooking Now</a>
       </div>
-      <h2 class="section-title" id="sectionFeatures">Features</h2>
-      <div class="grid">
-        <div class="card feature-card"><div class="feature-icon">🍽️</div><div class="feature-title" id="feat1">18 Cuisines</div><div class="feature-sub" id="feat1Sub">Global flavors</div></div>
-        <div class="card feature-card"><div class="feature-icon">🥗</div><div class="feature-title" id="feat2">AI Assistant</div><div class="feature-sub" id="feat2Sub">Interactive Q&A</div></div>
-        <div class="card feature-card"><div class="feature-icon">📊</div><div class="feature-title" id="feat3">Nutrition</div><div class="feature-sub" id="feat3Sub">Healthy Weight</div></div>
-        <div class="card feature-card"><div class="feature-icon">👶</div><div class="feature-title" id="feat4">Baby Safe</div><div class="feature-sub" id="feat4Sub">No salt/sugar</div></div>
-        <div class="card feature-card"><div class="feature-icon">🤰</div><div class="feature-title" id="feat5">Pregnancy</div><div class="feature-sub" id="feat5Sub">Mom friendly</div></div>
-        <div class="card feature-card"><div class="feature-icon">🎥</div><div class="feature-title" id="feat6">Video Guides</div><div class="feature-sub" id="feat6Sub">Step-by-step</div></div>
-      </div>
-      <h2 class="section-title" id="sectionSubscribe">Subscription Plans</h2>
-      <div class="grid-2">
-        <div class="card clickable" id="goPay" onclick="showPage('page-subscribe')"><div class="feature-icon">💳</div><div class="feature-title" id="subText">Subscribe</div><div class="feature-sub" id="subSub">Unlock full access</div></div>
-        <div class="card clickable" id="goFamily" onclick="showPage('page-subscribe')"><div class="feature-icon">👪</div><div class="feature-title" id="familyText">Family Share</div><div class="feature-sub" id="familySub">Multi-User Plan</div></div>
-      </div>
-      <div class="footer-links">
-        <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
+      <div class="features" id="homeFeatures"></div>
+      <div class="bottom">
+        <h3 id="homeBottomTitle">Simple. Fast. Delicious.</h3>
+        <p id="homeBottomDesc">Type any food-related keywords to explore endless recipes. Get popular, authentic dishes from worldwide cuisines with AI.</p>
+        <p class="sub-link"><a id="homeSubscriptionLink" onclick="showPage('page-subscribe')">Subscription</a></p>
       </div>
     </div>
-  </div>
-  
-<!-- 生成器页 - 最终整合版（视频：YouTube主通道 + Worker兜底） -->
-<div class="page" id="page-generator">
-  <div class="generator-wrap">
-    <!-- 卡片一：生成器（固定高度） -->
-    <div class="card-generator">
-      <div class="gen-header">
-  <div>
-    <div class="gen-title" id="genTitle">AI Recipe Generator</div>
-    <div class="gen-sub" id="limitInfo">Please log in to continue</div>
-  </div>
-  <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" title="Add to Home">+</button>
-</div>
-      <div class="form">
-        <div class="row">
-          <div class="label" id="genMealType">Category</div>
-          <select id="mealType">
-            <option value="standard" id="optStandard">Standard</option>
-            <option value="baby" id="optBaby">Baby</option>
-            <option value="pregnancy" id="optPregnancy">Pregnancy</option>
-          </select>
-        </div>
-        <div class="row">
-          <div class="label" id="genCuisine">Cuisine</div>
-          <select id="cuisine"></select>
-        </div>
-        <div class="row">
-          <div class="label" id="genDishName">What to eat?</div>
-          <input type="text" id="dishName" placeholder="Ingredients, dish names...">
-          <div class="hint" id="dishNameHint">Enter ingredients, dish names or food items</div>
-        </div>
-      </div>
-      <div class="help-trigger">
-        <button class="help-btn" id="howToUseBtn">How to use</button>
-      </div>
-      <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
-    </div>
-
-    <!-- 卡片二：食谱内容（可滚动） -->
-    <div class="card-content">
-      <div class="content-header">
-        <div class="recipe-banner" id="personalizedGreeting">Dear Gourmet! Enjoy your meal!</div>
-        <div class="content-nav">
-          <button class="nav-icon" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>←</button>
-          <button class="nav-icon" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>→</button>
-        </div>
-      </div>
-      <div class="recipe-body" id="recipeResultArea">
-        <div class="recipe-title" id="recipeNameDisplay"></div>
-        <div class="sec" id="ingredientsSection" style="display:none;">
-          <h4 id="ingredientsTitle">Ingredients</h4>
-          <ul id="ingredientsList"></ul>
-        </div>
-        <div class="sec" id="instructionsSection" style="display:none;">
-          <h4 id="instructionsTitle">Instructions</h4>
-          <ul id="instructionsList"></ul>
-        </div>
-        <div class="sec" id="nutritionSection" style="display:none;">
-          <h4 id="nutritionTitle">Nutrition</h4>
-          <ul id="nutritionList"></ul>
-        </div>
-        <div class="sec" id="warningsSection" style="display:none;">
-          <h4 id="warningsTitle">Allergens & Warnings</h4>
-          <ul id="warningsList"></ul>
-        </div>
-      </div>
-      <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()">↻ Recover last 3</button>
-    </div>
-
-    <!-- 卡片三：AI助手 -->
-    <div class="card-ai">
-      <div class="ai-title" id="aiAssistTitle">AI Assistant</div>
-      <div class="qa-list" id="qaHistory"></div>
-      <div class="ai-row">
-        <input class="ai-input" id="qaInput" placeholder="Ask about this recipe..." disabled>
-        <button class="btn-ask" id="askBtn" onclick="askQuestion()" disabled>Ask</button>
-      </div>
-      <div class="ai-bottom">
-        <div class="limit" id="qaLimitNote"></div>
-        <button class="btn-video" id="openVideoBtn">Watch Video Guides</button>
-      </div>
+    <div class="footer-links">
+      <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
     </div>
   </div>
 
-  <!-- 视频网格弹窗 -->
-  <div class="video-modal" id="videoModal">
-    <div class="video-modal-card">
-      <div class="video-modal-head">
-        <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
-        <button class="video-modal-close" id="closeVideoModal">×</button>
-      </div>
-      <div class="video-grid" id="videoGrid"></div>
-    </div>
-  </div>
-
-  <!-- 底部视频播放器 -->
-  <div class="video-player" id="videoPlayer">
-    <div class="video-player-container">
-      <div class="video-frame" id="videoFrameContainer"></div>
-      <div class="video-row">
-        <div class="video-thumb" id="videoThumb">Video</div>
-        <div class="video-info">
-          <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
-          <div class="video-info-desc">Step-by-step cooking</div>
+  <!-- 生成器页（完整最新设计 + 所有修复） -->
+  <div class="page" id="page-generator">
+    <div class="generator-wrap">
+      <div class="card-generator">
+        <div class="gen-header">
+          <div>
+            <div class="gen-title" id="genTitle">AI Recipe Generator</div>
+            <div class="gen-sub" id="limitInfo">Please log in to continue</div>
+          </div>
+          <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" title="Add to Home">+</button>
         </div>
-        <div class="video-controls">
-          <button class="video-control-btn" id="togglePlayer">⤢</button>
-          <button class="video-control-btn" id="closePlayer">×</button>
+        <div class="form">
+          <div class="row">
+            <div class="label" id="genMealType">Category</div>
+            <select id="mealType">
+              <option value="standard" id="optStandard">Standard</option>
+              <option value="baby" id="optBaby">Baby</option>
+              <option value="pregnancy" id="optPregnancy">Pregnancy</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="label" id="genCuisine">Cuisine</div>
+            <select id="cuisine"></select>
+          </div>
+          <div class="row">
+            <div class="label" id="genDishName">What to eat?</div>
+            <input type="text" id="dishName" placeholder="Ingredients, dish names...">
+            <div class="hint" id="dishNameHint">Enter ingredients, dish names or food items</div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 使用说明弹窗 -->
-  <div class="modal-overlay" id="howToModal">
-    <div class="modal">
-      <h4 id="howToTitle">How to use</h4>
-      <ul id="howToList">
-        <li>You can enter one or more ingredients, such as potatoes, spinach, chicken breast, salmon.</li>
-        <li>You can search for classic dishes and meals, such as grilled steak, roasted veggies, omelette, pasta.</li>
-        <li>You can look up desserts and baked treats, such as cheesecake, vanilla ice cream, croissant, muffin.</li>
-        <li>You can find recipes for soups, drinks & homemade beverages, such as tomato soup, iced coffee, cocktail, fresh juice.</li>
-        <li>Filter by taste and style: comfort food, savory dishes, spicy meals, sweet treats and healthy options.</li>
-        <li>Discover global cuisines and make dishes from around the world.</li>
-        <li>If you dislike a recipe, tap Generate again for brand-new cooking ideas.</li>
-      </ul>
-      <p class="modal-highlight-text" id="howToHighlight">Type any food-related words to explore countless recipes. Get popular, authentic dishes from worldwide cuisines with AI.</p>
-      <button class="close-btn" onclick="closeHowToModal()">Got it</button>
-    </div>
-  </div>
-</div>
-
-  <!-- 登录/注册页 -->
-<div class="page" id="page-login-register">
-  <div class="auth-container">
-    <div class="auth-card-new">
-      <div class="auth-tabs">
-        <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
-        <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
+        <div class="help-trigger">
+          <button class="help-btn" id="howToUseBtn">How to use</button>
+        </div>
+        <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
       </div>
 
-      <!-- 登录面板 -->
-      <div class="auth-panel active" id="loginForm">
-        <div class="auth-input-wrapper">
-          <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email address">
+      <div class="card-content">
+        <div class="content-header">
+          <div class="recipe-banner" id="personalizedGreeting">Dear Gourmet! Enjoy your meal!</div>
+          <div class="content-nav">
+            <button class="nav-icon" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>←</button>
+            <button class="nav-icon" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>→</button>
+          </div>
         </div>
-        <div class="auth-input-wrapper pwd-wrapper">
-          <input type="password" class="auth-input-new" id="loginPassword" placeholder="Password">
-          <span class="pwd-toggle" onclick="togglePasswordWithIcon('loginPassword', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-          </span>
+        <div class="recipe-body" id="recipeResultArea">
+          <div class="recipe-title" id="recipeNameDisplay"></div>
+          <div class="sec" id="ingredientsSection" style="display:none;">
+            <h4 id="ingredientsTitle">Ingredients</h4>
+            <ul id="ingredientsList"></ul>
+          </div>
+          <div class="sec" id="instructionsSection" style="display:none;">
+            <h4 id="instructionsTitle">Instructions</h4>
+            <ul id="instructionsList"></ul>
+          </div>
+          <div class="sec" id="nutritionSection" style="display:none;">
+            <h4 id="nutritionTitle">Nutrition</h4>
+            <ul id="nutritionList"></ul>
+          </div>
+          <div class="sec" id="warningsSection" style="display:none;">
+            <h4 id="warningsTitle">Allergens & Warnings</h4>
+            <ul id="warningsList"></ul>
+          </div>
         </div>
-        <div class="auth-link-row">
-          <span class="auth-link-text" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span>
-        </div>
-        <button class="auth-btn-primary" id="btnLoginSubmit" onclick="login()">Login</button>
-        <div class="auth-swap">
-          <span class="auth-swap-label" id="noAccount">New?</span>
-          <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Register</span>
-        </div>
+        <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()">↻ Recover last 3</button>
       </div>
 
-      <!-- 注册面板 -->
-      <div class="auth-panel" id="registerForm" style="display:none;">
-        <div class="auth-input-wrapper">
-          <input type="email" class="auth-input-new" id="registerEmail" placeholder="Email address">
+      <div class="card-ai">
+        <div class="ai-title" id="aiAssistTitle">AI Assistant</div>
+        <div class="qa-list" id="qaHistory"></div>
+        <div class="ai-row">
+          <input class="ai-input" id="qaInput" placeholder="Ask about this recipe..." disabled>
+          <button class="btn-ask" id="askBtn" onclick="askQuestion()" disabled>Ask</button>
         </div>
-        <div class="auth-row">
-          <input type="text" class="auth-input-new auth-code-input" id="registerCode" placeholder="Verification code">
-          <button class="auth-btn-secondary" id="sendCodeBtn">Send Code</button>
-        </div>
-        <div class="auth-input-wrapper pwd-wrapper">
-          <input type="password" class="auth-input-new" id="registerPassword" placeholder="Password">
-          <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerPassword', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-          </span>
-        </div>
-        <div class="auth-input-wrapper pwd-wrapper">
-          <input type="password" class="auth-input-new" id="registerConfirmPwd" placeholder="Confirm password">
-          <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerConfirmPwd', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-          </span>
-        </div>
-        <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Register</button>
-        <div class="auth-swap">
-          <span class="auth-swap-label" id="haveAccount">Have account?</span>
-          <span class="auth-swap-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span>
+        <div class="ai-bottom">
+          <div class="limit" id="qaLimitNote"></div>
+          <button class="btn-video" id="openVideoBtn">Watch Video Guides</button>
         </div>
       </div>
     </div>
-  </div>
-  <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
-</div>
 
-<!-- 忘记密码弹窗 -->
-<div class="modal-overlay-new" id="forgotModal">
-  <div class="modal-card-new">
-    <h3 class="modal-title-new" id="forgotTitle">Reset Password</h3>
-    <div class="auth-input-wrapper">
-      <input type="email" class="auth-input-new" id="forgotEmail" placeholder="Email address">
-    </div>
-    <div class="auth-row">
-      <input type="text" class="auth-input-new auth-code-input" id="forgotCode" placeholder="Verification code">
-      <button class="auth-btn-secondary" id="sendResetCodeBtn">Send Code</button>
-    </div>
-    <div class="auth-input-wrapper pwd-wrapper">
-      <input type="password" class="auth-input-new" id="forgotNewPwd" placeholder="New password">
-      <span class="pwd-toggle" onclick="togglePasswordWithIcon('forgotNewPwd', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-      </span>
-    </div>
-    <div class="modal-actions-new">
-      <button class="auth-btn-secondary" id="cancelForgot" onclick="closeModal('forgotModal')">Cancel</button>
-      <button class="auth-btn-primary" id="resetPwdBtn" onclick="resetPassword()">Reset</button>
-    </div>
-  </div>
-</div>
-  
-<!-- 个人信息页 -->
-<div class="page" id="page-profile">
-  <div class="profile-container">
-    <div class="profile-card-new">
-      <div class="avatar-area">
-        <div class="avatar-box">
-          <img id="profileAvatarImg" class="avatar" src="/images/default-avatar.png" alt="Avatar">
-          <label class="camera">
-            <input type="file" id="avatarInput" accept="image/*">+
-          </label>
+    <div class="video-modal" id="videoModal">
+      <div class="video-modal-card">
+        <div class="video-modal-head">
+          <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
+          <button class="video-modal-close" id="closeVideoModal">×</button>
         </div>
+        <div class="video-grid" id="videoGrid"></div>
       </div>
+    </div>
 
-      <div class="info-item">
-        <div><div class="label" id="profileNicknameLabel">Nickname</div><div class="value" id="profileNickname">Gourmet</div></div>
-        <div class="edit" id="editNicknameBtn">Edit</div>
-      </div>
-      <div class="info-item">
-        <div><div class="label" id="profileEmailLabel">Email</div><div class="value" id="profileEmail">user@example.com</div></div>
-        <div class="edit" id="editEmailBtn">Edit</div>
-      </div>
-      <div class="info-item">
-        <div><div class="label" id="profileJoinedLabel">Joined</div><div class="value" id="profileJoined">April 2026</div></div>
-      </div>
-
-      <div class="plan-status">
-        <div class="plan-row">
-          <div class="plan-title" id="profileSubTitle">Current Plan</div>
-          <div class="plan-tag" id="subStatus">Free</div>
-        </div>
-        <div class="plan-desc" id="subExpiryText">You're on the free tier.</div>
-        <!-- 家庭邀请区域（仅 Premium 显示） -->
-        <div id="familyArea" style="display:none; margin-top:16px;">
-          <div class="invite-box-new">
-            <div id="inviteCodeTitle">Your Invite Code</div>
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <input type="text" id="inviteCodeInput" placeholder="Enter code" class="auth-input-new" style="margin-bottom:0;">
-              <button class="auth-btn-secondary" onclick="bindInvite()">Join</button>
-            </div>
-            <div id="ownerInviteCode" style="margin-top:8px; font-weight:500;"></div>
+    <div class="video-player" id="videoPlayer">
+      <div class="video-player-container">
+        <div class="video-frame" id="videoFrameContainer"></div>
+        <div class="video-row">
+          <div class="video-thumb" id="videoThumb">Video</div>
+          <div class="video-info">
+            <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
+            <div class="video-info-desc">Step-by-step cooking</div>
+          </div>
+          <div class="video-controls">
+            <button class="video-control-btn" id="togglePlayer">⤢</button>
+            <button class="video-control-btn" id="closePlayer">×</button>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- 设置密码区域（仅未设置密码的社交登录用户显示） -->
-      <div id="setPasswordArea" style="display:none; margin-top:20px;">
-        <div class="label">Set Password (for email login)</div>
-        <div class="pwd-wrapper" style="margin-bottom:12px;">
-          <input type="password" id="newPasswordInput" class="auth-input-new" placeholder="New password">
-          <span class="pwd-toggle" onclick="togglePasswordWithIcon('newPasswordInput', this)">
-            <i class="pwd-icon pwd-icon-eye"></i>
-          </span>
+    <div class="modal-overlay" id="howToModal">
+      <div class="modal">
+        <h4 id="howToTitle">How to use</h4>
+        <ul id="howToList"></ul>
+        <p class="modal-highlight-text" id="howToHighlight"></p>
+        <button class="close-btn" onclick="closeHowToModal()">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 登录/注册页（配色已统一） -->
+  <div class="page" id="page-login-register">
+    <div class="auth-container">
+      <div class="auth-card-new">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
+          <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
         </div>
-        <div class="pwd-wrapper" style="margin-bottom:12px;">
-          <input type="password" id="confirmPasswordInput" class="auth-input-new" placeholder="Confirm password">
-          <span class="pwd-toggle" onclick="togglePasswordWithIcon('confirmPasswordInput', this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-          </span>
+        <div class="auth-panel active" id="loginForm">
+          <div class="auth-input-wrapper">
+            <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email address">
+          </div>
+          <div class="auth-input-wrapper pwd-wrapper">
+            <input type="password" class="auth-input-new" id="loginPassword" placeholder="Password">
+            <span class="pwd-toggle" onclick="togglePasswordWithIcon('loginPassword', this)">
+              <i class="pwd-icon pwd-icon-eye"></i>
+            </span>
+          </div>
+          <div class="auth-link-row">
+            <span class="auth-link-text" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span>
+          </div>
+          <button class="auth-btn-primary" id="btnLoginSubmit" onclick="login()">Login</button>
+          <div class="auth-swap">
+            <span class="auth-swap-label" id="noAccount">New?</span>
+            <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Register</span>
+          </div>
         </div>
-        <button class="auth-btn-primary" onclick="setPassword()">Set Password</button>
+        <div class="auth-panel" id="registerForm" style="display:none;">
+          <div class="auth-input-wrapper">
+            <input type="email" class="auth-input-new" id="registerEmail" placeholder="Email address">
+          </div>
+          <div class="auth-row">
+            <input type="text" class="auth-input-new auth-code-input" id="registerCode" placeholder="Verification code">
+            <button class="auth-btn-secondary" id="sendCodeBtn">Send Code</button>
+          </div>
+          <div class="auth-input-wrapper pwd-wrapper">
+            <input type="password" class="auth-input-new" id="registerPassword" placeholder="Password">
+            <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerPassword', this)">
+              <i class="pwd-icon pwd-icon-eye"></i>
+            </span>
+          </div>
+          <div class="auth-input-wrapper pwd-wrapper">
+            <input type="password" class="auth-input-new" id="registerConfirmPwd" placeholder="Confirm password">
+            <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerConfirmPwd', this)">
+              <i class="pwd-icon pwd-icon-eye"></i>
+            </span>
+          </div>
+          <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Register</button>
+          <div class="auth-swap">
+            <span class="auth-swap-label" id="haveAccount">Have account?</span>
+            <span class="auth-swap-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span>
+          </div>
+        </div>
       </div>
-
-      <div class="logout" id="logoutBtn" onclick="logout()">Sign Out</div>
     </div>
+    <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
+  </div>
 
-    <div class="promo-card">
-      <div class="promo-title" id="promoTitle">Go Premium</div>
-      <div class="promo-sub" id="promoSub">Unlock everything for your cooking</div>
-      <div class="promo-list">
-        <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature1">Unlimited recipes</div></div>
-        <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature2">Family sharing</div></div>
-        <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature3">Nutrition insights</div></div>
-        <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature4">Ad-free experience</div></div>
+  <!-- 忘记密码弹窗 -->
+  <div class="modal-overlay-new" id="forgotModal">
+    <div class="modal-card-new">
+      <h3 class="modal-title-new" id="forgotTitle">Reset Password</h3>
+      <div class="auth-input-wrapper">
+        <input type="email" class="auth-input-new" id="forgotEmail" placeholder="Email address">
       </div>
-      <div class="subscribe-btn" id="goSubscribeBtn" onclick="showPage('page-subscribe')">Subscription Plans</div>
+      <div class="auth-row">
+        <input type="text" class="auth-input-new auth-code-input" id="forgotCode" placeholder="Verification code">
+        <button class="auth-btn-secondary" id="sendResetCodeBtn">Send Code</button>
+      </div>
+      <div class="auth-input-wrapper pwd-wrapper">
+        <input type="password" class="auth-input-new" id="forgotNewPwd" placeholder="New password">
+        <span class="pwd-toggle" onclick="togglePasswordWithIcon('forgotNewPwd', this)">
+          <i class="pwd-icon pwd-icon-eye"></i>
+        </span>
+      </div>
+      <div class="modal-actions-new">
+        <button class="auth-btn-secondary" id="cancelForgot" onclick="closeModal('forgotModal')">Cancel</button>
+        <button class="auth-btn-primary" id="resetPwdBtn" onclick="resetPassword()">Reset</button>
+      </div>
     </div>
   </div>
 
-<!-- 昵称弹窗 -->
-<div class="modal-overlay-new" id="nicknameModal">
-  <div class="modal-card-new">
-    <h3 class="modal-title-new" id="nicknameTitle">Edit Nickname</h3>
-    <input class="auth-input-new" id="newNicknameInput" maxlength="20" placeholder="Enter your nickname">
-    <div class="modal-actions-new">
-      <button class="auth-btn-secondary" id="cancelNickname" onclick="closeModal('nicknameModal')">Cancel</button>
-      <button class="auth-btn-primary" id="saveNicknameBtn" onclick="saveNickname()">Save</button>
+  <!-- 个人信息页（配色统一，弹窗已修复） -->
+  <div class="page" id="page-profile">
+    <div class="profile-container">
+      <div class="profile-card-new">
+        <div class="avatar-area">
+          <div class="avatar-box">
+            <img id="profileAvatarImg" class="avatar" src="/images/default-avatar.png" alt="Avatar">
+            <label class="camera">
+              <input type="file" id="avatarInput" accept="image/*">+
+            </label>
+          </div>
+        </div>
+        <div class="info-item">
+          <div><div class="label" id="profileNicknameLabel">Nickname</div><div class="value" id="profileNickname">Gourmet</div></div>
+          <div class="edit" id="editNicknameBtn">Edit</div>
+        </div>
+        <div class="info-item">
+          <div><div class="label" id="profileEmailLabel">Email</div><div class="value" id="profileEmail">user@example.com</div></div>
+          <div class="edit" id="editEmailBtn">Edit</div>
+        </div>
+        <div class="info-item">
+          <div><div class="label" id="profileJoinedLabel">Joined</div><div class="value" id="profileJoined">April 2026</div></div>
+        </div>
+        <div class="plan-status">
+          <div class="plan-row">
+            <div class="plan-title" id="profileSubTitle">Current Plan</div>
+            <div class="plan-tag" id="subStatus">Free</div>
+          </div>
+          <div class="plan-desc" id="subExpiryText">You're on the free tier.</div>
+          <div id="familyArea" style="display:none; margin-top:16px;">
+            <div class="invite-box-new">
+              <div id="inviteCodeTitle">Your Invite Code</div>
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <input type="text" id="inviteCodeInput" placeholder="Enter code" class="auth-input-new" style="margin-bottom:0;">
+                <button class="auth-btn-secondary" onclick="bindInvite()">Join</button>
+              </div>
+              <div id="ownerInviteCode" style="margin-top:8px; font-weight:500;"></div>
+            </div>
+          </div>
+        </div>
+        <div id="setPasswordArea" style="display:none; margin-top:20px;">
+          <div class="label">Set Password (for email login)</div>
+          <div class="pwd-wrapper" style="margin-bottom:12px;">
+            <input type="password" id="newPasswordInput" class="auth-input-new" placeholder="New password">
+            <span class="pwd-toggle" onclick="togglePasswordWithIcon('newPasswordInput', this)">
+              <i class="pwd-icon pwd-icon-eye"></i>
+            </span>
+          </div>
+          <div class="pwd-wrapper" style="margin-bottom:12px;">
+            <input type="password" id="confirmPasswordInput" class="auth-input-new" placeholder="Confirm password">
+            <span class="pwd-toggle" onclick="togglePasswordWithIcon('confirmPasswordInput', this)">
+              <i class="pwd-icon pwd-icon-eye"></i>
+            </span>
+          </div>
+          <button class="auth-btn-primary" onclick="setPassword()">Set Password</button>
+        </div>
+        <div class="logout" id="logoutBtn" onclick="logout()">Sign Out</div>
+      </div>
+      <div class="promo-card">
+        <div class="promo-title" id="promoTitle">Go Premium</div>
+        <div class="promo-sub" id="promoSub">Unlock everything for your cooking</div>
+        <div class="promo-list">
+          <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature1">Unlimited recipes</div></div>
+          <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature2">Family sharing</div></div>
+          <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature3">Nutrition insights</div></div>
+          <div class="promo-item"><div class="check">✓</div><div class="promo-text" id="promoFeature4">Ad-free experience</div></div>
+        </div>
+        <div class="subscribe-btn" id="goSubscribeBtn" onclick="showPage('page-subscribe')">Subscription Plans</div>
+      </div>
+    </div>
+    <div class="modal-overlay-new" id="nicknameModal">
+      <div class="modal-card-new">
+        <h3 class="modal-title-new" id="nicknameTitle">Edit Nickname</h3>
+        <input class="auth-input-new" id="newNicknameInput" maxlength="20" placeholder="Enter your nickname">
+        <div class="modal-actions-new">
+          <button class="auth-btn-secondary" id="cancelNickname" onclick="closeModal('nicknameModal')">Cancel</button>
+          <button class="auth-btn-primary" id="saveNicknameBtn" onclick="saveNickname()">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay-new" id="emailModal">
+      <div class="modal-card-new">
+        <h3 class="modal-title-new" id="emailTitle">Change Email</h3>
+        <div class="error" id="emailError"></div>
+        <input class="auth-input-new" id="newEmailInput" placeholder="New email address">
+        <div class="modal-row">
+          <input class="auth-input-new" id="emailChangeCode" placeholder="Verification code">
+          <button class="auth-btn-secondary" id="sendEmailChangeCodeBtn">Send Code</button>
+        </div>
+        <div class="modal-actions-new">
+          <button class="auth-btn-secondary" id="cancelEmail" onclick="closeModal('emailModal')">Cancel</button>
+          <button class="auth-btn-primary" id="saveEmailBtn" onclick="saveEmail()">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="crop-modal" id="cropModal">
+      <div class="crop-box">
+        <div class="crop-wrap" id="cropWrap">
+          <img class="crop-img" id="cropImg" alt="Preview">
+        </div>
+        <div class="crop-actions">
+          <button class="crop-btn crop-cancel" id="cropCancel">Cancel</button>
+          <button class="crop-btn crop-confirm" id="cropConfirm">Set Photo</button>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- 邮箱弹窗 -->
-<div class="modal-overlay-new" id="emailModal">
-  <div class="modal-card-new">
-    <h3 class="modal-title-new" id="emailTitle">Change Email</h3>
-    <div class="error" id="emailError"></div>
-    <input class="auth-input-new" id="newEmailInput" placeholder="New email address">
-    <div class="modal-row">
-      <input class="auth-input-new" id="emailChangeCode" placeholder="Verification code">
-      <button class="auth-btn-secondary" id="sendEmailChangeCodeBtn">Send Code</button>
-    </div>
-    <div class="modal-actions-new">
-      <button class="auth-btn-secondary" id="cancelEmail" onclick="closeModal('emailModal')">Cancel</button>
-      <button class="auth-btn-primary" id="saveEmailBtn" onclick="saveEmail()">Save</button>
+  <!-- 订阅支付页（配色统一，结构不变） -->
+  <div class="page" id="page-subscribe">
+    <div class="container" style="max-width:1200px;">
+      <div class="pricing-header">
+        <p class="pricing-subtitle" id="pricingSubtitle">Choose Your Plan</p>
+        <h1 class="pricing-title" id="pricingTitle">Subscription Plans</h1>
+      </div>
+      <div class="plans-grid">
+        <div class="plan-card">
+          <h3 class="plan-name" id="planStarterName">Starter</h3>
+          <p class="plan-desc" id="planStarterDesc">Your personal cooking assistant</p>
+          <div class="plan-price-wrapper"><div class="plan-price">$4.99 <span id="planStarterPeriod">/ month</span></div></div>
+          <div id="paypal-starter-container" class="paypal-button-container"></div>
+          <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeStarter">Secured by PayPal · Auto-renewal</span></div>
+          <ul class="features-list">
+            <li id="featureStarter1">10 recipes daily</li>
+            <li id="featureStarter2">5 AI queries per recipe</li>
+            <li id="featureStarter3">For personal use only</li>
+            <li id="featureStarter4">Generate recipes from any ingredients</li>
+          </ul>
+        </div>
+        <div class="plan-card">
+          <h3 class="plan-name" id="planProName">Pro</h3>
+          <p class="plan-desc" id="planProDesc">Most popular among food lovers</p>
+          <div class="plan-price-wrapper"><div class="plan-price">$9.99 <span id="planProPeriod">/ month</span></div></div>
+          <div id="paypal-pro-container" class="paypal-button-container"></div>
+          <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePro">Secured by PayPal · Auto-renewal</span></div>
+          <ul class="features-list">
+            <li id="featurePro1">30 recipes daily</li>
+            <li id="featurePro2">5 AI queries per recipe</li>
+            <li id="featurePro3">All features unlocked</li>
+            <li id="featurePro4">Advanced recipe customization</li>
+          </ul>
+        </div>
+        <div class="plan-card">
+          <h3 class="plan-name" id="planPremiumName">Premium</h3>
+          <p class="plan-desc" id="planPremiumDesc">Suitable for multi-user sharing</p>
+          <div class="plan-price-wrapper"><div class="plan-price">$29.99 <span id="planPremiumPeriod">/ month</span></div></div>
+          <div id="paypal-premium-container" class="paypal-button-container"></div>
+          <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePremium">Secured by PayPal · Auto-renewal</span></div>
+          <ul class="features-list">
+            <li id="featurePremium1">80 recipes daily</li>
+            <li id="featurePremium2">5 AI queries per recipe</li>
+            <li id="featurePremium3">Up to 3 users sharing</li>
+            <li id="featurePremium4">Shared usage pool</li>
+            <li id="featurePremium5">Health & nutrition analysis</li>
+          </ul>
+        </div>
+        <div class="plan-card">
+          <h3 class="plan-name" id="planBusinessName">Business</h3>
+          <p class="plan-desc" id="planBusinessDesc">For commercial kitchens & catering</p>
+          <div class="plan-price-wrapper"><div class="plan-price">$49.99 <span id="planBusinessPeriod">/ month</span></div></div>
+          <div id="paypal-business-container" class="paypal-button-container"></div>
+          <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeBusiness">Secured by PayPal · Auto-renewal</span></div>
+          <ul class="features-list">
+            <li id="featureBusiness1">300 daily generations</li>
+            <li id="featureBusiness2">5 AI queries per recipe</li>
+            <li id="featureBusiness3">Priority generation queue</li>
+            <li id="featureBusiness4">Commercial usage rights</li>
+            <li id="featureBusiness5">Extended recipe permissions</li>
+          </ul>
+        </div>
+      </div>
+      <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
     </div>
   </div>
-</div>
 
-  <!-- 头像裁剪弹窗 -->
-  <div class="crop-modal" id="cropModal">
-    <div class="crop-box">
-      <div class="crop-wrap" id="cropWrap">
-        <img class="crop-img" id="cropImg" alt="Preview">
-      </div>
-      <div class="crop-actions">
-        <button class="crop-btn crop-cancel" id="cropCancel">Cancel</button>
-        <button class="crop-btn crop-confirm" id="cropConfirm">Set Photo</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 订阅支付页 -->
-<div class="page" id="page-subscribe">
-  <div class="container" style="max-width:1200px;">
-    <div class="pricing-header">
-      <p class="pricing-subtitle" id="pricingSubtitle">Choose Your Plan</p>
-      <h1 class="pricing-title" id="pricingTitle">Subscription Plans</h1>
-    </div>
-    <div class="plans-grid">
-      <!-- Starter -->
-      <div class="plan-card">
-        <h3 class="plan-name" id="planStarterName">Starter</h3>
-        <p class="plan-desc" id="planStarterDesc">Your personal cooking assistant</p>
-        <div class="plan-price-wrapper"><div class="plan-price">$4.99 <span id="planStarterPeriod">/ month</span></div></div>
-        <div id="paypal-starter-container" class="paypal-button-container"></div>
-        <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeStarter">Secured by PayPal · Auto-renewal</span></div>
-        <ul class="features-list">
-          <li id="featureStarter1">10 recipes daily</li>
-          <li id="featureStarter2">5 AI queries per recipe</li>
-          <li id="featureStarter3">For personal use only</li>
-          <li id="featureStarter4">Generate recipes from any ingredients</li>
-        </ul>
-      </div>
-      <!-- Pro -->
-      <div class="plan-card">
-        <h3 class="plan-name" id="planProName">Pro</h3>
-        <p class="plan-desc" id="planProDesc">Most popular among food lovers</p>
-        <div class="plan-price-wrapper"><div class="plan-price">$9.99 <span id="planProPeriod">/ month</span></div></div>
-        <div id="paypal-pro-container" class="paypal-button-container"></div>
-        <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePro">Secured by PayPal · Auto-renewal</span></div>
-        <ul class="features-list">
-          <li id="featurePro1">30 recipes daily</li>
-          <li id="featurePro2">5 AI queries per recipe</li>
-          <li id="featurePro3">All features unlocked</li>
-          <li id="featurePro4">Advanced recipe customization</li>
-        </ul>
-      </div>
-      <!-- Premium -->
-      <div class="plan-card">
-        <h3 class="plan-name" id="planPremiumName">Premium</h3>
-        <p class="plan-desc" id="planPremiumDesc">Suitable for multi-user sharing</p>
-        <div class="plan-price-wrapper"><div class="plan-price">$29.99 <span id="planPremiumPeriod">/ month</span></div></div>
-        <div id="paypal-premium-container" class="paypal-button-container"></div>
-        <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticePremium">Secured by PayPal · Auto-renewal</span></div>
-        <ul class="features-list">
-          <li id="featurePremium1">80 recipes daily</li>
-          <li id="featurePremium2">5 AI queries per recipe</li>
-          <li id="featurePremium3">Up to 3 users sharing</li>
-          <li id="featurePremium4">Shared usage pool</li>
-          <li id="featurePremium5">Health & nutrition analysis</li>
-        </ul>
-      </div>
-      <!-- Business -->
-      <div class="plan-card">
-        <h3 class="plan-name" id="planBusinessName">Business</h3>
-        <p class="plan-desc" id="planBusinessDesc">For commercial kitchens & catering</p>
-        <div class="plan-price-wrapper"><div class="plan-price">$49.99 <span id="planBusinessPeriod">/ month</span></div></div>
-        <div id="paypal-business-container" class="paypal-button-container"></div>
-        <div class="paypal-security"><i class="paypal-lock-icon"></i> <span id="planNoticeBusiness">Secured by PayPal · Auto-renewal</span></div>
-        <ul class="features-list">
-          <li id="featureBusiness1">300 daily generations</li>
-          <li id="featureBusiness2">5 AI queries per recipe</li>
-          <li id="featureBusiness3">Priority generation queue</li>
-          <li id="featureBusiness4">Commercial usage rights</li>
-          <li id="featureBusiness5">Extended recipe permissions</li>
-        </ul>
-      </div>
-    </div>
-    <div class="fine-print" id="finePrint">By subscribing you agree to our <a onclick="showPage('page-legal')">Terms</a>.</div>
-  </div>
-</div>
-  
-  <!-- 法律页 -->
+  <!-- 法律页（配色统一） -->
   <div class="page" id="page-legal">
     <div class="container">
       <div class="card legal-card">
@@ -527,50 +464,6 @@
     </div>
   </div>
 
-  <!-- 弹窗 -->
-  <div class="modal-overlay" id="forgotModalOld">
-    <div class="modal-card">
-      <h3 id="forgotTitleOld">Reset Password</h3>
-      <input class="auth-input" placeholder="Email" id="forgotEmailOld">
-      <div style="display: flex; gap: 8px;">
-        <input class="auth-input" id="forgotCodeOld" placeholder="Verification code" style="flex: 1;">
-        <button id="sendResetCodeBtnOld" class="btn btn-outline" style="width: 120px;">Send code</button>
-      </div>
-      <div class="password-wrapper" style="position: relative;">
-        <input class="auth-input" placeholder="New Password" type="password" id="forgotNewPwdOld" style="padding-right: 40px;">
-        <span class="password-toggle" onclick="togglePassword('forgotNewPwdOld')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-outline" id="cancelForgotOld" onclick="closeModal('forgotModalOld')">Cancel</button>
-        <button class="btn btn-primary" id="resetPwdBtnOld" onclick="resetPassword()">Reset</button>
-      </div>
-    </div>
-  </div>
-  <div class="modal-overlay" id="nicknameModalOld">
-    <div class="modal-card">
-      <h3 id="nicknameTitleOld">Change Nickname</h3>
-      <input class="auth-input" id="newNicknameInputOld" maxlength="12" placeholder="New nickname (max 12 chars)">
-      <div class="modal-actions">
-        <button class="btn btn-outline" id="cancelNicknameOld" onclick="closeModal('nicknameModalOld')">Cancel</button>
-        <button class="btn btn-primary" id="saveNicknameBtnOld" onclick="saveNickname()">Save</button>
-      </div>
-    </div>
-  </div>
-  <div class="modal-overlay" id="emailModalOld">
-    <div class="modal-card">
-      <h3 id="emailTitleOld">Change Email</h3>
-      <input class="auth-input" id="newEmailInputOld" placeholder="New Email">
-      <div style="display: flex; gap: 8px;">
-        <input class="auth-input" id="emailChangeCodeOld" placeholder="Verification code" style="flex: 1;">
-        <button id="sendEmailChangeCodeBtnOld" class="btn btn-outline" style="width: 120px;">Send code</button>
-      </div>
-      <div class="small-note">Please use a valid email for account recovery.</div>
-      <div class="modal-actions">
-        <button class="btn btn-outline" id="cancelEmailOld" onclick="closeModal('emailModalOld')">Cancel</button>
-        <button class="btn btn-primary" id="saveEmailBtnOld" onclick="saveEmail()">Save</button>
-      </div>
-    </div>
-  </div>
   <div class="modal-overlay" id="successModal">
     <div class="modal-card">
       <div style="font-size:48px;">✅</div>
