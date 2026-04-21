@@ -292,7 +292,16 @@ const translations = {
       'Descubre cocinas globales y prepara platos de todo el mundo.',
       'Si no te gusta una receta, toca Generar de nuevo para obtener nuevas ideas culinarias.'
     ],
-    howToHighlight: 'Escribe cualquier palabra relacionada con comida para explorar innumerables recetas. Obtén platos populares y auténticos de cocinas de todo el mundo con IA.'
+    howToHighlight: 'Escribe cualquier palabra relacionada con comida para explorar innumerables recetas. Obtén platos populares y auténticos de cocinas de todo el mundo con IA.',
+    homeHeroTitle: 'Descubre recetas infinitas con IA', homeHeroDesc: 'Escribe cualquier ingrediente, plato o cocina. Nuestro chef de IA crea platos auténticos y deliciosos de todo el mundo al instante.',
+    homeCtaBtn: 'Empieza a cocinar ahora', homeFeature1Title: 'Buscar por ingredientes', homeFeature1Desc: 'Escribe uno o más ingredientes, como patatas, espinacas, pechuga de pollo, salmón.',
+    homeFeature2Title: 'Encontrar platos clásicos', homeFeature2Desc: 'Busca filete a la parrilla, verduras asadas, tortilla, pasta y mucho más.',
+    homeFeature3Title: 'Postres y repostería', homeFeature3Desc: 'Tarta de queso, helado de vainilla, croissant, magdalenas y dulces.',
+    homeFeature4Title: 'Sopas y bebidas', homeFeature4Desc: 'Sopa de tomate, café frío, cócteles, zumos frescos y bebidas caseras.',
+    homeFeature5Title: 'Cocinas del mundo', homeFeature5Desc: 'Descubre cocinas del mundo y prepara platos auténticos de cualquier cultura.',
+    homeFeature6Title: 'Ideas ilimitadas', homeFeature6Desc: 'Pulsa Generar de nuevo para nuevas ideas culinarias cuando quieras.',
+    homeBottomTitle: 'Sencillo. Rápido. Delicioso.', homeBottomDesc: 'Escribe cualquier palabra clave relacionada con comida para explorar recetas infinitas. Obtén platos populares y auténticos de cocinas del mundo con IA.',
+    homeSubscriptionLink: 'Suscripción'
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -364,7 +373,16 @@ const translations = {
       'Découvrez les cuisines du monde et préparez des plats de tous les pays.',
       'Si une recette ne vous plaît pas, appuyez à nouveau sur Générer pour de nouvelles idées culinaires.'
     ],
-    howToHighlight: 'Tapez n\'importe quel mot lié à la nourriture pour explorer d\'innombrables recettes. Obtenez des plats populaires et authentiques des cuisines du monde entier avec l\'IA.'
+    howToHighlight: 'Tapez n\'importe quel mot lié à la nourriture pour explorer d\'innombrables recettes. Obtenez des plats populaires et authentiques des cuisines du monde entier avec l\'IA.',
+    homeHeroTitle: 'Découvrez des recettes infinies avec l\'IA', homeHeroDesc: 'Tapez n\'importe quel ingrédient, plat ou cuisine. Notre chef IA crée instantanément des plats authentiques et délicieux du monde entier.',
+    homeCtaBtn: 'Commencez à cuisiner maintenant', homeFeature1Title: 'Rechercher par ingrédients', homeFeature1Desc: 'Entrez un ou plusieurs ingrédients, comme pommes de terre, épinards, blanc de poulet, saumon.',
+    homeFeature2Title: 'Trouver des plats classiques', homeFeature2Desc: 'Recherchez steak grillé, légumes rôtis, omelette, pâtes et plus encore.',
+    homeFeature3Title: 'Desserts et pâtisseries', homeFeature3Desc: 'Cheesecake, glace vanille, croissant, muffin et autres gourmandises.',
+    homeFeature4Title: 'Soupes et boissons', homeFeature4Desc: 'Soupe de tomate, café glacé, cocktails, jus frais et boissons maison.',
+    homeFeature5Title: 'Cuisines du monde', homeFeature5Desc: 'Découvrez des cuisines du monde et préparez des plats authentiques de toutes cultures.',
+    homeFeature6Title: 'Idées illimitées', homeFeature6Desc: 'Appuyez sur Générer à nouveau pour de nouvelles idées de cuisine quand vous voulez.',
+    homeBottomTitle: 'Simple. Rapide. Délicieux.', homeBottomDesc: 'Tapez n\'importe quel mot-clé culinaire pour explorer des recettes infinies. Obtenez des plats populaires et authentiques de cuisines du monde avec l\'IA.',
+    homeSubscriptionLink: 'Abonnement'
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -437,7 +455,16 @@ const translations = {
       'Entdecken Sie globale Küchen und bereiten Sie Gerichte aus aller Welt zu.',
       'Wenn Ihnen ein Rezept nicht gefällt, tippen Sie erneut auf Generieren für brandneue Kochideen.'
     ],
-    howToHighlight: 'Geben Sie ein beliebiges lebensmittelbezogenes Wort ein, um unzählige Rezepte zu entdecken. Erhalten Sie beliebte, authentische Gerichte aus weltweiten Küchen mit KI.'
+    howToHighlight: 'Geben Sie ein beliebiges lebensmittelbezogenes Wort ein, um unzählige Rezepte zu entdecken. Erhalten Sie beliebte, authentische Gerichte aus weltweiten Küchen mit KI.',
+    homeHeroTitle: 'Entdecke endlose Rezepte mit KI', homeHeroDesc: 'Gib einfach Zutaten, Gerichte oder Küchen ein. Unser KI-Koch erstellt sofort authentische, leckere Gerichte aus aller Welt.',
+    homeCtaBtn: 'Jetzt kochen', homeFeature1Title: 'Nach Zutaten suchen', homeFeature1Desc: 'Gib eine oder mehrere Zutaten ein, z.B. Kartoffeln, Spinat, Hähnchenbrust, Lachs.',
+    homeFeature2Title: 'Klassische Gerichte finden', homeFeature2Desc: 'Suche nach gegrilltem Steak, gebratenem Gemüse, Omelette, Pasta und mehr.',
+    homeFeature3Title: 'Desserts & Backwaren', homeFeature3Desc: 'Käsekuchen, Vanilleeis, Croissant, Muffins und süße Leckereien.',
+    homeFeature4Title: 'Suppen & Getränke', homeFeature4Desc: 'Tomatensuppe, Eiskaffee, Cocktails, frische Säfte und hausgemachte Getränke.',
+    homeFeature5Title: 'Weltküchen', homeFeature5Desc: 'Entdecke Weltküchen und koche authentische Gerichte aus jeder Kultur.',
+    homeFeature6Title: 'Unbegrenzte Ideen', homeFeature6Desc: 'Tippe auf Generieren, wann immer du neue Kochideen brauchst.',
+    homeBottomTitle: 'Einfach. Schnell. Lecker.', homeBottomDesc: 'Gib einfach Lebensmittel-Schlüsselwörter ein, um endlose Rezepte zu entdecken. Hol dir beliebte, authentische Gerichte aus aller Welt mit KI.',
+    homeSubscriptionLink: 'Abonnement'
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -509,7 +536,16 @@ const translations = {
       'Scopri le cucine globali e prepara piatti da tutto il mondo.',
       'Se una ricetta non ti piace, tocca di nuovo Genera per nuove idee culinarie.'
     ],
-    howToHighlight: 'Digita qualsiasi parola relativa al cibo per esplorare innumerevoli ricette. Ottieni piatti popolari e autentici dalle cucine di tutto il mondo con l\'IA.'
+    howToHighlight: 'Digita qualsiasi parola relativa al cibo per esplorare innumerevoli ricette. Ottieni piatti popolari e autentici dalle cucine di tutto il mondo con l\'IA.',
+    homeHeroTitle: 'Scopri ricette infinite con l\'IA', homeHeroDesc: 'Inserisci qualsiasi ingrediente, piatto o cucina. Il nostro chef AI crea istantaneamente piatti autentici e deliziosi da tutto il mondo.',
+    homeCtaBtn: 'Inizia a cucinare ora', homeFeature1Title: 'Cerca per ingredienti', homeFeature1Desc: 'Inserisci uno o più ingredienti, come patate, spinaci, petto di pollo, salmone.',
+    homeFeature2Title: 'Trova piatti classici', homeFeature2Desc: 'Cerca bistecca grigliata, verdure arrosto, omelette, pasta e altro ancora.',
+    homeFeature3Title: 'Dolci e prodotti da forno', homeFeature3Desc: 'Cheesecake, gelato alla vaniglia, croissant, muffin e dolci.',
+    homeFeature4Title: 'Zuppe e bevande', homeFeature4Desc: 'Zuppa di pomodoro, caffè freddo, cocktail, succhi freschi e bevande fatte in casa.',
+    homeFeature5Title: 'Cucine del mondo', homeFeature5Desc: 'Scopri cucine del mondo e prepara piatti autentici di ogni cultura.',
+    homeFeature6Title: 'Idee illimitate', homeFeature6Desc: 'Tocca Genera di nuovo per nuove idee culinarie quando vuoi.',
+    homeBottomTitle: 'Semplice. Veloce. Delizioso.', homeBottomDesc: 'Inserisci qualsiasi parola chiave culinaria per esplorare ricette infinite. Ottieni piatti popolari e autentici da cucine di tutto il mondo con l\'IA.',
+    homeSubscriptionLink: 'Abbonamento'
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -581,7 +617,16 @@ const translations = {
       'Descubra cozinhas globais e faça pratos de todo o mundo.',
       'Se você não gostar de uma receita, toque em Gerar novamente para novas ideias culinárias.'
     ],
-    howToHighlight: 'Digite qualquer palavra relacionada a comida para explorar inúmeras receitas. Obtenha pratos populares e autênticos de cozinhas do mundo inteiro com IA.'
+    howToHighlight: 'Digite qualquer palavra relacionada a comida para explorar inúmeras receitas. Obtenha pratos populares e autênticos de cozinhas do mundo inteiro com IA.',
+    homeHeroTitle: 'Descubra receitas infinitas com IA', homeHeroDesc: 'Digite qualquer ingrediente, prato ou culinária. Nosso chef de IA cria pratos autênticos e deliciosos de todo o mundo instantaneamente.',
+    homeCtaBtn: 'Comece a cozinhar agora', homeFeature1Title: 'Buscar por ingredientes', homeFeature1Desc: 'Digite um ou mais ingredientes, como batatas, espinafre, peito de frango, salmão.',
+    homeFeature2Title: 'Encontre pratos clássicos', homeFeature2Desc: 'Procure bife grelhado, legumes assados, omelete, macarrão e muito mais.',
+    homeFeature3Title: 'Sobremesas e bolos', homeFeature3Desc: 'Cheesecake, sorvete de baunilha, croissant, muffin e doces.',
+    homeFeature4Title: 'Sopas e bebidas', homeFeature4Desc: 'Sopa de tomate, café gelado, coquetéis, sucos frescos e bebidas caseiras.',
+    homeFeature5Title: 'Culinárias do mundo', homeFeature5Desc: 'Descubra culinárias do mundo e prepare pratos autênticos de qualquer cultura.',
+    homeFeature6Title: 'Ideias ilimitadas', homeFeature6Desc: 'Toque Gerar novamente para novas ideias culinárias quando quiser.',
+    homeBottomTitle: 'Simples. Rápido. Delicioso.', homeBottomDesc: 'Digite qualquer palavra-chave relacionada a comida para explorar receitas infinitas. Obtenha pratos populares e autênticos de culinárias do mundo com IA.',
+    homeSubscriptionLink: 'Assinatura'
   }
 };
 
