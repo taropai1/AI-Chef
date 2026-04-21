@@ -1073,122 +1073,100 @@ async function bindInvite() {
 
 // ==================== 页面渲染 ====================
 function populateCuisines() {
-  const select = document.getElementById('cuisine'); if (!select) return;
+  const select = document.getElementById('cuisine');
+  if (!select) return;
   const map = CUISINE_MAP[currentLang] || CUISINE_MAP['en'] || {};
   select.innerHTML = CUISINES.map(c => `<option value="${c}">${map[c] || c}</option>`).join('');
 }
 function renderLanguage() {
+  // ========== 安全辅助函数 ==========
+  const safeText = (id, key) => { const el = document.getElementById(id); if (el) el.innerText = t(key); };
+  const safePlaceholder = (id, key) => { const el = document.getElementById(id); if (el) el.placeholder = t(key); };
+  const safeHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
   // ========== 首页 ==========
-  document.getElementById('heroSubtitle').innerText = t('heroSubtitle');
-  document.getElementById('sectionFeatures').innerText = t('sectionFeatures');
-  for (let i=1;i<=6;i++) { const el=document.getElementById(`feat${i}`); if(el) el.innerText = t(`feat${i}`); const sub=document.getElementById(`feat${i}Sub`); if(sub) sub.innerText = t(`feat${i}Sub`); }
-  document.getElementById('sectionSubscribe').innerText = t('sectionSubscribe');
-  document.getElementById('subText').innerText = t('subText'); document.getElementById('subSub').innerText = t('subSub');
-  document.getElementById('familyText').innerText = t('familyText'); document.getElementById('familySub').innerText = t('familySub');
-  document.getElementById('linkLegal').innerText = t('legalLink');
+  safeText('heroSubtitle', 'heroSubtitle'); safeText('sectionFeatures', 'sectionFeatures');
+  for (let i=1;i<=6;i++) { safeText(`feat${i}`, `feat${i}`); safeText(`feat${i}Sub`, `feat${i}Sub`); }
+  safeText('sectionSubscribe', 'sectionSubscribe'); safeText('subText', 'subText'); safeText('subSub', 'subSub');
+  safeText('familyText', 'familyText'); safeText('familySub', 'familySub'); safeText('linkLegal', 'legalLink');
 
   // ========== 生成器页 ==========
-  document.getElementById('genTitle').innerText = t('genTitle');
-  document.getElementById('genMealType').innerText = t('genMealType'); document.getElementById('genCuisine').innerText = t('genCuisine');
-  document.getElementById('genDishName').innerText = t('genDishName'); document.getElementById('optStandard').innerText = t('optStandard');
-  document.getElementById('optBaby').innerText = t('optBaby'); document.getElementById('optPregnancy').innerText = t('optPregnancy');
-  document.getElementById('btnGenerate').innerText = t('generate'); document.getElementById('aiAssistTitle').innerText = t('aiAssistTitle');
-  const qaInput=document.getElementById('qaInput'); if(qaInput) qaInput.placeholder = t('enterQuestion');
-  document.getElementById('askBtn').innerText = 'Ask'; document.getElementById('dishNameHint').innerText = t('dishNameHint');
-  document.getElementById('openVideoBtn').innerHTML = t('watchVideo'); document.getElementById('addToHomeBtn').innerHTML = '+';
+  safeText('genTitle', 'genTitle'); safeText('genMealType', 'genMealType'); safeText('genCuisine', 'genCuisine');
+  safeText('genDishName', 'genDishName'); safeText('optStandard', 'optStandard'); safeText('optBaby', 'optBaby');
+  safeText('optPregnancy', 'optPregnancy'); safeText('btnGenerate', 'generate'); safeText('aiAssistTitle', 'aiAssistTitle');
+  safePlaceholder('qaInput', 'enterQuestion'); safeText('askBtn', 'ask'); safeText('dishNameHint', 'dishNameHint');
+  safeHtml('openVideoBtn', t('watchVideo')); safeHtml('addToHomeBtn', '+');
 
   // ========== 登录/注册页 ==========
-  document.getElementById('tabLogin').innerText = t('signIn'); document.getElementById('tabRegister').innerText = t('signUp');
-  document.getElementById('loginEmail').placeholder = t('email'); document.getElementById('loginPassword').placeholder = t('password');
-  document.getElementById('forgotPwdLink').innerText = t('forgot'); document.getElementById('btnLoginSubmit').innerText = t('signIn');
-  document.getElementById('noAccount').innerText = t('noAccount'); document.getElementById('switchToRegister').innerText = t('signUp');
-  document.getElementById('registerEmail').placeholder = t('email'); document.getElementById('registerPassword').placeholder = t('password');
-  document.getElementById('registerConfirmPwd').placeholder = t('confirmPwd'); document.getElementById('btnRegisterSubmit').innerText = t('signUp');
-  document.getElementById('haveAccount').innerText = t('haveAccount'); document.getElementById('switchToLogin').innerText = t('signIn');
+  safeText('tabLogin', 'signIn'); safeText('tabRegister', 'signUp');
+  safePlaceholder('loginEmail', 'email'); safePlaceholder('loginPassword', 'password');
+  safeText('forgotPwdLink', 'forgot'); safeText('btnLoginSubmit', 'signIn');
+  safeText('noAccount', 'noAccount'); safeText('switchToRegister', 'signUp');
+  safePlaceholder('registerEmail', 'email'); safePlaceholder('registerPassword', 'password');
+  safePlaceholder('registerConfirmPwd', 'confirmPwd'); safeText('btnRegisterSubmit', 'signUp');
+  safeText('haveAccount', 'haveAccount'); safeText('switchToLogin', 'signIn');
 
   // ========== 个人信息页 ==========
-  document.getElementById('profileNicknameLabel').innerText = t('profileNickname');
-  document.getElementById('profileEmailLabel').innerText = t('profileEmail');
-  document.getElementById('profileJoinedLabel').innerText = t('profileJoined');
-  document.getElementById('profileSubTitle').innerText = t('profileSub');
-  document.getElementById('logoutBtn').innerText = t('logout');
-  document.getElementById('editNicknameBtn').innerText = t('edit');
-  document.getElementById('editEmailBtn').innerText = t('edit');
-  document.getElementById('promoTitle').innerText = t('promoTitle');
-  document.getElementById('promoSub').innerText = t('promoSub');
-  document.getElementById('promoFeature1').innerText = t('promoFeature1');
-  document.getElementById('promoFeature2').innerText = t('promoFeature2');
-  document.getElementById('promoFeature3').innerText = t('promoFeature3');
-  document.getElementById('promoFeature4').innerText = t('promoFeature4');
-  document.getElementById('goSubscribeBtn').innerText = t('subscribeBtn');
-  document.getElementById('inviteCodeTitle').innerText = t('inviteCodeTitle');
+  safeText('profileNicknameLabel', 'profileNickname'); safeText('profileEmailLabel', 'profileEmail');
+  safeText('profileJoinedLabel', 'profileJoined'); safeText('profileSubTitle', 'profileSub');
+  safeText('logoutBtn', 'logout'); safeText('editNicknameBtn', 'edit'); safeText('editEmailBtn', 'edit');
+  safeText('promoTitle', 'promoTitle'); safeText('promoSub', 'promoSub');
+  safeText('promoFeature1', 'promoFeature1'); safeText('promoFeature2', 'promoFeature2');
+  safeText('promoFeature3', 'promoFeature3'); safeText('promoFeature4', 'promoFeature4');
+  safeText('goSubscribeBtn', 'subscribeBtn'); safeText('inviteCodeTitle', 'inviteCodeTitle');
 
   // ========== 订阅页 ==========
-  const pricingSub=document.getElementById('pricingSubtitle'); if(pricingSub) pricingSub.innerText = t('pricingSubtitle');
-  const pricingTitle=document.getElementById('pricingTitle'); if(pricingTitle) pricingTitle.innerText = t('pricingTitle');
+  safeText('pricingSubtitle', 'pricingSubtitle'); safeText('pricingTitle', 'pricingTitle');
   ['Starter','Pro','Premium','Business'].forEach(type => {
-    const nameEl=document.getElementById(`plan${type}Name`); if(nameEl) nameEl.innerText = t(`plan${type}Name`);
-    const descEl=document.getElementById(`plan${type}Desc`); if(descEl) descEl.innerText = t(`plan${type}Desc`);
-    const periodEl=document.getElementById(`plan${type}Period`); if(periodEl) periodEl.innerText = t(`plan${type}Period`);
+    safeText(`plan${type}Name`, `plan${type}Name`); safeText(`plan${type}Desc`, `plan${type}Desc`);
+    safeText(`plan${type}Period`, `plan${type}Period`);
   });
-  ['planNoticeStarter','planNoticePro','planNoticePremium','planNoticeBusiness'].forEach(id => { const el=document.getElementById(id); if(el) el.innerText = t('planNotice'); });
-  [1,2,3,4].forEach(i => { const el=document.getElementById(`featureStarter${i}`); if(el) el.innerText = t(`featureStarter${i}`); });
-  [1,2,3,4].forEach(i => { const el=document.getElementById(`featurePro${i}`); if(el) el.innerText = t(`featurePro${i}`); });
-  [1,2,3,4,5].forEach(i => { const el=document.getElementById(`featurePremium${i}`); if(el) el.innerText = t(`featurePremium${i}`); });
-  [1,2,3,4,5].forEach(i => { const el=document.getElementById(`featureBusiness${i}`); if(el) el.innerText = t(`featureBusiness${i}`); });
-  const finePrint=document.getElementById('finePrint'); if(finePrint) finePrint.innerHTML = t('finePrint') + ' <a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
+  ['planNoticeStarter','planNoticePro','planNoticePremium','planNoticeBusiness'].forEach(id => { safeText(id, 'planNotice'); });
+  [1,2,3,4].forEach(i => { safeText(`featureStarter${i}`, `featureStarter${i}`); });
+  [1,2,3,4].forEach(i => { safeText(`featurePro${i}`, `featurePro${i}`); });
+  [1,2,3,4,5].forEach(i => { safeText(`featurePremium${i}`, `featurePremium${i}`); });
+  [1,2,3,4,5].forEach(i => { safeText(`featureBusiness${i}`, `featureBusiness${i}`); });
+  const finePrint = document.getElementById('finePrint');
+  if (finePrint) finePrint.innerHTML = t('finePrint') + ' <a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
 
   // ========== 法律页 ==========
-  document.querySelectorAll('.legal-tab')[0].innerText = t('legalPrivacyTitle'); document.querySelectorAll('.legal-tab')[1].innerText = t('legalTermsTitle');
-  document.getElementById('legalPrivacyTitle').innerText = t('legalPrivacyTitle'); document.getElementById('legalEffDate').innerText = t('legalEffDate');
-  document.getElementById('legalPrivacyCollect').innerText = t('legalPrivacyCollect'); document.getElementById('legalPrivacy1').innerText = t('legalPrivacy1');
-  document.getElementById('legalPrivacyUse').innerText = t('legalPrivacyUse'); document.getElementById('legalPrivacy2').innerText = t('legalPrivacy2');
-  document.getElementById('legalPrivacySecurity').innerText = t('legalPrivacySecurity'); document.getElementById('legalPrivacy3').innerText = t('legalPrivacy3');
-  document.getElementById('legalPrivacyChanges').innerText = t('legalPrivacyChanges'); document.getElementById('legalPrivacy4').innerText = t('legalPrivacy4');
-  document.getElementById('legalPrivacyContact').innerText = t('legalPrivacyContact'); document.getElementById('legalPrivacy5').innerText = t('legalPrivacy5');
-  document.getElementById('legalTermsTitle').innerText = t('legalTermsTitle'); document.getElementById('legalTermEffDate').innerText = t('legalTermEffDate');
-  document.getElementById('legalTermsLicense').innerText = t('legalTermsLicense'); document.getElementById('legalTerms1').innerText = t('legalTerms1');
-  document.getElementById('legalTermsDisclaimer').innerText = t('legalTermsDisclaimer'); document.getElementById('legalTerms2').innerText = t('legalTerms2');
-  document.getElementById('legalTermsLimitations').innerText = t('legalTermsLimitations'); document.getElementById('legalTerms3').innerText = t('legalTerms3');
-  document.getElementById('legalTermsModifications').innerText = t('legalTermsModifications'); document.getElementById('legalTerms4').innerText = t('legalTerms4');
-  document.getElementById('legalTermsLaw').innerText = t('legalTermsLaw'); document.getElementById('legalTerms5').innerText = t('legalTerms5');
-  document.getElementById('legalTermsSubRules').innerText = t('legalTermsSubRules');
-  for (let i=1;i<=10;i++) { const el=document.getElementById(`legalTermsSub${i}`); if(el) el.innerText = t(`legalTermsSub${i}`); }
+  const legalTabs = document.querySelectorAll('.legal-tab');
+  if (legalTabs[0]) legalTabs[0].innerText = t('legalPrivacyTitle');
+  if (legalTabs[1]) legalTabs[1].innerText = t('legalTermsTitle');
+  safeText('legalPrivacyTitle', 'legalPrivacyTitle'); safeText('legalEffDate', 'legalEffDate');
+  safeText('legalPrivacyCollect', 'legalPrivacyCollect'); safeText('legalPrivacy1', 'legalPrivacy1');
+  safeText('legalPrivacyUse', 'legalPrivacyUse'); safeText('legalPrivacy2', 'legalPrivacy2');
+  safeText('legalPrivacySecurity', 'legalPrivacySecurity'); safeText('legalPrivacy3', 'legalPrivacy3');
+  safeText('legalPrivacyChanges', 'legalPrivacyChanges'); safeText('legalPrivacy4', 'legalPrivacy4');
+  safeText('legalPrivacyContact', 'legalPrivacyContact'); safeText('legalPrivacy5', 'legalPrivacy5');
+  safeText('legalTermsTitle', 'legalTermsTitle'); safeText('legalTermEffDate', 'legalTermEffDate');
+  safeText('legalTermsLicense', 'legalTermsLicense'); safeText('legalTerms1', 'legalTerms1');
+  safeText('legalTermsDisclaimer', 'legalTermsDisclaimer'); safeText('legalTerms2', 'legalTerms2');
+  safeText('legalTermsLimitations', 'legalTermsLimitations'); safeText('legalTerms3', 'legalTerms3');
+  safeText('legalTermsModifications', 'legalTermsModifications'); safeText('legalTerms4', 'legalTerms4');
+  safeText('legalTermsLaw', 'legalTermsLaw'); safeText('legalTerms5', 'legalTerms5');
+  safeText('legalTermsSubRules', 'legalTermsSubRules');
+  for (let i=1;i<=10;i++) { safeText(`legalTermsSub${i}`, `legalTermsSub${i}`); }
 
   // ========== 弹窗及按钮 ==========
-  document.getElementById('forgotTitle').innerText = t('forgotTitle'); document.getElementById('cancelForgot').innerText = t('cancel');
-  document.getElementById('resetPwdBtn').innerText = t('reset'); document.getElementById('nicknameTitle').innerText = t('nicknameTitle');
-  document.getElementById('cancelNickname').innerText = t('cancel'); document.getElementById('saveNicknameBtn').innerText = t('save');
-  document.getElementById('emailTitle').innerText = t('emailTitle'); document.getElementById('cancelEmail').innerText = t('cancel');
-  document.getElementById('saveEmailBtn').innerText = t('save'); document.getElementById('successTitle').innerText = t('success');
-  document.getElementById('closeSuccessBtn').innerText = t('ok');
-  document.getElementById('sendCodeBtn').innerText = t('sendCode'); document.getElementById('sendResetCodeBtn').innerText = t('sendCode');
-  document.getElementById('sendEmailChangeCodeBtn').innerText = t('sendCode');
+  safeText('forgotTitle', 'forgotTitle'); safeText('cancelForgot', 'cancel'); safeText('resetPwdBtn', 'reset');
+  safeText('nicknameTitle', 'nicknameTitle'); safeText('cancelNickname', 'cancel'); safeText('saveNicknameBtn', 'save');
+  safeText('emailTitle', 'emailTitle'); safeText('cancelEmail', 'cancel'); safeText('saveEmailBtn', 'save');
+  safeText('successTitle', 'success'); safeText('closeSuccessBtn', 'ok');
+  safeText('sendCodeBtn', 'sendCode'); safeText('sendResetCodeBtn', 'sendCode'); safeText('sendEmailChangeCodeBtn', 'sendCode');
 
-  // ========== 营销首页（安全渲染） ==========
-  const homeHeroTitle = document.getElementById('homeHeroTitle');
-  if (homeHeroTitle) homeHeroTitle.innerText = t('homeHeroTitle');
-  const homeHeroDesc = document.getElementById('homeHeroDesc');
-  if (homeHeroDesc) homeHeroDesc.innerText = t('homeHeroDesc');
-  const homeCtaBtn = document.getElementById('homeCtaBtn');
-  if (homeCtaBtn) homeCtaBtn.innerText = t('homeCtaBtn');
-  const homeBottomTitle = document.getElementById('homeBottomTitle');
-  if (homeBottomTitle) homeBottomTitle.innerText = t('homeBottomTitle');
-  const homeBottomDesc = document.getElementById('homeBottomDesc');
-  if (homeBottomDesc) homeBottomDesc.innerText = t('homeBottomDesc');
-  const homeSubscriptionLink = document.getElementById('homeSubscriptionLink');
-  if (homeSubscriptionLink) homeSubscriptionLink.innerText = t('homeSubscriptionLink');
-
+  // ========== 营销首页 ==========
+  safeText('homeHeroTitle', 'homeHeroTitle'); safeText('homeHeroDesc', 'homeHeroDesc');
+  safeText('homeCtaBtn', 'homeCtaBtn'); safeText('homeBottomTitle', 'homeBottomTitle');
+  safeText('homeBottomDesc', 'homeBottomDesc'); safeText('homeSubscriptionLink', 'homeSubscriptionLink');
   const features = document.querySelectorAll('.item');
   if (features.length) {
     const titles = ['homeFeature1Title','homeFeature2Title','homeFeature3Title','homeFeature4Title','homeFeature5Title','homeFeature6Title'];
     const descs = ['homeFeature1Desc','homeFeature2Desc','homeFeature3Desc','homeFeature4Desc','homeFeature5Desc','homeFeature6Desc'];
     features.forEach((item, idx) => {
       if (idx < 6) {
-        const h3 = item.querySelector('h3');
-        const p = item.querySelector('p');
-        if (h3) h3.innerText = t(titles[idx]);
-        if (p) p.innerText = t(descs[idx]);
+        const h3 = item.querySelector('h3'); if (h3) h3.innerText = t(titles[idx]);
+        const p = item.querySelector('p'); if (p) p.innerText = t(descs[idx]);
       }
     });
   }
