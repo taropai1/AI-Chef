@@ -745,7 +745,7 @@ async function generateRecipe() {
     const data = await response.json();
     let recipe = data.choices[0].message.content;
 
-    parseRecipeToUI(recipe);
+    renderRecipeContent(recipe);
 
     let displayName = 'Gourmet';
     if (userData && userData.nickname) displayName = userData.nickname;
