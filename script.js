@@ -282,7 +282,7 @@ const translations = {
     featureBusiness4: 'Derechos de uso comercial', featureBusiness5: 'Permisos extendidos de recetas', freeTierDesc: 'Estás en el nivel gratuito.',
     promoTitle: 'Hazte Premium', promoSub: 'Desbloquea todo para tu cocina', promoFeature1: 'Recetas ilimitadas', promoFeature2: 'Compartir en familia',
     promoFeature3: 'Información nutricional', promoFeature4: 'Sin anuncios',
-    howToTitle: 'Cómo usar',
+    howToTitle: 'Cómo usar', warnings: 'Alérgenos y Seguridad',
     howToList: [
       'Puedes ingresar uno o más ingredientes, como papas, espinacas, pechuga de pollo, salmón.',
       'Puedes buscar platos y comidas clásicas, como bistec a la parrilla, verduras asadas, tortilla, pasta.',
@@ -363,7 +363,7 @@ const translations = {
     featureBusiness4: 'Droits d\'utilisation commerciale', featureBusiness5: 'Autorisations étendues sur les recettes', freeTierDesc: 'Vous êtes sur le niveau gratuit.',
     promoTitle: 'Passez à Premium', promoSub: 'Débloquez tout pour votre cuisine', promoFeature1: 'Recettes illimitées',
     promoFeature2: 'Partage familial', promoFeature3: 'Informations nutritionnelles', promoFeature4: 'Sans publicité',
-    howToTitle: 'Comment utiliser',
+    howToTitle: 'Comment utiliser', warnings: 'Allergènes et Sécurité',
     howToList: [
       'Vous pouvez entrer un ou plusieurs ingrédients, comme des pommes de terre, épinards, blanc de poulet, saumon.',
       'Vous pouvez rechercher des plats et repas classiques, comme steak grillé, légumes rôtis, omelette, pâtes.',
@@ -445,7 +445,7 @@ const translations = {
     featureBusiness4: 'Kommerzielle Nutzungsrechte', featureBusiness5: 'Erweiterte Rezeptberechtigungen', freeTierDesc: 'Sie befinden sich in der kostenlosen Stufe.',
     promoTitle: 'Premium sichern', promoSub: 'Alles für Ihre Küche freischalten', promoFeature1: 'Unbegrenzte Rezepte',
     promoFeature2: 'Familienfreigabe', promoFeature3: 'Nährwertanalyse', promoFeature4: 'Werbefrei',
-    howToTitle: 'Verwendung',
+    howToTitle: 'Verwendung', warnings: 'Allergene & Sicherheit',
     howToList: [
       'Sie können eine oder mehrere Zutaten eingeben, wie Kartoffeln, Spinat, Hähnchenbrust, Lachs.',
       'Sie können nach klassischen Gerichten und Mahlzeiten suchen, wie gegrilltes Steak, Ofengemüse, Omelett, Pasta.',
@@ -526,7 +526,7 @@ const translations = {
     featureBusiness4: 'Diritti di utilizzo commerciale', featureBusiness5: 'Permessi estesi sulle ricette', freeTierDesc: 'Sei nel livello gratuito.',
     promoTitle: 'Passa a Premium', promoSub: 'Sblocca tutto per la tua cucina', promoFeature1: 'Ricette illimitate', promoFeature2: 'Condivisione familiare',
     promoFeature3: 'Informazioni nutrizionali', promoFeature4: 'Senza pubblicità',
-    howToTitle: 'Come usare',
+    howToTitle: 'Come usare', warnings: 'Allergeni e Sicurezza',
     howToList: [
       'Puoi inserire uno o più ingredienti, come patate, spinaci, petto di pollo, salmone.',
       'Puoi cercare piatti e pasti classici, come bistecca alla griglia, verdure arrosto, frittata, pasta.',
@@ -607,7 +607,7 @@ const translations = {
     featureBusiness4: 'Direitos de uso comercial', featureBusiness5: 'Permissões estendidas de receitas', freeTierDesc: 'Você está no nível gratuito.',
     promoTitle: 'Seja Premium', promoSub: 'Desbloqueie tudo para sua cozinha', promoFeature1: 'Receitas ilimitadas', promoFeature2: 'Compartilhamento familiar',
     promoFeature3: 'Informações nutricionais', promoFeature4: 'Sem anúncios',
-    howToTitle: 'Como usar',
+    howToTitle: 'Como usar', warnings: 'Alérgenos e Segurança',
     howToList: [
       'Você pode inserir um ou mais ingredientes, como batatas, espinafre, peito de frango, salmão.',
       'Você pode pesquisar pratos e refeições clássicas, como bife grelhado, legumes assados, omelete, macarrão.',
