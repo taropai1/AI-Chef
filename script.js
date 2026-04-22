@@ -777,16 +777,51 @@ async function generateRecipe() {
   } finally { genBtn.disabled = false; genBtn.innerText = t('generate'); }
 }
 
-function parseRecipeToUI(recipeText) {
-  const lines = recipeText.split('\n');
-  const sections = {
-    name: '',
-    ingredients: [],
-    instructions: [],
-    nutrition: [],
-    warnings: [],
-    time: ''
-  };
+function renderRecipeContent(text) {
+    const blocks = text.split(/\n\s*\n/);
+    const name = blocks[0]?.trim() || '';
+    document.getElementById('recipeNameDisplay').innerText = name;
+
+    let html = '';
+    let timeStr = '';
+
+    for (let i = 1; i < blocks.length; i++) {
+        const block = blocks[i].trim();
+        if (!block) continue;
+        const lines = block.split('\n');
+
+        const hasDashItems = lines.some(l => l.trim().startsWith('-'));
+        const hasNumberedItems = lines.some(l => /^\d+\./.test(l.trim()));
+
+        if (hasDashItems) {
+            const isNutrition = block.includes('热量') || block.includes('卡路里') || block.toLowerCase().includes('calorie');
+            const items = lines.filter(l => l.trim().startsWith('-')).map(l => l.trim().substring(1).trim());
+            const title = isNutrition ? t('nutrition') : t('ingredients');
+            html += `<h4>${title}</h4><ul>`;
+            items.forEach(item => { html += `<li>${item}</li>`; });
+            html += '</ul>';
+        } else if (hasNumberedItems) {
+            const isWarnings = block.includes('风险') || block.includes('建议') || block.toLowerCase().includes('allergen') || block.toLowerCase().includes('warning');
+            const items = lines.filter(l => /^\d+\./.test(l.trim())).map(l => l.trim().replace(/^\d+\./, '').trim());
+            if (isWarnings) {
+                html += `<h4>${t('warnings')}</h4><ul class="warnings-list">`;
+                items.forEach(item => { html += `<li>${item}</li>`; });
+                html += '</ul>';
+            } else {
+                const timeMatch = block.match(/(?:[（(±]?\s*(\d+)\s*[分钟mins）)]?)/i) || block.match(/(\d+)\s*(?:分钟|mins)/i);
+                if (timeMatch) timeStr = timeMatch[1];
+                const title = t('instructions') + (timeStr ? ` (±${timeStr} ${t('minutes')})` : '');
+                html += `<h4>${title}</h4><ul class="instructions-list">`;
+                items.forEach(item => { html += `<li>${item}</li>`; });
+                html += '</ul>';
+            }
+        } else {
+            html += `<p>${block.replace(/\n/g, '<br>')}</p>`;
+        }
+    }
+
+    document.getElementById('recipeContent').innerHTML = html;
+}
   let currentSection = '';
 
   for (let line of lines) {
