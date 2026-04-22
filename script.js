@@ -1128,17 +1128,29 @@ function renderLanguage() {
   const safePlaceholder = (id, key) => { const el = document.getElementById(id); if (el) el.placeholder = t(key); };
   const safeHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
 
-  safeText('heroSubtitle', 'heroSubtitle'); safeText('sectionFeatures', 'sectionFeatures');
+  // ========== 首页 ==========
+  safeText('heroSubtitle', 'heroSubtitle');
+  safeText('sectionFeatures', 'sectionFeatures');
   for (let i=1;i<=6;i++) { safeText(`feat${i}`, `feat${i}`); safeText(`feat${i}Sub`, `feat${i}Sub`); }
-  safeText('sectionSubscribe', 'sectionSubscribe'); safeText('subText', 'subText'); safeText('subSub', 'subSub');
-  safeText('familyText', 'familyText'); safeText('familySub', 'familySub'); safeText('linkLegal', 'legalLink');
+  safeText('sectionSubscribe', 'sectionSubscribe');
+  safeText('subText', 'subText'); safeText('subSub', 'subSub');
+  safeText('familyText', 'familyText'); safeText('familySub', 'familySub');
+  safeText('linkLegal', 'legalLink');
 
-  safeText('genTitle', 'genTitle'); safeText('genMealType', 'genMealType'); safeText('genCuisine', 'genCuisine');
-  safeText('genDishName', 'genDishName'); safeText('optStandard', 'optStandard'); safeText('optBaby', 'optBaby');
-  safeText('optPregnancy', 'optPregnancy'); safeText('btnGenerate', 'generate'); safeText('aiAssistTitle', 'aiAssistTitle');
-  safePlaceholder('qaInput', 'enterQuestion'); safeText('askBtn', 'ask'); safeText('dishNameHint', 'dishNameHint');
-  safeHtml('openVideoBtn', t('watchVideo')); safeHtml('addToHomeBtn', '+');
+  // ========== 生成器页 ==========
+  safeText('genTitle', 'genTitle');
+  safeText('genMealType', 'genMealType'); safeText('genCuisine', 'genCuisine');
+  safeText('genDishName', 'genDishName');
+  safeText('optStandard', 'optStandard'); safeText('optBaby', 'optBaby'); safeText('optPregnancy', 'optPregnancy');
+  safeText('btnGenerate', 'generate');
+  safeText('aiAssistTitle', 'aiAssistTitle');
+  safePlaceholder('qaInput', 'enterQuestion');
+  safeText('askBtn', 'ask');
+  safeText('dishNameHint', 'dishNameHint');
+  safeHtml('openVideoBtn', t('watchVideo'));
+  safeHtml('addToHomeBtn', '+');
 
+  // ========== 登录/注册页 ==========
   safeText('tabLogin', 'signIn'); safeText('tabRegister', 'signUp');
   safePlaceholder('loginEmail', 'email'); safePlaceholder('loginPassword', 'password');
   safeText('forgotPwdLink', 'forgot'); safeText('btnLoginSubmit', 'signIn');
@@ -1147,17 +1159,24 @@ function renderLanguage() {
   safePlaceholder('registerConfirmPwd', 'confirmPwd'); safeText('btnRegisterSubmit', 'signUp');
   safeText('haveAccount', 'haveAccount'); safeText('switchToLogin', 'signIn');
 
-  safeText('profileNicknameLabel', 'profileNickname'); safeText('profileEmailLabel', 'profileEmail');
-  safeText('profileJoinedLabel', 'profileJoined'); safeText('profileSubTitle', 'profileSub');
-  safeText('logoutBtn', 'logout'); safeText('editNicknameBtn', 'edit'); safeText('editEmailBtn', 'edit');
+  // ========== 个人信息页 ==========
+  safeText('profileNicknameLabel', 'profileNickname');
+  safeText('profileEmailLabel', 'profileEmail');
+  safeText('profileJoinedLabel', 'profileJoined');
+  safeText('profileSubTitle', 'profileSub');
+  safeText('logoutBtn', 'logout');
+  safeText('editNicknameBtn', 'edit'); safeText('editEmailBtn', 'edit');
   safeText('promoTitle', 'promoTitle'); safeText('promoSub', 'promoSub');
   safeText('promoFeature1', 'promoFeature1'); safeText('promoFeature2', 'promoFeature2');
   safeText('promoFeature3', 'promoFeature3'); safeText('promoFeature4', 'promoFeature4');
-  safeText('goSubscribeBtn', 'subscribeBtn'); safeText('inviteCodeTitle', 'inviteCodeTitle');
+  safeText('goSubscribeBtn', 'subscribeBtn');
+  safeText('inviteCodeTitle', 'inviteCodeTitle');
 
+  // ========== 订阅页 ==========
   safeText('pricingSubtitle', 'pricingSubtitle'); safeText('pricingTitle', 'pricingTitle');
   ['Starter','Pro','Premium','Business'].forEach(type => {
-    safeText(`plan${type}Name`, `plan${type}Name`); safeText(`plan${type}Desc`, `plan${type}Desc`);
+    safeText(`plan${type}Name`, `plan${type}Name`);
+    safeText(`plan${type}Desc`, `plan${type}Desc`);
     safeText(`plan${type}Period`, `plan${type}Period`);
   });
   ['planNoticeStarter','planNoticePro','planNoticePremium','planNoticeBusiness'].forEach(id => { safeText(id, 'planNotice'); });
@@ -1168,6 +1187,7 @@ function renderLanguage() {
   const finePrint = document.getElementById('finePrint');
   if (finePrint) finePrint.innerHTML = t('finePrint') + ' <a onclick="showPage(\'page-legal\')">' + t('legalTermsTitle') + '</a>.';
 
+  // ========== 法律页 ==========
   const legalTabs = document.querySelectorAll('.legal-tab');
   if (legalTabs[0]) legalTabs[0].innerText = t('legalPrivacyTitle');
   if (legalTabs[1]) legalTabs[1].innerText = t('legalTermsTitle');
@@ -1186,12 +1206,14 @@ function renderLanguage() {
   safeText('legalTermsSubRules', 'legalTermsSubRules');
   for (let i=1;i<=10;i++) { safeText(`legalTermsSub${i}`, `legalTermsSub${i}`); }
 
+  // ========== 弹窗及按钮 ==========
   safeText('forgotTitle', 'forgotTitle'); safeText('cancelForgot', 'cancel'); safeText('resetPwdBtn', 'reset');
   safeText('nicknameTitle', 'nicknameTitle'); safeText('cancelNickname', 'cancel'); safeText('saveNicknameBtn', 'save');
   safeText('emailTitle', 'emailTitle'); safeText('cancelEmail', 'cancel'); safeText('saveEmailBtn', 'save');
   safeText('successTitle', 'success'); safeText('closeSuccessBtn', 'ok');
   safeText('sendCodeBtn', 'sendCode'); safeText('sendResetCodeBtn', 'sendCode'); safeText('sendEmailChangeCodeBtn', 'sendCode');
 
+  // ========== 营销首页 ==========
   safeText('homeHeroTitle', 'homeHeroTitle'); safeText('homeHeroDesc', 'homeHeroDesc');
   safeText('homeCtaBtn', 'homeCtaBtn'); safeText('homeBottomTitle', 'homeBottomTitle');
   safeText('homeBottomDesc', 'homeBottomDesc'); safeText('homeSubscriptionLink', 'homeSubscriptionLink');
