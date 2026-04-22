@@ -822,28 +822,6 @@ function renderRecipeContent(text) {
 
     document.getElementById('recipeContent').innerHTML = html;
 }
- 
-  // 填充 UI
-  document.getElementById('recipeNameDisplay').innerText = sections.name || '';
-
-  const ingredientsList = document.getElementById('ingredientsList');
-  ingredientsList.innerHTML = sections.ingredients.map(i => `<li>${i}</li>`).join('');
-  document.getElementById('ingredientsSection').style.display = sections.ingredients.length ? 'block' : 'none';
-
-  const instructionsTitle = document.getElementById('instructionsTitle');
-  instructionsTitle.innerText = sections.time ? `Instructions (±${sections.time} mins)` : 'Instructions';
-  const instructionsList = document.getElementById('instructionsList');
-  instructionsList.innerHTML = sections.instructions.map(i => `<li>${i}</li>`).join('');
-  document.getElementById('instructionsSection').style.display = sections.instructions.length ? 'block' : 'none';
-
-  const nutritionList = document.getElementById('nutritionList');
-  nutritionList.innerHTML = sections.nutrition.map(i => `<li>${i}</li>`).join('');
-  document.getElementById('nutritionSection').style.display = sections.nutrition.length ? 'block' : 'none';
-
-  const warningsList = document.getElementById('warningsList');
-  warningsList.innerHTML = sections.warnings.map(i => `<li>${i}</li>`).join('');
-  document.getElementById('warningsSection').style.display = sections.warnings.length ? 'block' : 'none';
-}
 
 function updateLimitInfo() {
   const el = document.getElementById('limitInfo');
