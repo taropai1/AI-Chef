@@ -801,8 +801,7 @@ function renderRecipeContent(text) {
             items.forEach(item => { html += `<li>${item}</li>`; });
             html += '</ul>';
         } else if (hasNumberedItems) {
-            const isWarnings = block.includes('风险') || block.includes('建议') || block.toLowerCase().includes('allergen') || block.toLowerCase().includes('warning');
-            const items = lines.filter(l => /^\d+\./.test(l.trim())).map(l => l.trim().replace(/^\d+\./, '').trim());
+            const isWarnings = block.includes('风险') || block.includes('建议') || block.includes('过敏原') || block.includes('安全提示') || block.toLowerCase().includes('allergen') || block.toLowerCase().includes('safety') || block.toLowerCase().includes('warning');
             if (isWarnings) {
                 html += `<h4>${t('warnings')}</h4><ul class="warnings-list">`;
                 items.forEach(item => { html += `<li>${item}</li>`; });
