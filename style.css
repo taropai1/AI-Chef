@@ -242,33 +242,39 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
 @media (max-width:640px){.plans-grid{grid-template-columns:1fr}.video-grid{grid-template-columns:1fr}}
 
-/* ==================== 食谱内容区排版（最终版） ==================== */
-
-/* 父容器内边距提供左右对称留白 */
+/* ==================== 食谱内容区（纯文本增强渲染） ==================== */
 .recipe-body {
   padding: 20px;
 }
 
-/* 分项标题 */
-.sec h4 {
-  margin-bottom: 6px;
+.recipe-body h4 {
+  font-weight: 700;
+  margin: 18px 0 6px 0;
   padding-left: 0;
 }
 
-/* 基础列表重置 */
-.sec li {
+.recipe-body h4:first-of-type {
+  margin-top: 0;
+}
+
+.recipe-body ul {
   list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recipe-body li {
   line-height: 1.45;
   margin-bottom: 2px;
 }
 
 /* 食材 & 营养：带项目符号，悬挂缩进 */
-#ingredientsList li, #nutritionList li {
+.recipe-body ul:not(.instructions-list) li {
   padding-left: 1.2em;
   text-indent: -1.2em;
 }
 
-#ingredientsList li::before, #nutritionList li::before {
+.recipe-body ul:not(.instructions-list) li::before {
   content: "•";
   color: #4a90e2;
   font-weight: bold;
@@ -277,33 +283,25 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   margin-left: -1.2em;
 }
 
-/* 制作方法：步骤连续排列（不分行），顶格 */
-#instructionsList {
+/* 制作方法：步骤连续排列（不分行） */
+.instructions-list {
   display: block;
 }
-#instructionsList li {
+.instructions-list li {
   display: inline;
   padding-left: 0;
   text-indent: 0;
-  margin-right: 0;
 }
-#instructionsList li::after {
-  content: "  ";             /* 步骤之间用两个空格分隔 */
+.instructions-list li::after {
+  content: "  ";
 }
-#instructionsList li:last-child::after {
-  content: none;
-}
-#instructionsList li::before {
+.instructions-list li:last-child::after {
   content: none;
 }
 
 /* 风险提示：分行排列，顶格 */
-#warningsList li {
+.warnings-list li {
   display: block;
   padding-left: 0;
   text-indent: 0;
-  margin-bottom: 4px;
-}
-#warningsList li::before {
-  content: none;
 }
