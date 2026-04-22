@@ -822,56 +822,7 @@ function renderRecipeContent(text) {
 
     document.getElementById('recipeContent').innerHTML = html;
 }
-  let currentSection = '';
-
-  for (let line of lines) {
-    line = line.trim();
-    if (!line) continue;
-
-    // 食材准备 / Ingredients
-    if (line.includes('食材准备') || line.toLowerCase().includes('ingredients')) {
-      currentSection = 'ingredients';
-      continue;
-    }
-
-    // 制作方法 / Instructions（提取时间数字）
-    if (line.includes('制作方法') || line.toLowerCase().includes('instructions')) {
-      currentSection = 'instructions';
-      const timeMatch = line.match(/[（(][^）)]*(\d+)[^）)]*[分钟mins]+[）)]?/i) || line.match(/[（(](\d+)\s*分钟[）)]?/);
-      if (timeMatch) sections.time = timeMatch[1];
-      continue;
-    }
-
-    // 营养参数 / Nutrition
-    if (line.includes('营养参数') || line.toLowerCase().includes('nutrition')) {
-      currentSection = 'nutrition';
-      continue;
-    }
-
-    // 风险提示与建议 / Allergens & Warnings
-    if (line.includes('风险提示') || line.includes('建议') || line.toLowerCase().includes('allergen') || line.toLowerCase().includes('warning')) {
-      currentSection = 'warnings';
-      continue;
-    }
-
-    // 菜名：第一个非空且非标题行
-    if (!currentSection && !sections.name) {
-      sections.name = line;
-      continue;
-    }
-
-    // 内容行处理
-    if (currentSection === 'ingredients' && line.startsWith('-')) {
-      sections.ingredients.push(line.substring(1).trim());
-    } else if (currentSection === 'instructions' && /^\d+\./.test(line)) {
-      sections.instructions.push(line.replace(/^\d+\./, '').trim());
-    } else if (currentSection === 'nutrition' && line.startsWith('-')) {
-      sections.nutrition.push(line.substring(1).trim());
-    } else if (currentSection === 'warnings' && /^\d+\./.test(line)) {
-      sections.warnings.push(line.replace(/^\d+\./, '').trim());
-    }
-  }
-
+ 
   // 填充 UI
   document.getElementById('recipeNameDisplay').innerText = sections.name || '';
 
