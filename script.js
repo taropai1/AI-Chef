@@ -871,6 +871,7 @@ async function askQuestion() {
     let answer = data.choices[0].message.content.replace(/\*/g, '');
     const lines = answer.split('\n'); if (lines.length > 5) answer = lines.slice(0,5).join('\n');
     historyEl.innerHTML += `<div class="qa"><a>${answer}</a></div>`;
+    historyEl.scrollTop = historyEl.scrollHeight;
     const res = await apiCall('/api/user/record-question', { method: 'POST' });
     userData.qLeft = res.qLeft;
     document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
