@@ -242,54 +242,78 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
 @media (max-width:640px){.plans-grid{grid-template-columns:1fr}.video-grid{grid-template-columns:1fr}}
 
-/* ==================== 食谱内容区视觉修正（最终版） ==================== */
+/* ==================== 食谱内容区（稳定版） ==================== */
+.recipe-title {
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
 
-/* 1. 制作方法步骤：连续排列，数字序号自然分隔，不额外添加符号 */
+.recipe-body h4 {
+  font-weight: 700 !important;          /* 强制加粗 */
+  margin: 24px 0 8px 0;                /* 上留白充足，下间距适中 */
+  padding-left: 0;
+}
+.recipe-body h4:first-of-type {
+  margin-top: 0;
+}
+
+.recipe-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.recipe-body li {
+  line-height: 1.5;
+  margin-bottom: 2px;
+}
+
+/* 食材 & 营养：纯文本 "-" 符号，无悬挂缩进问题 */
+.dash-list li {
+  padding-left: 0;
+  text-indent: 0;
+  display: flex;
+  align-items: baseline;
+}
+.dash-list li::before {
+  content: "- ";
+  color: #4a90e2;
+  font-weight: bold;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+/* 制作方法：步骤连续排列，保留数字序号 */
 .instructions-list {
   display: block;
   margin: 0;
   padding: 0;
 }
 .instructions-list li {
-  display: inline !important;      /* 强制同行排列 */
-  padding-left: 0 !important;
-  text-indent: 0 !important;
+  display: inline;
+  padding-left: 0;
+  text-indent: 0;
   margin-right: 0;
-  list-style: none;
 }
-/* 移除之前可能添加的任何额外符号 */
 .instructions-list li::after {
-  content: none !important;
+  content: "  ";                       /* 步骤之间两个空格分隔 */
 }
+.instructions-list li:last-child::after {
+  content: none;
+}
+/* 确保数字序号正常显示，不被任何符号覆盖 */
 .instructions-list li::before {
   content: none !important;
 }
 
-/* 2. 项目符号位置修正：保持在边界内，悬挂缩进 */
-.recipe-body ul:not(.instructions-list):not(.warnings-list) li {
-  padding-left: 1.5em;
-  text-indent: -1.5em;
-  list-style: none;
-}
-.recipe-body ul:not(.instructions-list):not(.warnings-list) li::before {
-  content: "•";
-  color: #4a90e2;
-  font-weight: bold;
-  display: inline-block;
-  width: 1.5em;
-  margin-left: -1.5em;
-}
-
-/* 3. 分项标题加粗统一 */
-.recipe-body h4 {
-  font-weight: 700 !important;
-}
-
-/* 4. 风险提示分行保持（无额外符号） */
+/* 风险提示：分行，保留数字序号 */
 .warnings-list li {
   display: block;
   padding-left: 0;
   text-indent: 0;
+  margin-bottom: 4px;
 }
 .warnings-list li::before {
   content: none;
