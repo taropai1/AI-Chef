@@ -718,7 +718,7 @@ async function generateRecipe() {
   const recentNames = window.lastSixDishNames.join('、');
   
   // 判断是否为精准菜名输入（输入内容包含完整菜名，而非单一食材）
-  const isExactDish = dish.length >= 4 && !/[，,、\s]/.test(dish) && dish.length <= 20;
+  const isExactDish = dish.length >= 4 && !(/[^/s]/).test(dish) && dish.length <= 20;
   
   const avoidRepeatInstruction = (!isExactDish && window.lastSixDishNames.length > 0) 
     ? `\n注意：请勿生成与以下菜名重复的食谱：${recentNames}。` 
