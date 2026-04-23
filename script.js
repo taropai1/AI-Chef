@@ -1162,7 +1162,8 @@ if (askBtn) askBtn.innerText = 'Ask';
   safeText('dishNameHint', 'dishNameHint');
   safeHtml('openVideoBtn', t('watchVideo'));
   safeHtml('addToHomeBtn', '+');
-
+  safeText('howToUseBtn', 'howToUse');
+  
   // ========== 登录/注册页 ==========
   safeText('tabLogin', 'signIn'); safeText('tabRegister', 'signUp');
   safePlaceholder('loginEmail', 'email'); safePlaceholder('loginPassword', 'password');
