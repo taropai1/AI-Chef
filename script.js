@@ -716,7 +716,11 @@ async function generateRecipe() {
     // 连续生成去重：记录最近6次菜名，在提示词中要求避免重复
   if (!window.lastSixDishNames) window.lastSixDishNames = [];
   const recentNames = window.lastSixDishNames.join('、');
-  const avoidRepeatInstruction = window.lastSixDishNames.length > 0 
+  
+  // 判断是否为精准菜名输入（输入内容包含完整菜名，而非单一食材）
+  const isExactDish = dish.length >= 4 && !/[，,、\s]/.test(dish) && dish.length <= 20;
+  
+  const avoidRepeatInstruction = (!isExactDish && window.lastSixDishNames.length > 0) 
     ? `\n注意：请勿生成与以下菜名重复的食谱：${recentNames}。` 
     : '';
   const mealType = document.getElementById('mealType').value;
