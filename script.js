@@ -125,7 +125,7 @@ const translations = {
     featureBusiness2: '5 AI queries per recipe', featureBusiness3: 'Priority generation queue', featureBusiness4: 'Commercial usage rights',
     featureBusiness5: 'Extended recipe permissions', freeTierDesc: "You're on the free tier.", promoTitle: 'Go Premium',
     promoSub: 'Unlock everything for your cooking', promoFeature1: 'Unlimited recipes', promoFeature2: 'Family sharing',
-    promoFeature3: 'Nutrition insights', promoFeature4: 'Ad-free experience',
+    promoFeature3: 'Nutrition insights', promoFeature4: 'Ad-free experience',personalizedGreeting: 'Dear Gourmet! Enjoy your meal!', howToUse: 'How to use', qLeft: 'Q left',
     howToTitle: 'How to use', ingredients: 'Ingredients', instructions: 'Instructions', nutrition: 'Nutrition', warnings: 'Allergens & Safety', minutes: 'mins',
     howToList: [
       'You can enter one or more ingredients, such as potatoes, spinach, chicken breast, salmon.',
@@ -198,7 +198,7 @@ const translations = {
     featurePremium5: '健康与营养分析', featureBusiness1: '每日 300 次生成', featureBusiness2: '每份食谱 5 次 AI 提问', featureBusiness3: '优先生成队列',
     featureBusiness4: '商业使用授权', featureBusiness5: '扩展食谱权限', freeTierDesc: '您当前为免费用户。', promoTitle: '升级高级版',
     promoSub: '解锁全部烹饪功能', promoFeature1: '无限食谱生成', promoFeature2: '家庭共享', promoFeature3: '营养分析', promoFeature4: '无广告体验',
-    howToTitle: '使用说明', ingredients: '食材准备', instructions: '制作方法', nutrition: '营养参数', warnings: '风险提示与建议', minutes: '分钟',
+    howToTitle: '使用说明', ingredients: '食材准备', instructions: '制作方法', nutrition: '营养参数', warnings: '风险提示与建议', minutes: '分钟', personalizedGreeting: '亲爱的美食家！祝您用餐愉快！', howToUse: '使用说明', qLeft: '剩余提问',
     howToList: [
       '可输入单种或多种食材，例如：土豆、菠菜、鸡胸肉、三文鱼。',
       '可搜索各类经典餐食，例如：炙烤牛排、烤杂蔬、煎蛋卷、意面。',
