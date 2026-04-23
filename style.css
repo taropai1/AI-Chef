@@ -318,3 +318,24 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .warnings-list li::before {
   content: none;
 }
+/* 生成器卡片内微调 */
+.help-trigger {
+  margin-bottom: 12px;        /* How to use 与生成按钮间距 */
+}
+.generate-btn {
+  margin-top: 8px;            /* 与上方元素适度分离 */
+  margin-bottom: 4px;         /* 与卡片底部留白 */
+}
+.ai-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ai-bottom .limit {
+  flex: 1;
+  text-align: center;         /* Q left 居中显示 */
+  margin-right: 8px;
+}
+.btn-video {
+  white-space: nowrap;
+}
