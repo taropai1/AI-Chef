@@ -791,12 +791,12 @@ function renderRecipeContent(text) {
       const isNutrition = block.includes('热量') || block.includes('卡路里') || block.toLowerCase().includes('calorie');
       const items = lines.filter(l => l.trim().startsWith('-')).map(l => l.trim().substring(1).trim());
       const title = isNutrition ? t('nutrition') : t('ingredients');
-      html += `<h4>${title}</h4><ul>`;
+      html += `<h4>${title}</h4><ul class="dash-list">`;
       items.forEach(item => { html += `<li>${item}</li>`; });
       html += '</ul>';
     } else if (hasNumberedItems) {
       const isWarnings = block.includes('风险') || block.includes('建议') || block.includes('过敏原') || block.includes('安全提示') || block.toLowerCase().includes('allergen') || block.toLowerCase().includes('safety') || block.toLowerCase().includes('warning');
-      const items = lines.filter(l => /^\d+\./.test(l.trim())).map(l => l.trim().replace(/^\d+\./, '').trim());
+      const items = lines.filter(l => /^\d+\./.test(l.trim())).map(l => l.trim());
       if (isWarnings) {
         html += `<h4>${t('warnings')}</h4><ul class="warnings-list">`;
         items.forEach(item => { html += `<li>${item}</li>`; });
