@@ -242,66 +242,55 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
 @media (max-width:640px){.plans-grid{grid-template-columns:1fr}.video-grid{grid-template-columns:1fr}}
 
-/* ==================== 食谱内容区（纯文本增强渲染） ==================== */
-.recipe-body {
-  padding: 20px;
-}
+/* ==================== 食谱内容区视觉修正（最终版） ==================== */
 
-.recipe-body h4 {
-  font-weight: 700;
-  margin: 18px 0 6px 0;
-  padding-left: 0;
-}
-
-.recipe-body h4:first-of-type {
-  margin-top: 0;
-}
-
-.recipe-body ul {
-  list-style: none;
-  padding: 0;
+/* 1. 制作方法步骤：连续排列，数字序号自然分隔，不额外添加符号 */
+.instructions-list {
+  display: block;
   margin: 0;
+  padding: 0;
+}
+.instructions-list li {
+  display: inline !important;      /* 强制同行排列 */
+  padding-left: 0 !important;
+  text-indent: 0 !important;
+  margin-right: 0;
+  list-style: none;
+}
+/* 移除之前可能添加的任何额外符号 */
+.instructions-list li::after {
+  content: none !important;
+}
+.instructions-list li::before {
+  content: none !important;
 }
 
-.recipe-body li {
-  line-height: 1.45;
-  margin-bottom: 2px;
+/* 2. 项目符号位置修正：保持在边界内，悬挂缩进 */
+.recipe-body ul:not(.instructions-list):not(.warnings-list) li {
+  padding-left: 1.5em;
+  text-indent: -1.5em;
+  list-style: none;
 }
-
-/* 食材 & 营养：带项目符号，悬挂缩进 */
-.recipe-body ul:not(.instructions-list) li {
-  padding-left: 1.2em;
-  text-indent: -1.2em;
-}
-
-.recipe-body ul:not(.instructions-list) li::before {
+.recipe-body ul:not(.instructions-list):not(.warnings-list) li::before {
   content: "•";
   color: #4a90e2;
   font-weight: bold;
   display: inline-block;
-  width: 1.2em;
-  margin-left: -1.2em;
+  width: 1.5em;
+  margin-left: -1.5em;
 }
 
-/* 制作方法：步骤连续排列（不分行） */
-.instructions-list {
-  display: block;
-}
-.instructions-list li {
-  display: inline;
-  padding-left: 0;
-  text-indent: 0;
-}
-.instructions-list li::after {
-  content: "  ";
-}
-.instructions-list li:last-child::after {
-  content: none;
+/* 3. 分项标题加粗统一 */
+.recipe-body h4 {
+  font-weight: 700 !important;
 }
 
-/* 风险提示：分行排列，顶格 */
+/* 4. 风险提示分行保持（无额外符号） */
 .warnings-list li {
   display: block;
   padding-left: 0;
   text-indent: 0;
+}
+.warnings-list li::before {
+  content: none;
 }
