@@ -850,6 +850,7 @@ async function askQuestion() {
   const askBtn = document.getElementById('askBtn'); askBtn.disabled = true;
   const historyEl = document.getElementById('qaHistory');
   historyEl.innerHTML += `<div class="qa"><q>${question}</q></div>`;
+  historyEl.scrollTop = historyEl.scrollHeight;
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
