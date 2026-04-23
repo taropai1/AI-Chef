@@ -805,6 +805,7 @@ function renderRecipeContent(text) {
         const timeMatch = block.match(/(?:[（(±]?\s*(\d+)\s*[分钟mins）)]?)/i) || block.match(/(\d+)\s*(?:分钟|mins)/i);
         if (timeMatch) timeStr = timeMatch[1];
         const title = t('instructions') + (timeStr ? ` (±${timeStr} ${t('minutes')})` : '');
+        // 关键修正：为制作方法的 <ul> 添加 class="instructions-list"
         html += `<h4>${title}</h4><ul class="instructions-list">`;
         items.forEach(item => { html += `<li>${item}</li>`; });
         html += '</ul>';
