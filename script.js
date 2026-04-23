@@ -713,6 +713,12 @@ async function generateRecipe() {
   const dish = document.getElementById('dishName').value.trim();
   if (!dish) { alert(t('alertInvalidFood')); return; }
 
+    // 连续生成去重：记录最近6次菜名，在提示词中要求避免重复
+  if (!window.lastSixDishNames) window.lastSixDishNames = [];
+  const recentNames = window.lastSixDishNames.join('、');
+  const avoidRepeatInstruction = window.lastSixDishNames.length > 0 
+    ? `\n注意：请勿生成与以下菜名重复的食谱：${recentNames}。` 
+    : '';
   const mealType = document.getElementById('mealType').value;
   const cuisine = document.getElementById('cuisine').value;
   const genBtn = document.getElementById('btnGenerate');
