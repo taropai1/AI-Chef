@@ -773,7 +773,7 @@ async function generateRecipe() {
       document.getElementById('qaInput').disabled = false;
       document.getElementById('askBtn').disabled = false;
       document.getElementById('qaHistory').innerHTML = '';
-      document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
+      document.getElementById('qaLimitNote').innerText = `${t('qLeft')}: ${userData.qLeft}`;
     }
     updateLimitInfo();
   } catch (error) {
