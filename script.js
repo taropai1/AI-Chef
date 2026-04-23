@@ -1284,7 +1284,7 @@ function showEmailModal() { document.getElementById('newEmailInput').value = use
 // ==================== 历史记录 ====================
 function addToHistory(recipe) { recipeHistory.push(recipe); if (recipeHistory.length > MAX_HISTORY) recipeHistory.shift(); historyIndex = recipeHistory.length - 1; localStorage.setItem('recipeHistory', JSON.stringify(recipeHistory)); updateHistoryButtons(); }
 function loadHistoryFromCache() { const cached = localStorage.getItem('recipeHistory'); if (cached) { recipeHistory = JSON.parse(cached); historyIndex = recipeHistory.length - 1; updateHistoryButtons(); } }
-function restoreRecentRecipes() { const cached = localStorage.getItem('recipeHistory'); if (!cached || JSON.parse(cached).length===0) { showToast('No cached recipes found.'); return; } const recent = JSON.parse(cached).slice(-3); if (recent.length) parseRecipeToUI(recent[recent.length-1]); }
+function restoreRecentRecipes() { const cached = localStorage.getItem('recipeHistory'); if (!cached || JSON.parse(cached).length===0) { showToast('No cached recipes found.'); return; } const recent = JSON.parse(cached).slice(-3); if (recent.length) renderRecipeContent(recent[recent.length - 1]);}
 function showPrevRecipe() { if (historyIndex > 0) { historyIndex--; parseRecipeToUI(recipeHistory[historyIndex]); } updateHistoryButtons(); }
 function showNextRecipe() { if (historyIndex < recipeHistory.length - 1) { historyIndex++; parseRecipeToUI(recipeHistory[historyIndex]); } updateHistoryButtons(); }
 function updateHistoryButtons() { document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0; document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length - 1; }
