@@ -320,7 +320,7 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 }
 /* 生成器卡片内微调 */
 .help-trigger {
-  margin-bottom: 12px;        /* How to use 与生成按钮间距 */
+  margin-bottom: 8px;        /* How to use 与生成按钮间距 */
 }
 .generate-btn {
   margin-top: 6px;            /* 与上方元素适度分离 */
