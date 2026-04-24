@@ -282,21 +282,14 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .crop-confirm{background:#4a90e2;color:#fff}
 .error{color:#ef4444;font-size:14px;margin-bottom:16px;display:none}
 .modal-row{display:flex;gap:8px;align-items:stretch;margin-bottom:20px}
-/* 只给弹窗里、不在flex行里的单独第一个输入框，加下边距 */
-.modal > .auth-input-new {
-    margin-bottom: 20px;
+/* 新邮箱输入框 */
+#newEmailInput {
+    margin-bottom: 16px !important;
 }
 
-/* 弹窗flex行内部规则，保留、无冲突 */
-.modal-row .auth-input-new {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-/* 按钮防挤压，只在弹窗生效 */
-.modal-row .send-code-btn {
-    min-width: 140px;
-    flex-shrink: 0;
+/* 验证码行（包含输入框与发送按钮） */
+.modal-row {
+    margin-top: 4px;
 }
 
 /* ==================== 订阅支付页 ==================== */
