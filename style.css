@@ -335,7 +335,10 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
   text-align: center;
   box-sizing: border-box;
 }
-
+.logo {
+    margin-left: 20px;   /* 向右移动 20px，可根据需要调整 */
+    /* 保留原有其他样式 */
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
