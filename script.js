@@ -859,20 +859,24 @@ async function askQuestion() {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const response = await fetch(DEEPSEEK_API, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'deepseek-chat', temperature: 0.3, max_tokens: 300,
-        const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
 
-// 然后在请求体中使用：
-messages: [
-  { role: 'system', content: systemContent },
-  { role: 'user', content: question }
-]
-      }),
-      signal: controller.signal
-    });
+    const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
+
+    const response = await fetch(DEEPSEEK_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        model: 'deepseek-chat',
+        temperature: 0.3,
+        max_tokens: 300,
+        messages: [
+            { role: 'system', content: systemContent },
+            { role: 'user', content: question }
+        ]
+    }),
+    signal: controller.signal
+});
+
     clearTimeout(timeoutId);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
