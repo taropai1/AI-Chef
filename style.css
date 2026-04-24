@@ -321,8 +321,6 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .legal-tab.active {
     color: #4a90e2;
     border-right: none;           /* 删除右侧边框 */
-    border-left: 2px solid #4a90e2; /* 将选中线移至文字左侧 */
-    padding-left: 8px;            /* 文字与线条间留空 */
 }
 
 /* ==================== 响应式 ==================== */
