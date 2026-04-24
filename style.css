@@ -340,13 +340,15 @@ input:focus, select:focus {
 }
 
 .qa-list {
-    max-height: 360px;                      /* 第一段覆盖第二段的 280px */
+    max-height: 360px;
     overflow-y: auto;
-    scroll-behavior: smooth;                /* 第一段新增 */
+    scroll-behavior: smooth;
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding-right: 4px;
+    min-height: 200px;            /* 新增：固定最小高度，无内容时显示空白区 */
+    background-color: #f9fafb;    /* 新增：与食谱内容区一致的浅灰背景 */
 }
 
 .qa {
