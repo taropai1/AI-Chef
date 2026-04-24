@@ -339,3 +339,8 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .btn-video {
   white-space: nowrap;
 }
+.qa-list {
+  max-height: 360px;         /* 固定高度，大约容纳3条问答 */
+  overflow-y: auto;          /* 超长滚动 */
+  scroll-behavior: smooth;   /* 平滑滚动 */
+}
