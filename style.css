@@ -325,7 +325,7 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 
 /* 电脑端固定280px，手机端自动缩放 */
 .cta {
-    min-width: 280px;
+    min-width: 260px;
     max-width: 100%;
     width: auto;
     text-align: center;
