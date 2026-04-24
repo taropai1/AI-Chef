@@ -323,13 +323,12 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     border-right: none;           /* 删除右侧边框 */
 }
 
-/* 电脑端固定260px，手机端自动缩放 */
 .cta {
-    min-width: 260px;
-    max-width: 100%;
-    width: auto;
-    text-align: center;
-    box-sizing: border-box;
+  width: 100%;
+  max-width: 240px;
+  margin: 0 auto;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 /* ==================== 响应式 ==================== */
