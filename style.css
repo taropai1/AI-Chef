@@ -283,6 +283,9 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .error{color:#ef4444;font-size:14px;margin-bottom:16px;display:none}
 .modal-row{display:flex;gap:8px;align-items:stretch;margin-bottom:20px}
 .modal-row .auth-input-new{flex:1;margin-bottom:0}
+.modal-row .auth-input-new {
+    margin-bottom: 12px;
+}
 
 /* ==================== 订阅支付页 ==================== */
 .pricing-header{text-align:center;margin-bottom:30px;padding-top:20px}
