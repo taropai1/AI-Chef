@@ -323,7 +323,7 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     border-right: none;           /* 删除右侧边框 */
 }
 
-/* 电脑端固定280px，手机端自动缩放 */
+/* 电脑端固定260px，手机端自动缩放 */
 .cta {
     min-width: 260px;
     max-width: 100%;
