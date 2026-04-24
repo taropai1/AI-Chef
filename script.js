@@ -848,50 +848,58 @@ function updateLimitInfo() {
 
 // ==================== 问答 ====================
 async function askQuestion() {
-  if (!userData || !userData.lastRecipeText) { alert(t('alertNoRecipe')); return; }
-  if (userData.qLeft <= 0) { alert(t('qLimitReached') + ' ' + t('alertNoPoints')); return; }
-  const question = document.getElementById('qaInput').value.trim();
-  if (!question) return;
-  const askBtn = document.getElementById('askBtn'); askBtn.disabled = true;
-  const historyEl = document.getElementById('qaHistory');
-  historyEl.innerHTML += `<div class="qa"><q>${question}</q></div>`;
-  historyEl.scrollTop = historyEl.scrollHeight;
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    if (!userData || !userData.lastRecipeText) { ... }
+    if (userData.qLeft <= 0) { ... }
+    const question = document.getElementById('qaInput').value.trim();
+    if (!question) return;
 
-    const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
-
-    const response = await fetch(DEEPSEEK_API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        model: 'deepseek-chat',
-        temperature: 0.3,
-        max_tokens: 300,
-        messages: [
-            { role: 'system', content: systemContent },
-            { role: 'user', content: question }
-        ]
-    }),
-    signal: controller.signal
-});
-
-    clearTimeout(timeoutId);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    let answer = data.choices[0].message.content.replace(/\*/g, '');
-    const lines = answer.split('\n'); if (lines.length > 5) answer = lines.slice(0,5).join('\n');
-    historyEl.innerHTML += `<div class="qa"><a>${answer}</a></div>`;
+    const askBtn = document.getElementById('askBtn'); askBtn.disabled = true;
+    const historyEl = document.getElementById('qaHistory');
+    historyEl.innerHTML += `<div class="qa"><q>${question}</q></div>`;
     historyEl.scrollTop = historyEl.scrollHeight;
-    const res = await apiCall('/api/user/record-question', { method: 'POST' });
-    userData.qLeft = res.qLeft;
-    document.getElementById('qaLimitNote').innerText = t('q') + ' left: ' + userData.qLeft;
-  } catch (error) {
-    historyEl.innerHTML += `<div class="qa"><a>Error, please try again.</a></div>`;
-  } finally { askBtn.disabled = false; document.getElementById('qaInput').value = ''; }
-}
 
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+        const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
+
+        const response = await fetch(DEEPSEEK_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                temperature: 0.3,
+                max_tokens: 300,
+                messages: [
+                    { role: 'system', content: systemContent },
+                    { role: 'user', content: question }
+                ]
+            }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        let answer = data.choices[0].message.content.replace(/\*/g, '');
+        const lines = answer.split('\n');
+        if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
+
+        historyEl.innerHTML += `<div class="qa"><a>${answer}</a></div>`;
+        historyEl.scrollTop = historyEl.scrollHeight;
+
+        const res = await apiCall('/api/user/record-question', { method: 'POST' });
+        userData.qLeft = res.qLeft;
+        document.getElementById('qaLimitNote').innerText = `${t('qLeft')}: ${userData.qLeft}`;
+    } catch (error) {
+        historyEl.innerHTML += `<div class="qa"><a>Error, please try again.</a></div>`;
+        historyEl.scrollTop = historyEl.scrollHeight;
+    } finally {
+        askBtn.disabled = false;
+        document.getElementById('qaInput').value = '';
+    }
+}
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
 
