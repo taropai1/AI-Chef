@@ -50,6 +50,11 @@ const PLANS = {
   business: { dailyLimit: 300, qPerRecipe: 5 }
 };
 
+function getCurrentLang() {
+  const stored = localStorage.getItem('aiChefLang');
+  return stored && LANGS.includes(stored) ? stored : 'en';
+}
+
 let currentLang = localStorage.getItem('aiChefLang');
 if (!currentLang) {
   const browserLang = navigator.language.split('-')[0];
