@@ -1273,6 +1273,13 @@ if (askBtn) askBtn.innerText = 'Ask';
     });
   }
 
+  let displayName = 'Gourmet';
+  if (userData && userData.nickname) displayName = userData.nickname;
+  else if (userData && userData.email) displayName = userData.email.split('@')[0];
+  const greetingEl = document.getElementById('personalizedGreeting');
+  if (greetingEl) {
+  greetingEl.innerText = t('personalizedGreeting').replace('Gourmet', displayName);
+}
   populateCuisines();
 }
 
