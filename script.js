@@ -362,7 +362,7 @@ const translations = {
     featureBusiness4: 'Droits d\'utilisation commerciale', featureBusiness5: 'Autorisations étendues sur les recettes', freeTierDesc: 'Vous êtes sur le niveau gratuit.',
     promoTitle: 'Passez à Premium', promoSub: 'Débloquez tout pour votre cuisine', promoFeature1: 'Recettes illimitées',
     promoFeature2: 'Partage familial', promoFeature3: 'Informations nutritionnelles', promoFeature4: 'Sans publicité',
-    howToTitle: 'Comment utiliser', warnings: 'Allergènes et Sécurité', personalizedGreeting: 'Cher Gourmet ! Bon appétit !', howToUse: 'Guide d'utilisation', qLeft: 'Questions restantes',  
+    howToTitle: 'Comment utiliser', warnings: 'Allergènes et Sécurité', personalizedGreeting: 'Cher Gourmet ! Bon appétit !', howToUse: 'Guide d'utilisation', qLeft: 'Questions restantes',
     howToList: [
       'Vous pouvez entrer un ou plusieurs ingrédients, comme des pommes de terre, épinards, blanc de poulet, saumon.',
       'Vous pouvez rechercher des plats et repas classiques, comme steak grillé, légumes rôtis, omelette, pâtes.',
