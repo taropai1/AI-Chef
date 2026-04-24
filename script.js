@@ -864,8 +864,7 @@ async function askQuestion() {
       body: JSON.stringify({
         model: 'deepseek-chat', temperature: 0.3, max_tokens: 300,
         messages: [
-          { role: 'system', // 无需单独定义变量，直接在模板字符串中调用 getCurrentLang()
-const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`; },
+          { role: 'system', const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`; },
           { role: 'user', content: question }
         ]
       }),
