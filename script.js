@@ -848,20 +848,29 @@ function updateLimitInfo() {
 
 // ==================== 问答 ====================
 async function askQuestion() {
-    if (!userData || !userData.lastRecipeText) { ... }
-    if (userData.qLeft <= 0) { ... }
+    if (!userData || !userData.lastRecipeText) {
+        alert(t('alertNoRecipe'));
+        return;
+    }
+    if (userData.qLeft <= 0) {
+        alert(t('qLimitReached') + ' ' + t('alertNoPoints'));
+        return;
+    }
     const question = document.getElementById('qaInput').value.trim();
-    if (!question) return;
+    if (!question)
+        return;
 
-    const askBtn = document.getElementById('askBtn'); askBtn.disabled = true;
-    const historyEl = document.getElementById('qaHistory');
+    const askBtn = document.getElementById('askBtn');
+    askBtn.disabled = true;
+    const historyEl = document.getElementById('qaHistory');  // 注意 ID 是 qaHistory
     historyEl.innerHTML += `<div class="qa"><q>${question}</q></div>`;
-    historyEl.scrollTop = historyEl.scrollHeight;
+    historyEl.scrollTop = historyEl.scrollHeight;  //  自动滚动到底部
 
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
+        // 关键是这里使用 getCurrentLang() 实时获取语言
         const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
 
         const response = await fetch(DEEPSEEK_API, {
@@ -881,13 +890,14 @@ async function askQuestion() {
 
         clearTimeout(timeoutId);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
         const data = await response.json();
         let answer = data.choices[0].message.content.replace(/\*/g, '');
         const lines = answer.split('\n');
         if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
 
         historyEl.innerHTML += `<div class="qa"><a>${answer}</a></div>`;
-        historyEl.scrollTop = historyEl.scrollHeight;
+        historyEl.scrollTop = historyEl.scrollHeight;  // 再次滚动到底部
 
         const res = await apiCall('/api/user/record-question', { method: 'POST' });
         userData.qLeft = res.qLeft;
