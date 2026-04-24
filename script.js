@@ -1038,6 +1038,14 @@ async function login() {
 
 function logout() {
   localStorage.removeItem('authToken'); userData = null;
+  const recipeContent = document.getElementById('recipeContent');
+if (recipeContent) recipeContent.innerHTML = '';
+const recipeName = document.getElementById('recipeNameDisplay');
+if (recipeName) recipeName.innerText = '';
+const qaHistory = document.getElementById('qaHistory');
+if (qaHistory) qaHistory.innerHTML = '';
+const qaLimitNote = document.getElementById('qaLimitNote');
+if (qaLimitNote) qaLimitNote.innerText = '';
   showPage('page-home'); updateNavButton(); renderProfile(); updateLimitInfo();
 }
 
