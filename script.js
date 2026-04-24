@@ -524,7 +524,7 @@ const translations = {
     featureBusiness1: '300 generazioni al giorno', featureBusiness2: '5 domande IA per ricetta', featureBusiness3: 'Coda di generazione prioritaria',
     featureBusiness4: 'Diritti di utilizzo commerciale', featureBusiness5: 'Permessi estesi sulle ricette', freeTierDesc: 'Sei nel livello gratuito.',
     promoTitle: 'Passa a Premium', promoSub: 'Sblocca tutto per la tua cucina', promoFeature1: 'Ricette illimitate', promoFeature2: 'Condivisione familiare',
-    promoFeature3: 'Informazioni nutrizionali', promoFeature4: 'Senza pubblicità', personalizedGreeting: 'Caro Gourmet! Buon appetito!', howToUse: 'Guida all'uso', qLeft: 'Domande in sospeso',
+    promoFeature3: 'Informazioni nutrizionali', promoFeature4: 'Senza pubblicità', personalizedGreeting: 'Caro Gourmet! Buon appetito!', howToUse: 'Guida all\'uso', qLeft: 'Domande in sospeso',
     howToTitle: 'Come usare', warnings: 'Allergeni e Sicurezza',
     howToList: [
       'Puoi inserire uno o più ingredienti, come patate, spinaci, petto di pollo, salmone.',
