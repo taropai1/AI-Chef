@@ -340,7 +340,7 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
   box-sizing: border-box;
 }
 .logo {
-    margin-left: 25px;   /* 向右移动 20px，可根据需要调整 */
+    margin-left: 20px;   /* 向右移动 20px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
 /* ==================== 响应式 ==================== */
