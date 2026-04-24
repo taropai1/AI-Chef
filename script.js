@@ -840,7 +840,12 @@ function renderRecipeContent(text) {
 function updateLimitInfo() {
   const el = document.getElementById('limitInfo');
   if (!el) return;
-  if (!userData) { el.innerText = t('pleaseLogin'); return; }
+  if (!userData) {
+  el.innerText = t('pleaseLogin');
+  const qaLimit = document.getElementById('qaLimitNote');
+  if (qaLimit) qaLimit.innerText = t('qLeft'); // 仅显示“剩余提问”，无数字
+  return;
+}
   const plan = userData.plan;
   if (plan === 'free') { el.innerText = t('freeLimitInfo', { used: userData.freeUsed }); }
   else { const used = userData.dailyUsed || 0; const qLeft = userData.qLeft || 0; el.innerText = t(plan + 'Info', { used, qLeft }); }
