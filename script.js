@@ -772,7 +772,7 @@ ${isChinese ? '风险提示与建议:' : 'Allergens & Safety:'}
 1. ${isChinese ? '食材安全与搭配风险' : 'Food safety and pairing risks'}
 2. ${isChinese ? '额外营养建议' : 'Additional nutritional advice'}
 
-语言：${isChinese ? '中文' : 'English'}
+语言：${targetLang}
 人群：${mealType === 'baby' ? (isChinese ? '婴幼儿（无盐无糖）' : 'Baby (no salt/sugar)') : mealType === 'pregnancy' ? (isChinese ? '孕妇' : 'Pregnancy') : (isChinese ? '普通人群' : 'General')}
 
 重要：必须完整输出以上所有区块，包括“${isChinese ? '风险提示与建议' : 'Allergens & Safety'}”部分，不可省略。你必须严格使用指定的语言输出全部内容，标题和描述都必须用指定语言，不得混用其他语言。`;
@@ -929,7 +929,7 @@ const langMap = {
   'zh-CN': '中文'
 };
 const targetLang = langMap[lang] || 'English';
-const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。你必须用${isChinese ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
+const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。你必须用语言：${targetLang}回答。\n食谱：\n${userData.lastRecipeText}`;
 
         const response = await fetch(DEEPSEEK_API, {
             method: 'POST',
