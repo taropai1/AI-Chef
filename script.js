@@ -908,7 +908,9 @@ async function askQuestion() {
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
         // 关键是这里使用 getCurrentLang() 实时获取语言
-        const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。请用${getCurrentLang() === 'zh-CN' ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
+       const lang = getCurrentLang();
+const isChinese = lang === 'zh-CN';
+const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。你必须用${isChinese ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
 
         const response = await fetch(DEEPSEEK_API, {
             method: 'POST',
