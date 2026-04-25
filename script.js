@@ -739,17 +739,12 @@ async function generateRecipe() {
   
   const lang = getCurrentLang();
 const langMap = {
-  'en': 'English',
-  'es': 'Español',
-  'fr': 'Français',
-  'de': 'Deutsch',
-  'it': 'Italiano',
-  'pt': 'Português',
-  'zh-CN': '中文'
+  'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch',
+  'it': 'Italiano', 'pt': 'Português', 'zh-CN': '中文'
 };
 const targetLang = langMap[lang] || 'English';
 
-const systemPrompt = `You are a professional chef. Output ONLY a clean recipe text with NO special symbols, markdown, or extra formatting.
+const systemPrompt = `You are a professional chef. Output ONLY clean recipe text with NO special symbols, markdown, or extra formatting.
 
 Follow this structure exactly, with a blank line between sections:
 
@@ -850,14 +845,14 @@ function renderRecipeContent(text) {
     if (!block) continue;
     const lines = block.split('\n');
 
-    // 识别当前区块第一个非空行作为标题（假设标题总是单独一行）
+    // 提取标题（第一个非空行）
     let titleLine = '';
     const contentLines = [];
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed) continue;
       if (!titleLine) {
-        titleLine = trimmed; // 第一个非空行当做标题
+        titleLine = trimmed;
       } else {
         contentLines.push(trimmed);
       }
@@ -877,8 +872,9 @@ function renderRecipeContent(text) {
       items.forEach(item => { html += `<li>${item}</li>`; });
       html += '</ul>';
     } else if (hasNumberedItems) {
+      // 保留原始序号，直接使用整行作为列表项内容
       const isWarnings = titleLine.toLowerCase().includes('allergen') || titleLine.toLowerCase().includes('safety') || titleLine.includes('风险') || titleLine.includes('建议');
-      const items = contentLines.filter(l => /^\d+\./.test(l)).map(l => l.replace(/^\d+\./, '').trim());
+      const items = contentLines.filter(l => /^\d+\./.test(l)).map(l => l.trim());
       if (isWarnings) {
         html += '<ul class="warnings-list">';
         items.forEach(item => { html += `<li>${item}</li>`; });
@@ -939,19 +935,10 @@ async function askQuestion() {
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
         const lang = getCurrentLang();
-const langMap = {
-  'en': 'English',
-  'es': 'Español',
-  'fr': 'Français',
-  'de': 'Deutsch',
-  'it': 'Italiano',
-  'pt': 'Português',
-  'zh-CN': '中文'
-};
+const langMap = { /* 同上 */ };
 const targetLang = langMap[lang] || 'English';
 
 const systemContent = `You are a professional nutrition chef assistant. Answer questions based on the provided recipe. Keep responses concise, professional, and no more than 5 lines. Do NOT use any asterisks. You MUST answer in ${targetLang}.\n\nRecipe:\n${userData.lastRecipeText}`;
-        
         
        const response = await fetch(DEEPSEEK_API, {
             method: 'POST',
