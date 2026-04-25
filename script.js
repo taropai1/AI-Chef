@@ -2,6 +2,10 @@
 const DEEPSEEK_API = "https://api.taropai.com/v1/chat/completions";
 const BACKEND_URL = "https://auth.taropai.com";
 const LANGS = ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh-CN'];
+function getCurrentLang() {
+  const stored = localStorage.getItem('aiChefLang');
+  return stored && LANGS.includes(stored) ? stored : 'en';
+}
 const CUISINES = ["American","Italian","Mexican","French","Spanish","German","Mediterranean","Middle Eastern","Chinese Home Cooking","Chinese Cantonese Cuisine","Chinese Sichuan Cuisine","Chinese Hunan Cuisine","Chinese Huaiyang Cuisine","Chinese Northern Cuisine","Japanese Cuisine","Thai Cuisine","Korean cuisine","Indian Cuisine"];
 const CUISINE_MAP = {
   'zh-CN': {
