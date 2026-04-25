@@ -738,7 +738,16 @@ async function generateRecipe() {
   genBtn.disabled = true; genBtn.innerText = t('generating');
 
   const lang = getCurrentLang();
-const isChinese = lang === 'zh-CN';
+const langMap = {
+  'en': 'English',
+  'es': 'Español',
+  'fr': 'Français',
+  'de': 'Deutsch',
+  'it': 'Italiano',
+  'pt': 'Português',
+  'zh-CN': '中文'
+};
+const targetLang = langMap[lang] || 'English';
 
 const systemPrompt = `你是专业营养厨师，只输出纯净食谱文本，无任何符号、无星号、无加粗、无特殊格式。
 严格按以下结构输出，每个标题之间空一行：
@@ -910,7 +919,16 @@ async function askQuestion() {
 
         // 关键是这里使用 getCurrentLang() 实时获取语言
        const lang = getCurrentLang();
-const isChinese = lang === 'zh-CN';
+const langMap = {
+  'en': 'English',
+  'es': 'Español',
+  'fr': 'Français',
+  'de': 'Deutsch',
+  'it': 'Italiano',
+  'pt': 'Português',
+  'zh-CN': '中文'
+};
+const targetLang = langMap[lang] || 'English';
 const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。你必须用${isChinese ? '中文' : 'English'}回答。\n食谱：\n${userData.lastRecipeText}`;
 
         const response = await fetch(DEEPSEEK_API, {
