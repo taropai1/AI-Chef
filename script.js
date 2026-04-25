@@ -1361,6 +1361,7 @@ async function showPage(pageId) {
   if (pageId === 'page-profile') { renderProfile(); renderLanguage(); }
   if (pageId === 'page-home') renderLanguage();
   renderLanguage();
+}
 function switchLang(lang) {
     currentLang = lang;
     localStorage.setItem('aiChefLang', lang);
