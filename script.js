@@ -850,33 +850,50 @@ function renderRecipeContent(text) {
     if (!block) continue;
     const lines = block.split('\n');
 
-    const hasDashItems = lines.some(l => l.trim().startsWith('-'));
-    const hasNumberedItems = lines.some(l => /^\d+\./.test(l.trim()));
+    // 识别当前区块第一个非空行作为标题（假设标题总是单独一行）
+    let titleLine = '';
+    const contentLines = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      if (!titleLine) {
+        titleLine = trimmed; // 第一个非空行当做标题
+      } else {
+        contentLines.push(trimmed);
+      }
+    }
+
+    const hasDashItems = contentLines.some(l => l.startsWith('-'));
+    const hasNumberedItems = contentLines.some(l => /^\d+\./.test(l));
+
+    // 标题直接使用 AI 输出的原始文本，加粗
+    if (titleLine) {
+      html += `<h4>${titleLine}</h4>`;
+    }
 
     if (hasDashItems) {
-      const isNutrition = block.includes('热量') || block.includes('卡路里') || block.toLowerCase().includes('calorie');
-      const items = lines.filter(l => l.trim().startsWith('-')).map(l => l.trim().substring(1).trim());
-      const title = isNutrition ? t('nutrition') : t('ingredients');
-      html += `<h4>${title}</h4><ul class="dash-list">`;
+      const items = contentLines.filter(l => l.startsWith('-')).map(l => l.substring(1).trim());
+      html += '<ul class="dash-list">';
       items.forEach(item => { html += `<li>${item}</li>`; });
       html += '</ul>';
     } else if (hasNumberedItems) {
-      const isWarnings = block.includes('风险') || block.includes('建议') || block.includes('过敏原') || block.includes('安全提示') || block.toLowerCase().includes('allergen') || block.toLowerCase().includes('safety') || block.toLowerCase().includes('warning');
-      const items = lines.filter(l => /^\d+\./.test(l.trim())).map(l => l.trim());
+      const isWarnings = titleLine.toLowerCase().includes('allergen') || titleLine.toLowerCase().includes('safety') || titleLine.includes('风险') || titleLine.includes('建议');
+      const items = contentLines.filter(l => /^\d+\./.test(l)).map(l => l.replace(/^\d+\./, '').trim());
       if (isWarnings) {
-        html += `<h4>${t('warnings')}</h4><ul class="warnings-list">`;
+        html += '<ul class="warnings-list">';
         items.forEach(item => { html += `<li>${item}</li>`; });
         html += '</ul>';
       } else {
-        const timeMatch = block.match(/(?:[（(±]?\s*(\d+)\s*[分钟mins）)]?)/i) || block.match(/(\d+)\s*(?:分钟|mins)/i);
+        // 提取时间信息（如果标题中包含）
+        const timeMatch = titleLine.match(/(\d+)\s*(?:分钟|mins?)/i);
         if (timeMatch) timeStr = timeMatch[1];
-        const title = t('instructions') + (timeStr ? ` (±${timeStr} ${t('minutes')})` : '');
-        html += `<h4>${title}</h4><ul class="instructions-list">`;
+        html += '<ul class="instructions-list">';
         items.forEach(item => { html += `<li>${item}</li>`; });
         html += '</ul>';
       }
     } else {
-      html += `<p>${block.replace(/\n/g, '<br>')}</p>`;
+      // 无特殊格式，直接显示内容
+      html += `<p>${contentLines.join('<br>')}</p>`;
     }
   }
 
