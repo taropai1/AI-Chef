@@ -736,7 +736,7 @@ async function generateRecipe() {
   const cuisine = document.getElementById('cuisine').value;
   const genBtn = document.getElementById('btnGenerate');
   genBtn.disabled = true; genBtn.innerText = t('generating');
-
+  
   const lang = getCurrentLang();
 const langMap = {
   'en': 'English',
@@ -752,30 +752,31 @@ const targetLang = langMap[lang] || 'English';
 const systemPrompt = `你是专业营养厨师，只输出纯净食谱文本，无任何符号、无星号、无加粗、无特殊格式。
 严格按以下结构输出，每个标题之间空一行：
 
-${isChinese ? '菜名（单独一行）' : 'Dish Name (separate line)'}
+菜名（单独一行）
 
-${isChinese ? '食材准备:' : 'Ingredients:'}
-- ${isChinese ? '食材 用量' : 'ingredient quantity'}
+食材准备：
+- 食材 用量
 
-${isChinese ? '制作方法 (±X分钟)' : 'Instructions (±X mins)'}
-1. ${isChinese ? '步骤' : 'Step'}
-2. ${isChinese ? '步骤' : 'Step'}
+制作方法 (±X分钟)
+1. 步骤
+2. 步骤
 
-${isChinese ? '营养参数:' : 'Nutrition:'}
-- ${isChinese ? '热量: 约X千卡' : 'Calories: approx. X kcal'}
-- ${isChinese ? '蛋白质: X克' : 'Protein: X g'}
-- ${isChinese ? '碳水化合物: X克' : 'Carbohydrates: X g'}
-- ${isChinese ? '脂肪: X克' : 'Fat: X g'}
-- ${isChinese ? '膳食纤维: X克' : 'Dietary Fiber: X g'}
+营养参数：
+- 热量: 约X千卡
+- 蛋白质: X克
+- 碳水化合物: X克
+- 脂肪: X克
+- 膳食纤维: X克
 
-${isChinese ? '风险提示与建议:' : 'Allergens & Safety:'}
-1. ${isChinese ? '食材安全与搭配风险' : 'Food safety and pairing risks'}
-2. ${isChinese ? '额外营养建议' : 'Additional nutritional advice'}
+风险提示与建议：
+1. 食材安全与搭配风险
+2. 额外营养建议
 
 语言：${targetLang}
-人群：${mealType === 'baby' ? (isChinese ? '婴幼儿（无盐无糖）' : 'Baby (no salt/sugar)') : mealType === 'pregnancy' ? (isChinese ? '孕妇' : 'Pregnancy') : (isChinese ? '普通人群' : 'General')}
+人群：${mealType === 'baby' ? '婴幼儿（无盐无糖）' : mealType === 'pregnancy' ? '孕妇' : '普通人群'}
 
-重要：必须完整输出以上所有区块，包括“${isChinese ? '风险提示与建议' : 'Allergens & Safety'}”部分，不可省略。你必须严格使用指定的语言输出全部内容，标题和描述都必须用指定语言，不得混用其他语言。`;
+重要：必须完整输出以上所有区块，包括“风险提示与建议”部分，不可省略。你必须严格使用指定的语言输出全部内容，标题和描述都必须用指定语言，不得混用其他语言。`;
+    
     const generatedName = document.getElementById('recipeNameDisplay').innerText;
     if (generatedName) {
       window.lastSixDishNames.push(generatedName);
