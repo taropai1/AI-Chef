@@ -749,33 +749,34 @@ const langMap = {
 };
 const targetLang = langMap[lang] || 'English';
 
-const systemPrompt = `你是专业营养厨师，只输出纯净食谱文本，无任何符号、无星号、无加粗、无特殊格式。
-严格按以下结构输出，每个标题之间空一行：
+const systemPrompt = `You are a professional chef. Output ONLY a clean recipe text with NO special symbols, markdown, or extra formatting.
 
-菜名（单独一行）
+Follow this structure exactly, with a blank line between sections:
 
-食材准备：
-- 食材 用量
+Dish Name
 
-制作方法 (±X分钟)
-1. 步骤
-2. 步骤
+Ingredients:
+- ingredient amount
 
-营养参数：
-- 热量: 约X千卡
-- 蛋白质: X克
-- 碳水化合物: X克
-- 脂肪: X克
-- 膳食纤维: X克
+Instructions (±X mins)
+1. step
+2. step
 
-风险提示与建议：
-1. 食材安全与搭配风险
-2. 额外营养建议
+Nutrition:
+- Calories: approx. X kcal
+- Protein: X g
+- Carbohydrates: X g
+- Fat: X g
+- Dietary Fiber: X g
 
-语言：${targetLang}
-人群：${mealType === 'baby' ? '婴幼儿（无盐无糖）' : mealType === 'pregnancy' ? '孕妇' : '普通人群'}
+Allergens & Safety:
+1. Food safety and pairing risk
+2. Additional nutritional advice
 
-重要：必须完整输出以上所有区块，包括“风险提示与建议”部分，不可省略。你必须严格使用指定的语言输出全部内容，标题和描述都必须用指定语言，不得混用其他语言。`;
+Language: ${targetLang}
+Suitable for: ${mealType === 'baby' ? 'Baby (no salt/sugar)' : mealType === 'pregnancy' ? 'Pregnancy' : 'General'}
+
+Important: You MUST output the entire recipe, including the 'Allergens & Safety' section, completely in the specified language. DO NOT mix languages.`;
     
     const generatedName = document.getElementById('recipeNameDisplay').innerText;
     if (generatedName) {
@@ -918,7 +919,6 @@ async function askQuestion() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-        // 关键是这里使用 getCurrentLang() 实时获取语言
         const lang = getCurrentLang();
 const langMap = {
   'en': 'English',
@@ -931,7 +931,8 @@ const langMap = {
 };
 const targetLang = langMap[lang] || 'English';
 
-const systemContent = `你是一个专业的营养厨师助手，基于以下食谱回答问题。保持简洁、专业，回答不超过5行，不要使用任何*符号。你必须用${targetLang}回答。\n食谱：\n${userData.lastRecipeText}`;
+const systemContent = `You are a professional nutrition chef assistant. Answer questions based on the provided recipe. Keep responses concise, professional, and no more than 5 lines. Do NOT use any asterisks. You MUST answer in ${targetLang}.\n\nRecipe:\n${userData.lastRecipeText}`;
+        
         
        const response = await fetch(DEEPSEEK_API, {
             method: 'POST',
