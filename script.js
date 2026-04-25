@@ -778,7 +778,7 @@ ${isChinese ? '风险提示与建议:' : 'Allergens & Safety:'}
     const response = await fetch(DEEPSEEK_API, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'deepseek-chat', temperature: 0.9, max_tokens: 1200,
+        model: 'deepseek-v4-flash', temperature: 0.9, max_tokens: 1200,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法。随机种子：${Date.now()}_${Math.random().toString(36)}` }
@@ -916,7 +916,7 @@ const systemContent = `你是一个专业的营养厨师助手，基于以下食
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'deepseek-chat',
+                model: 'deepseek-v4-flash',
                 temperature: 0.3,
                 max_tokens: 300,
                 messages: [
