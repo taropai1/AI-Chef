@@ -1361,9 +1361,15 @@ async function showPage(pageId) {
   if (pageId === 'page-profile') { renderProfile(); renderLanguage(); }
   if (pageId === 'page-home') renderLanguage();
   renderLanguage();
+function switchLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('aiChefLang', lang);
+    document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼';
+    renderLanguage();        // ← 必须补全这一行，立即刷新界面
+    updateLimitInfo();
+    if (userData) renderProfile();
+    document.getElementById('langDropdown').style.display = 'none';
 }
-
-function switchLang(lang) { currentLang = lang; localStorage.setItem('aiChefLang', lang); document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼'; renderLanguage(); updateLimitInfo(); if (userData) renderProfile(); document.getElementById('langDropdown').style.display = 'none'; }
 function addToHome() { if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) { alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。'); } else if (navigator.share) { navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{}); } else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); } }
 function showToast(msg) { alert(msg); } // 简化为alert，无successModal
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
