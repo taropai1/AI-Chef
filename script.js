@@ -806,9 +806,11 @@ Important: You MUST output the entire recipe, including the 'Allergens & Safety'
     renderRecipeContent(recipe);
 
     let displayName = 'Gourmet';
-    if (userData && userData.nickname) displayName = userData.nickname;
-    else if (userData && userData.email) displayName = userData.email.split('@')[0];
-    document.getElementById('personalizedGreeting').innerText = `Dear ${displayName}! Enjoy your meal!`;
+    if (userData && userData.nickname) {
+      displayName = userData.nickname;
+    } else if (userData && userData.email) {
+      displayName = userData.email.split('@')[0];
+    }
 
     addToHistory(recipe);
     userData.lastRecipeText = recipe;
