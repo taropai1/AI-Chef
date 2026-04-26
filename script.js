@@ -1450,29 +1450,6 @@ function addRestoreLink() { const generatorCard = document.querySelector('#page-
   window.addEventListener('click', (e) => { if (e.target === cropModal) cropModal.classList.remove('show'); });
 })();
 
-// ==================== Service Worker ====================
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/service-worker.js').catch(err=>console.log('SW failed:', err)); }); }
-
-// ==================== 初始化 ====================
-(async function init() {
-  await initDeviceId(); userData = await loadUserData(); updateNavButton(); loadHistoryFromCache();
-  document.querySelector('.lang-btn').addEventListener('click', (e) => { e.stopPropagation(); const dd = document.getElementById('langDropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; });
-  document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
-  document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
-  populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
-  document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
-  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
-
-  const videoBtn = document.getElementById('openVideoBtn');
-if (videoBtn) videoBtn.onclick = showVideo;
-  initVideoPlayerControls();
-  document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
-  document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
-  document.getElementById('howToModal').addEventListener('click', (e) => { if (e.target === document.getElementById('howToModal')) closeHowToModal(); });
-  document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
-  document.getElementById('editNicknameBtn').onclick = showNicknameModal;
-  document.getElementById('editEmailBtn').onclick = showEmailModal;
-})();
 // ==================== 语音识别模块 ====================
 (function initVoiceInput() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1595,4 +1572,28 @@ if (videoBtn) videoBtn.onclick = showVideo;
       recognition.lang = langMap[lang] || 'en-US';
     }
   };
+})();
+
+// ==================== Service Worker ====================
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/service-worker.js').catch(err=>console.log('SW failed:', err)); }); }
+
+// ==================== 初始化 ====================
+(async function init() {
+  await initDeviceId(); userData = await loadUserData(); updateNavButton(); loadHistoryFromCache();
+  document.querySelector('.lang-btn').addEventListener('click', (e) => { e.stopPropagation(); const dd = document.getElementById('langDropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; });
+  document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
+  document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
+  populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
+  document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
+  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
+
+  const videoBtn = document.getElementById('openVideoBtn');
+if (videoBtn) videoBtn.onclick = showVideo;
+  initVideoPlayerControls();
+  document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
+  document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
+  document.getElementById('howToModal').addEventListener('click', (e) => { if (e.target === document.getElementById('howToModal')) closeHowToModal(); });
+  document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
+  document.getElementById('editNicknameBtn').onclick = showNicknameModal;
+  document.getElementById('editEmailBtn').onclick = showEmailModal;
 })();
