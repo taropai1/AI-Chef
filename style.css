@@ -468,6 +468,32 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .mic-btn.unsupported {
   display: none !important;
 }
+/* ==================== 布局细节优化 ==================== */
+
+/* 1. 剩余次数位置调整：左对齐，左边预留间距，避免被按钮遮挡 */
+#qaLimitNote {
+    text-align: left;
+    padding-left: 1.6em;
+}
+
+/* 2. 视频按钮底部线条优化：向左渐变消失的精致线，保留原卷边阴影 */
+.btn-video::after {
+    content: '';
+    position: absolute;
+    left: -20px;
+    bottom: -6px;
+    width: calc(100% + 20px);
+    height: 12px;
+    background: linear-gradient(to right, transparent 0%, #e5e7eb 30%, rgba(0, 0, 0, 0.03) 100%);
+    border-radius: 0 0 4px 4px;
+    transform: perspective(20px) rotateX(5deg);
+    transform-origin: top;
+    transition: background 0.2s ease;
+}
+
+.btn-video:hover::after {
+    background: linear-gradient(to right, transparent 0%, #4a90e2 30%, rgba(0, 0, 0, 0.03) 100%);
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
