@@ -471,3 +471,11 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
 @media (max-width:640px){.plans-grid{grid-template-columns:1fr}.video-grid{grid-template-columns:1fr}}
+
+.page.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
