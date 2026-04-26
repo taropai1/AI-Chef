@@ -1607,12 +1607,13 @@ if (videoBtn) videoBtn.onclick = showVideo;
 
                 // 安全重写 switchLang
                 if (typeof window.switchLang === 'function') {
-                    const originalSwitchLang = window.switchLang;
-                    window.switchLang = function(lang) {
-                        try { originalSwitchLang(lang); } catch (e) {}
-                        if (recognition) recognition.lang = langMap[lang] || 'en-US';
-                    };
-                }
+    const originalSwitchLang = window.switchLang;
+    window.switchLang = function(lang) {
+        originalSwitchLang(lang);   // 去掉 try-catch，直接执行
+        if (recognition)
+            recognition.lang = langMap[lang] || 'en-US';
+    };
+}
             } catch (e) {
                 console.warn('语音事件绑定失败', e);
             }
