@@ -1463,7 +1463,8 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
   addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
 
-  document.getElementById('openVideoBtn').onclick = showVideo;
+  const videoBtn = document.getElementById('openVideoBtn');
+if (videoBtn) videoBtn.onclick = showVideo;
   initVideoPlayerControls();
   document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
   document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
