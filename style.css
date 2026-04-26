@@ -343,6 +343,100 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
+/* ==================== 语音输入与发送图标 ==================== */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-with-icon input {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.mic-btn, .send-btn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+  color: #9ca3af;
+}
+
+.mic-btn:hover, .send-btn:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.mic-btn:active, .send-btn:active {
+  transform: scale(0.95);
+}
+
+.mic-btn.recording {
+  color: #ef4444;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 生成器输入框麦克风位置 */
+#dishMicBtn {
+  right: 8px;
+}
+
+/* AI 助手输入框图标位置 */
+.ai-input-wrapper .mic-btn {
+  left: 8px;
+}
+
+.ai-input-wrapper .send-btn {
+  right: 8px;
+}
+
+.ai-input-wrapper input {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* ==================== 视频按钮纸张卷起效果 ==================== */
+.btn-video {
+  position: relative;
+  overflow: visible;
+}
+
+.btn-video::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 12px 12px;
+  border-color: transparent transparent #cc0000 transparent;
+  border-radius: 0 0 6px 0;
+  transition: border-color 0.15s ease;
+}
+
+.btn-video:hover::after {
+  border-bottom-color: #aa0000;
+}
+
+/* 语音不支持时隐藏图标 */
+.mic-btn.unsupported {
+  display: none !important;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
