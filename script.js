@@ -1472,3 +1472,126 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
 })();
+// ==================== 语音识别模块 ====================
+(function initVoiceInput() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    // 不支持语音识别，隐藏所有麦克风图标
+    document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.add('unsupported'));
+    return;
+  }
+
+  const langMap = {
+    'en': 'en-US',
+    'es': 'es-ES',
+    'fr': 'fr-FR',
+    'de': 'de-DE',
+    'it': 'it-IT',
+    'pt': 'pt-PT',
+    'zh-CN': 'zh-CN'
+  };
+
+  let recognition = null;
+  let activeInput = null;
+  let activeBtn = null;
+
+  function startRecognition(inputEl, btnEl) {
+    if (recognition) recognition.abort();
+    
+    recognition = new SpeechRecognition();
+    recognition.lang = langMap[getCurrentLang()] || 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      inputEl.value = transcript;
+      inputEl.focus();
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error === 'not-allowed') {
+        alert('麦克风权限被拒绝，请在浏览器设置中允许麦克风访问。');
+      }
+      stopRecognition();
+    };
+
+    recognition.onend = () => {
+      stopRecognition();
+    };
+
+    recognition.start();
+    activeInput = inputEl;
+    activeBtn = btnEl;
+    btnEl.classList.add('recording');
+  }
+
+  function stopRecognition() {
+    if (recognition) {
+      recognition.abort();
+      recognition = null;
+    }
+    if (activeBtn) {
+      activeBtn.classList.remove('recording');
+      activeBtn = null;
+    }
+    activeInput = null;
+  }
+
+  // 生成器输入框麦克风
+  const dishMicBtn = document.getElementById('dishMicBtn');
+  const dishInput = document.getElementById('dishName');
+  if (dishMicBtn && dishInput) {
+    dishMicBtn.addEventListener('click', () => {
+      if (activeInput === dishInput) {
+        stopRecognition();
+      } else {
+        startRecognition(dishInput, dishMicBtn);
+      }
+    });
+  }
+
+  // AI 助手输入框麦克风
+  const qaMicBtn = document.getElementById('qaMicBtn');
+  const qaInput = document.getElementById('qaInput');
+  if (qaMicBtn && qaInput) {
+    qaMicBtn.addEventListener('click', () => {
+      if (activeInput === qaInput) {
+        stopRecognition();
+      } else {
+        startRecognition(qaInput, qaMicBtn);
+      }
+    });
+  }
+
+  // 发送箭头触发问答
+  const qaSendBtn = document.getElementById('qaSendBtn');
+  if (qaSendBtn) {
+    qaSendBtn.addEventListener('click', () => {
+      if (qaInput.value.trim()) {
+        askQuestion();
+      }
+    });
+  }
+
+  // 回车发送
+  qaInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && qaInput.value.trim()) {
+      e.preventDefault();
+      askQuestion();
+    }
+  });
+
+  // 语言切换时更新识别语言
+  const originalSwitchLang = window.switchLang;
+  window.switchLang = function(lang) {
+    originalSwitchLang(lang);
+    if (recognition) {
+      recognition.lang = langMap[lang] || 'en-US';
+    }
+  };
+})();
