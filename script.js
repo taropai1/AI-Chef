@@ -744,7 +744,7 @@ const langMap = {
 };
 const targetLang = langMap[lang] || 'English';
 
-const systemPrompt = `You are a professional chef. Output ONLY clean recipe text with NO special symbols, markdown, or extra formatting.
+  const systemPrompt = `You are a professional chef. Output ONLY clean recipe text with NO special symbols, markdown, or extra formatting.
 
 Follow this structure exactly, with a blank line between sections:
 
@@ -771,7 +771,7 @@ Allergens & Safety:
 Language: ${targetLang}
 Suitable for: ${mealType === 'baby' ? 'Baby (no salt/sugar)' : mealType === 'pregnancy' ? 'Pregnancy' : 'General'}
 
-IMPORTANT: You MUST translate ALL section headings (e.g. "Ingredients", "Instructions", "Nutrition", "Allergens & Safety") and ALL nutrient labels (e.g. "Calories", "Protein", "Carbohydrates", "Fat", "Dietary Fiber") into ${targetLang}. The entire output, including every single word and abbreviation (kcal, g, mg), must be in ${targetLang} only. Do not mix languages.
+CRITICAL: You MUST translate ALL section headings (e.g. "Ingredients", "Instructions", "Nutrition", "Allergens & Safety") and ALL nutrient labels (e.g. "Calories", "Protein", "Carbohydrates", "Fat", "Dietary Fiber") into ${targetLang}. The entire output, including every single word and abbreviation (kcal, g, mg), must be in ${targetLang} only. Do not mix languages.`;
     
     const generatedName = document.getElementById('recipeNameDisplay').innerText;
     if (generatedName) {
