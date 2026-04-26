@@ -1408,7 +1408,8 @@ function switchLang(lang) {
     currentLang = lang;
     localStorage.setItem('aiChefLang', lang);
     document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼';
-    renderLanguage();        // ← 必须补全这一行，立即刷新界面
+    document.documentElement.lang = lang;   // ← 新增这一行
+    renderLanguage(); 
     updateLimitInfo();
     if (userData) renderProfile();
     document.getElementById('langDropdown').style.display = 'none';
