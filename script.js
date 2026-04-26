@@ -1266,8 +1266,6 @@ function renderLanguage() {
   safeText('btnGenerate', 'generate');
   safeText('aiAssistTitle', 'aiAssistTitle');
   safePlaceholder('qaInput', 'enterQuestion');
-  const askBtn = document.getElementById('askBtn');
-if (askBtn) askBtn.innerText = 'Ask';
   safeText('dishNameHint', 'dishNameHint');
   safeHtml('openVideoBtn', t('watchVideo'));
   safeHtml('addToHomeBtn', '+');
