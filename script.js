@@ -1608,7 +1608,9 @@ if (videoBtn) videoBtn.onclick = showVideo;
                 if (typeof window.switchLang === 'function') {
     const originalSwitchLang = window.switchLang;
     window.switchLang = function(lang) {
-        originalSwitchLang(lang);   // 去掉 try-catch，直接执行
+        try {
+            originalSwitchLang(lang);   // 保留 try-catch，做好错误隔离
+        } catch (e) {}
         if (recognition)
             recognition.lang = langMap[lang] || 'en-US';
     };
