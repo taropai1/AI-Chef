@@ -816,8 +816,10 @@ Important: You MUST output the entire recipe, including the 'Allergens & Safety'
     else {
       userData.dailyUsed = res.dailyUsed;
       userData.qLeft = res.qLeft;
-      document.getElementById('qaInput').disabled = false;
-      document.getElementById('askBtn').disabled = false;
+      const qaInputEl = document.getElementById('qaInput');
+const sendBtn = document.getElementById('qaSendBtn');
+if (qaInputEl) qaInputEl.disabled = false;
+if (sendBtn) sendBtn.disabled = false;
       document.getElementById('qaHistory').innerHTML = '';
       document.getElementById('qaLimitNote').innerText = `${t('qLeft')}: ${userData.qLeft}`;
     }
