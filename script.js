@@ -1402,16 +1402,6 @@ async function showPage(pageId) {
         renderLanguage();
     renderLanguage();
 }
-    target.style.display = 'block';
-    target.style.visibility = 'visible';
-    target.style.opacity = '1';
-    target.style.position = 'relative';
-    target.style.zIndex = '1';
-    target.style.top = 'auto';
-    target.style.left = 'auto';
-    target.style.clipPath = 'none';
-    target.style.transform = 'none';
-
     // 以下完全是您原有的业务逻辑，不动
     if (pageId === 'page-generator') {
         if (userData)
