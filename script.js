@@ -771,7 +771,7 @@ Allergens & Safety:
 Language: ${targetLang}
 Suitable for: ${mealType === 'baby' ? 'Baby (no salt/sugar)' : mealType === 'pregnancy' ? 'Pregnancy' : 'General'}
 
-Important: You MUST output the entire recipe, including the 'Allergens & Safety' section, completely in the specified language. DO NOT mix languages.`;
+IMPORTANT: You MUST translate ALL section headings (e.g. "Ingredients", "Instructions", "Nutrition", "Allergens & Safety") and ALL nutrient labels (e.g. "Calories", "Protein", "Carbohydrates", "Fat", "Dietary Fiber") into ${targetLang}. The entire output, including every single word and abbreviation (kcal, g, mg), must be in ${targetLang} only. Do not mix languages.
     
     const generatedName = document.getElementById('recipeNameDisplay').innerText;
     if (generatedName) {
