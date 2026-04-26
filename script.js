@@ -1450,11 +1450,33 @@ function addRestoreLink() { const generatorCard = document.querySelector('#page-
   window.addEventListener('click', (e) => { if (e.target === cropModal) cropModal.classList.remove('show'); });
 })();
 
+// ==================== Service Worker ====================
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/service-worker.js').catch(err=>console.log('SW failed:', err)); }); }
+
+// ==================== 初始化 ====================
+(async function init() {
+  await initDeviceId(); userData = await loadUserData(); updateNavButton(); loadHistoryFromCache();
+  document.querySelector('.lang-btn').addEventListener('click', (e) => { e.stopPropagation(); const dd = document.getElementById('langDropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; });
+  document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
+  document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
+  populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
+  document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
+  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
+
+  const videoBtn = document.getElementById('openVideoBtn');
+if (videoBtn) videoBtn.onclick = showVideo;
+  initVideoPlayerControls();
+  document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
+  document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
+  document.getElementById('howToModal').addEventListener('click', (e) => { if (e.target === document.getElementById('howToModal')) closeHowToModal(); });
+  document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
+  document.getElementById('editNicknameBtn').onclick = showNicknameModal;
+  document.getElementById('editEmailBtn').onclick = showEmailModal;
+})();
 // ==================== 语音识别模块 ====================
 (function initVoiceInput() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    // 不支持语音识别，隐藏所有麦克风图标
     document.querySelectorAll('.mic-btn').forEach(btn => btn.classList.add('unsupported'));
     return;
   }
@@ -1466,51 +1488,64 @@ function addRestoreLink() { const generatorCard = document.querySelector('#page-
     'de': 'de-DE',
     'it': 'it-IT',
     'pt': 'pt-PT',
+    'zh': 'zh-CN',
     'zh-CN': 'zh-CN'
   };
+
+  // 安全获取当前页面语言：取 <html lang> 的前两个字符，默认中文
+  function getCurrentLangSafely() {
+    const htmlLang = document.documentElement.lang || 'zh';
+    const key = htmlLang.slice(0, 2).toLowerCase();
+    return langMap[key] ? key : 'zh';
+  }
 
   let recognition = null;
   let activeInput = null;
   let activeBtn = null;
 
   function startRecognition(inputEl, btnEl) {
-    if (recognition) recognition.abort();
-    
-    recognition = new SpeechRecognition();
-    recognition.lang = langMap[getCurrentLang()] || 'en-US';
-    recognition.interimResults = true;
-    recognition.continuous = true;
-    recognition.maxAlternatives = 1;
+    try {
+      if (recognition) recognition.abort();
+      
+      recognition = new SpeechRecognition();
+      recognition.lang = langMap[getCurrentLangSafely()] || 'zh-CN';
+      recognition.interimResults = true;
+      recognition.continuous = true;
+      recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
-      }
-      inputEl.value = transcript;
-      inputEl.focus();
-    };
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        inputEl.value = transcript;
+        inputEl.focus();
+      };
 
-    recognition.onerror = (event) => {
-      if (event.error === 'not-allowed') {
-        alert('麦克风权限被拒绝，请在浏览器设置中允许麦克风访问。');
-      }
+      recognition.onerror = (event) => {
+        if (event.error === 'not-allowed') {
+          alert('麦克风权限被拒绝，请在浏览器设置中允许麦克风访问。');
+        }
+        stopRecognition();
+      };
+
+      recognition.onend = () => {
+        stopRecognition();
+      };
+
+      recognition.start();
+      activeInput = inputEl;
+      activeBtn = btnEl;
+      btnEl.classList.add('recording');
+    } catch (e) {
+      console.warn('语音启动失败', e);
       stopRecognition();
-    };
-
-    recognition.onend = () => {
-      stopRecognition();
-    };
-
-    recognition.start();
-    activeInput = inputEl;
-    activeBtn = btnEl;
-    btnEl.classList.add('recording');
+    }
   }
 
   function stopRecognition() {
     if (recognition) {
-      recognition.abort();
+      try { recognition.abort(); } catch (e) {}
       recognition = null;
     }
     if (activeBtn) {
@@ -1546,54 +1581,34 @@ function addRestoreLink() { const generatorCard = document.querySelector('#page-
     });
   }
 
-  // 发送箭头触发问答
+  // 发送箭头触发问答（保护 askQuestion 可能不存在）
   const qaSendBtn = document.getElementById('qaSendBtn');
-  if (qaSendBtn) {
+  if (qaSendBtn && typeof askQuestion === 'function') {
     qaSendBtn.addEventListener('click', () => {
-      if (qaInput.value.trim()) {
+      if (qaInput && qaInput.value.trim()) {
         askQuestion();
       }
     });
   }
 
   // 回车发送
-  qaInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && qaInput.value.trim()) {
-      e.preventDefault();
-      askQuestion();
-    }
-  });
+  if (qaInput && typeof askQuestion === 'function') {
+    qaInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && qaInput.value.trim()) {
+        e.preventDefault();
+        askQuestion();
+      }
+    });
+  }
 
-  // 语言切换时更新识别语言
-  const originalSwitchLang = window.switchLang;
-  window.switchLang = function(lang) {
-    originalSwitchLang(lang);
-    if (recognition) {
-      recognition.lang = langMap[lang] || 'en-US';
-    }
-  };
-})();
-
-// ==================== Service Worker ====================
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/service-worker.js').catch(err=>console.log('SW failed:', err)); }); }
-
-// ==================== 初始化 ====================
-(async function init() {
-  await initDeviceId(); userData = await loadUserData(); updateNavButton(); loadHistoryFromCache();
-  document.querySelector('.lang-btn').addEventListener('click', (e) => { e.stopPropagation(); const dd = document.getElementById('langDropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; });
-  document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
-  document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
-  populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
-  document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
-  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
-
-  const videoBtn = document.getElementById('openVideoBtn');
-if (videoBtn) videoBtn.onclick = showVideo;
-  initVideoPlayerControls();
-  document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
-  document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
-  document.getElementById('howToModal').addEventListener('click', (e) => { if (e.target === document.getElementById('howToModal')) closeHowToModal(); });
-  document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
-  document.getElementById('editNicknameBtn').onclick = showNicknameModal;
-  document.getElementById('editEmailBtn').onclick = showEmailModal;
+  // 语言切换时更新识别语言（安全重写）
+  if (typeof window.switchLang === 'function') {
+    const originalSwitchLang = window.switchLang;
+    window.switchLang = function(lang) {
+      originalSwitchLang(lang);
+      if (recognition) {
+        recognition.lang = langMap[lang] || 'zh-CN';
+      }
+    };
+  }
 })();
