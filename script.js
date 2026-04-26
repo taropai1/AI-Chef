@@ -976,7 +976,8 @@ const systemContent = `You are a professional nutrition chef assistant. Answer q
         historyEl.innerHTML += `<div class="qa"><a>Error, please try again.</a></div>`;
         historyEl.scrollTop = historyEl.scrollHeight;
     } finally {
-        askBtn.disabled = false;
+        const sendBtn = document.getElementById('qaSendBtn');
+if (sendBtn) sendBtn.disabled = false;
         document.getElementById('qaInput').value = '';
     }
 }
