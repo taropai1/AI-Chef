@@ -940,8 +940,7 @@ if (sendBtn) sendBtn.disabled = true;
 const langMap = { /* 同上 */ };
 const targetLang = langMap[lang] || 'English';
 
-const systemContent = `You are a professional nutrition chef assistant. Answer questions based on the provided recipe. Keep responses concise, professional, and no more than 5 lines. Do NOT use any asterisks. You MUST answer in ${targetLang}.\n\nRecipe:\n${userData.lastRecipeText}`;
-        
+      const systemContent = `You are a professional nutrition chef assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks. The following recipe is for reference:\n\n${userData.lastRecipeText}`;
        const response = await fetch(DEEPSEEK_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
