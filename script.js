@@ -1402,23 +1402,6 @@ async function showPage(pageId) {
         renderLanguage();
     renderLanguage();
 }
-    // 以下完全是您原有的业务逻辑，不动
-    if (pageId === 'page-generator') {
-        if (userData)
-            await refreshUserData();
-        updateLimitInfo();
-        populateCuisines();
-    }
-    if (pageId === 'page-subscribe')
-        renderPayPal();
-    if (pageId === 'page-profile') {
-        renderProfile();
-        renderLanguage();
-    }
-    if (pageId === 'page-home')
-        renderLanguage();
-    renderLanguage();
-}
 
 function switchLang(lang) {
     currentLang = lang;
