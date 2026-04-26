@@ -926,8 +926,8 @@ async function askQuestion() {
     if (!question)
         return;
 
-    const askBtn = document.getElementById('askBtn');
-    askBtn.disabled = true;
+    const sendBtn = document.getElementById('qaSendBtn');
+if (sendBtn) sendBtn.disabled = true;
     const historyEl = document.getElementById('qaHistory');  // 注意 ID 是 qaHistory
     historyEl.innerHTML += `<div class="qa"><q>${question}</q></div>`;
     historyEl.scrollTop = historyEl.scrollHeight;  //  自动滚动到底部
