@@ -787,7 +787,7 @@ IMPORTANT: You MUST translate ALL section headings (e.g. "Ingredients", "Instruc
         model: 'deepseek-v4-flash', temperature: 0.9, max_tokens: 1200,
         messages: [
           { role: 'system', content: systemPrompt },
-         { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法。随机种子：${Date.now()}_${Math.random().toString(36)}` }
+        { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法。随机种子：${Date.now()}_${Math.random().toString(36)}` }
         ],
         cache_prefix: 'ai_chef_recipe_',
       }),
