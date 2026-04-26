@@ -1384,23 +1384,24 @@ function renderProfile() {
 }
 
 async function showPage(pageId) {
-    // 关闭所有可能的弹窗和遮罩层
-    const overlays = document.querySelectorAll(
-        '.modal-overlay, .modal-overlay-new, .video-modal, .video-player, #howToModal, #forgotModal, #nicknameModal, #emailModal, #cropModal'
-    );
-    overlays.forEach(o => o.classList.remove('show'));
-
-    // 彻底重置所有页面容器的内联样式和 active 状态
-    document.querySelectorAll('.page').forEach(p => {
-        p.classList.remove('active');
-        p.style.cssText = '';   // 清除一切先前写入的内联属性
-    });
-
-    const target = document.getElementById(pageId);
-    if (!target) return;
-
-    target.classList.add('active');
-    // 强制设置可见性，确保不被任何 CSS 残留或遮挡影响
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    if (pageId === 'page-generator') {
+        if (userData)
+            await refreshUserData();
+        updateLimitInfo();
+        populateCuisines();
+    }
+    if (pageId === 'page-subscribe')
+        renderPayPal();
+    if (pageId === 'page-profile') {
+        renderProfile();
+        renderLanguage();
+    }
+    if (pageId === 'page-home')
+        renderLanguage();
+    renderLanguage();
+}
     target.style.display = 'block';
     target.style.visibility = 'visible';
     target.style.opacity = '1';
