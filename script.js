@@ -937,7 +937,15 @@ if (sendBtn) sendBtn.disabled = true;
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
         const lang = getCurrentLang();
-const langMap = { /* 同上 */ };
+const langMap = {
+    'en': 'English',
+    'es': 'Español',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'it': 'Italiano',
+    'pt': 'Português',
+    'zh-CN': '中文'
+};
 const targetLang = langMap[lang] || 'English';
 
       const systemContent = `You are a professional nutrition chef assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks. The following recipe is for reference:\n\n${userData.lastRecipeText}`;
