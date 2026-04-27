@@ -468,32 +468,63 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .mic-btn.unsupported {
   display: none !important;
 }
-/* ==================== 布局细节优化 ==================== */
+/* ========== 布局与细节最终优化 ========== */
 
-/* 1. 剩余次数位置调整：左对齐，左边预留间距，避免被按钮遮挡 */
+/* 1. 加大卡片底部空间，彻底解决遮挡 */
+.ai-bottom {
+    position: relative;          /* 为了让按钮相对定位 */
+    padding-bottom: 32px;        /* 留出充足空间放按钮和文字 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
+
+/* 2. 剩余次数左对齐且不被遮挡 */
 #qaLimitNote {
     text-align: left;
-    padding-left: 0.8em; /* 调整至合适的间距，不贴边 */
+    padding-left: 0.8em;         /* 适度的左侧间距 */
+    line-height: 1.2;
+    z-index: 2;                  /* 防止被按钮盖住 */
 }
 
-.btn-video:hover::after {
-    background: linear-gradient(to right, transparent 0%, #4a90e2 30%, rgba(0, 0, 0, 0.03) 100%);
-}
-/* 新增的底部延长线：用内阴影或外阴影模拟极细线条 */
+/* 3. 视频按钮位置微调 */
 .btn-video {
-    position: relative; /* 确保定位参考 */
-    box-shadow: 
-        0 1px 0 0 #e5e7eb, /* 模拟1px的底部边框线，默认灰色 */
-        -20px 0 8px -8px rgba(0,0,0,0.03); /* 保留原有的柔和阴影感 */
-    transition: box-shadow 0.2s ease; /* 平滑过渡 */
+    position: absolute;
+    right: 16px;
+    bottom: 12px;                /* 适度上移，留出透气空间 */
+    margin: 0;
+    z-index: 1;
 }
 
-/* 鼠标悬停时：高光线变为湖蓝色 */
-.btn-video:hover {
-    box-shadow: 
-        0 1px 0 0 #4a90e2, /* 底部线变蓝色 */
-        -20px 0 8px -8px rgba(0,0,0,0.03);
+/* 4. 保留原有卷边阴影，完全不动 */
+.btn-video::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 12px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.03), transparent);
+    border-radius: 0 0 4px 4px;
+    transform: perspective(20px) rotateX(5deg);
+    transform-origin: top;
+}
+
+/* 5. 新增：极细高光底部线条，向左延伸渐变消失 */
+.btn-video::before {
+    content: '';
+    position: absolute;
+    left: -24px;                  /* 向左延伸 */
+    bottom: 0;
+    width: calc(100% + 24px);
+    height: 1px;                  /* 极细的线条 */
+    background: linear-gradient(to right, transparent 0%, #e5e7eb 40%, #e5e7eb 100%);
+    transition: background 0.2s ease;
+}
+
+/* 悬停时线条变为高亮湖蓝色 */
+.btn-video:hover::before {
+    background: linear-gradient(to right, transparent 0%, #4a90e2 40%, #4a90e2 100%);
 }
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
