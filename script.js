@@ -1166,14 +1166,13 @@ async function sendEmailChangeCode() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { alert('Invalid email'); return; }
   const btn = document.getElementById('sendEmailChangeCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
   try {
+    const token = localStorage.getItem('authToken');
+    if (!token) throw new Error('Not logged in');
     const res = await fetch("https://auth.taropai.com/api/send-email-change-code", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        const token = localStorage.getItem('authToken');
-if (!token) throw new Error('Not logged in');
-// 然后在 headers 里用
-"Authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({ newEmail, lang: getCurrentLang() })
     });
