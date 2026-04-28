@@ -1162,25 +1162,32 @@ async function sendResetCode() {
   catch (e) { if (e.message.includes('not found')) { alert('Email not found. Please register first.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
 }
 async function sendEmailChangeCode() {
+  var userToken = localStorage.getItem('authToken');
   const newEmail = document.getElementById('newEmailInput').value;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { alert('Invalid email'); return; }
-  const btn = document.getElementById('sendEmailChangeCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
+  const btn = document.getElementById('sendEmailChangeCodeBtn');
+  const originalText = btn.innerText;
+  btn.disabled = true; btn.innerText = t('sending');
   try {
-    const token = localStorage.getItem('authToken');
-    if (!token) throw new Error('Not logged in');
+    if (!userToken) throw new Error('Not logged in');
     const res = await fetch("https://auth.taropai.com/api/send-email-change-code", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${userToken}`
       },
       body: JSON.stringify({ newEmail, lang: getCurrentLang() })
     });
     const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'send failed');
-    alert(t('codeSent')); startCountdown('sendEmailChangeCodeBtn', 60);
+    if (!data.success) throw new Error(data.error || JSON.stringify(data));
+    alert(t('codeSent'));
+    startCountdown('sendEmailChangeCodeBtn', 60);
+  } catch (e) {
+    if (e.message.includes('already used')) alert('New email already used by another account.');
+    else if (e.message.includes('Not logged in')) alert('Please log in first.');
+    else alert(t('codeSendFailed') + ': ' + e.message);
+    btn.disabled = false; btn.innerText = originalText;
   }
-  catch (e) { if (e.message.includes('already used')) { alert('New email already used by another account.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
 }
 
 // ==================== 密码小眼睛 ====================
