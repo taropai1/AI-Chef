@@ -1133,21 +1133,48 @@ async function sendVerificationCode() {
   const email = document.getElementById('registerEmail').value;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
   const btn = document.getElementById('sendCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
-  try { await apiCall('/api/send-verification-code', { method: 'POST', body: JSON.stringify({ email }) }); alert(t('codeSent')); startCountdown('sendCodeBtn', 60); }
+  try { const code = Math.floor(100000 + Math.random() * 900000).toString();
+const lang = localStorage.getItem('preferredLanguage') || 'en';
+const res = await fetch("https://email.taropai.com", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ to: email, code, lang })
+});
+const data = await res.json();
+if (!data.success) throw new Error('send failed');
+sessionStorage.setItem('registerVerifyCode', code); alert(t('codeSent')); startCountdown('sendCodeBtn', 60); }
   catch (e) { if (e.message.includes('already registered')) { alert('Email already registered. Please login.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
 }
 async function sendResetCode() {
   const email = document.getElementById('forgotEmail').value;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
   const btn = document.getElementById('sendResetCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
-  try { await apiCall('/api/send-reset-code', { method: 'POST', body: JSON.stringify({ email }) }); alert(t('codeSent')); startCountdown('sendResetCodeBtn', 60); }
+  try { const code = Math.floor(100000 + Math.random() * 900000).toString();
+const lang = localStorage.getItem('preferredLanguage') || 'en';
+const res = await fetch("https://email.taropai.com", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ to: email, code, lang })
+});
+const data = await res.json();
+if (!data.success) throw new Error('send failed');
+sessionStorage.setItem('resetVerifyCode', code); alert(t('codeSent')); startCountdown('sendResetCodeBtn', 60); }
   catch (e) { if (e.message.includes('not found')) { alert('Email not found. Please register first.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
 }
 async function sendEmailChangeCode() {
   const newEmail = document.getElementById('newEmailInput').value;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { alert('Invalid email'); return; }
   const btn = document.getElementById('sendEmailChangeCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
-  try { await apiCall('/api/send-email-change-code', { method: 'POST', body: JSON.stringify({ newEmail }) }); alert(t('codeSent')); startCountdown('sendEmailChangeCodeBtn', 60); }
+  try { const code = Math.floor(100000 + Math.random() * 900000).toString();
+const lang = localStorage.getItem('preferredLanguage') || 'en';
+const res = await fetch("https://email.taropai.com", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ to: newEmail, code, lang })
+});
+const data = await res.json();
+if (!data.success) throw new Error('send failed');
+sessionStorage.setItem('changeEmailVerifyCode', code); alert(t('codeSent')); startCountdown('sendEmailChangeCodeBtn', 60); }
   catch (e) { if (e.message.includes('already used')) { alert('New email already used by another account.'); } else { alert(t('codeSendFailed') + ': ' + e.message); } btn.disabled = false; btn.innerText = originalText; }
 }
 
