@@ -214,7 +214,7 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .auth-container{max-width:400px;width:100%;margin:40px auto;padding:0 16px}
 .auth-card-new{background:#fff;border-radius:20px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:32px 28px}
 .auth-tabs{display:flex;border-bottom:1px solid #e5e7eb;margin-bottom:24px}
-.auth-tab{flex:1;text-align:center;padding:12px 0;font-size:16px;font-weight:600;color:#9ca3af;cursor:pointer;border-bottom:2px solid transparent}
+.auth-tab{flex:1;text-align:center;padding:12px 0;font-size:16px;font-weight:600;color:#9ca3af;cursor:pointer;border-bottom:1px solid transparent}
 .auth-tab.active{color:#4a90e2;border-bottom-color:#4a90e2}
 .auth-panel{display:none}
 .auth-panel.active{display:block}
