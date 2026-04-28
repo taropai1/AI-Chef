@@ -1135,10 +1135,10 @@ async function sendVerificationCode() {
   const btn = document.getElementById('sendCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
   try { const code = Math.floor(100000 + Math.random() * 900000).toString();
 const lang = localStorage.getItem('preferredLanguage') || 'en';
-const res = await fetch("https://email.taropai.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ to: email, code, lang })
+const res = await fetch("https://auth.taropai.com/api/send-verification-code", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, lang: navigator.language?.split('-')[0] || 'en' })
 });
 const data = await res.json();
 if (!data.success) throw new Error('send failed');
@@ -1151,10 +1151,10 @@ async function sendResetCode() {
   const btn = document.getElementById('sendResetCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
   try { const code = Math.floor(100000 + Math.random() * 900000).toString();
 const lang = localStorage.getItem('preferredLanguage') || 'en';
-const res = await fetch("https://email.taropai.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ to: email, code, lang })
+const res = await fetch("https://auth.taropai.com/api/send-reset-code", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, lang: navigator.language?.split('-')[0] || 'en' })
 });
 const data = await res.json();
 if (!data.success) throw new Error('send failed');
@@ -1167,10 +1167,13 @@ async function sendEmailChangeCode() {
   const btn = document.getElementById('sendEmailChangeCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
   try { const code = Math.floor(100000 + Math.random() * 900000).toString();
 const lang = localStorage.getItem('preferredLanguage') || 'en';
-const res = await fetch("https://email.taropai.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ to: newEmail, code, lang })
+const res = await fetch("https://auth.taropai.com/api/send-email-change-code", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${userToken}`
+  },
+  body: JSON.stringify({ newEmail, lang: navigator.language?.split('-')[0] || 'en' })
 });
 const data = await res.json();
 if (!data.success) throw new Error('send failed');
