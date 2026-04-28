@@ -1122,6 +1122,16 @@ if (qaLimitNote) qaLimitNote.innerText = '';
   showPage('page-home'); updateNavButton(); renderProfile(); updateLimitInfo();
 }
 
+// 自动填充注册验证码（从邮件链接跳转过来时）
+const urlParams = new URLSearchParams(window.location.search);
+const autoCode = urlParams.get('code');
+if (autoCode) {
+  const codeInput = document.getElementById('registerCode');
+  if (codeInput) {
+    codeInput.value = autoCode;
+  }
+}
+
 // ==================== 验证码发送 ====================
 let countdowns = {};
 function startCountdown(btnId, seconds) {
@@ -1532,6 +1542,16 @@ if (videoBtn) videoBtn.onclick = showVideo;
   document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
+  // 自动填充修改邮箱验证码（从邮件链接跳转过来时）
+const urlParams = new URLSearchParams(window.location.search);
+const autoCode = urlParams.get('code');
+const action = urlParams.get('action');
+if (autoCode && action === 'changeEmail') {
+  const codeInput = document.getElementById('emailChangeCode');
+  if (codeInput) {
+    codeInput.value = autoCode;
+  }
+}
 })();
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
