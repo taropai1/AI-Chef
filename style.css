@@ -436,6 +436,13 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     transition: all 0.2s ease;
 }
 
+#qaLimitNote {
+    text-align: left !important;   /* 强制靠左 */
+    padding-left: 16px !important; /* 左边留空 4格 间距 */
+    line-height: 1.2;
+    z-index: 10;
+}
+
 /* 纸张卷起阴影效果 */
 .btn-video::after {
     content: '';
