@@ -32,14 +32,14 @@
             document.getElementById('status').innerHTML = '<span class="success">Email verified successfully!</span><br>Redirecting...';
             localStorage.setItem('verifiedEmail', data.email);
             if (data.type === 'register') {
-              window.location.href = '/?action=register&email=' + encodeURIComponent(data.email);
-            } else if (data.type === 'reset') {
-              window.location.href = '/?action=reset&email=' + encodeURIComponent(data.email);
-            } else if (data.type === 'changeEmail') {
-              window.location.href = '/?action=changeEmail&email=' + encodeURIComponent(data.newEmail || data.email);
-            } else {
-              window.location.href = '/';
-            }
+  window.location.href = `/?action=register&email=${encodeURIComponent(data.email)}&code=${data.code || ''}`;
+} else if (data.type === 'reset') {
+  window.location.href = `/?action=reset&email=${encodeURIComponent(data.email)}`;
+} else if (data.type === 'changeEmail') {
+  window.location.href = `/?action=changeEmail&email=${encodeURIComponent(data.newEmail || data.email)}&code=${data.code || ''}`;
+} else {
+  window.location.href = '/';
+}         
           } else {
             document.getElementById('status').innerHTML = '<span class="error">Link expired or invalid. Please use the verification code sent to your email.</span>';
           }
