@@ -1170,7 +1170,10 @@ async function sendEmailChangeCode() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${userToken}`
+        const token = localStorage.getItem('authToken');
+if (!token) throw new Error('Not logged in');
+// 然后在 headers 里用
+"Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({ newEmail, lang: getCurrentLang() })
     });
