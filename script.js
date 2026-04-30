@@ -1168,14 +1168,59 @@ function resetGeneratorState() {
 
 // 初始化：绑定事件
 function initNewGenerator() {
-    // 模式按钮
+    // ========== 模式按钮 ==========
     document.getElementById('modeBtnRecipe')?.addEventListener('click', () => switchMode('recipe'));
     document.getElementById('modeBtnQA')?.addEventListener('click', () => switchMode('qa'));
 
-    // 发送按钮
+    // 设置模式按钮多语言文本
+    const recipeBtn = document.getElementById('modeBtnRecipe');
+    const qaBtn = document.getElementById('modeBtnQA');
+    if (recipeBtn) recipeBtn.innerText = getModeBtnText('Generate Recipe');
+    if (qaBtn) qaBtn.innerText = getModeBtnText('AI Assistant');
+
+    // ========== 分类下拉 ==========
+    document.getElementById('categoryBtn')?.addEventListener('click', () => toggleDropdown('category'));
+    const categoryItems = document.querySelectorAll('#categoryMenu .dropdown-item');
+    categoryItems.forEach(item => {
+        item.addEventListener('click', function() {
+            selectItem('category', this);
+            // 同步到原有 mealType 变量
+            const text = this.textContent.trim();
+            const originalSelect = document.getElementById('mealType');
+            if (originalSelect) {
+                const opt = Array.from(originalSelect.options).find(o => o.text === text || o.value === text.toLowerCase());
+                if (opt) originalSelect.value = opt.value;
+            }
+        });
+    });
+
+    // ========== 菜系下拉 (动态填充后绑定事件) ==========
+    populateCuisines(); // 填充菜系菜单
+    document.getElementById('cuisineBtn')?.addEventListener('click', () => toggleDropdown('cuisine'));
+    // 注意：菜系的点击事件需要委托，因为菜单项是动态生成的
+    document.getElementById('cuisineMenu')?.addEventListener('click', function(e) {
+        const item = e.target.closest('.dropdown-item');
+        if (!item) return;
+        selectItem('cuisine', item);
+        // 同步到原有 cuisine 选择框
+        const originalSelect = document.getElementById('cuisine');
+        if (originalSelect) {
+            const text = item.textContent.trim();
+            const opt = Array.from(originalSelect.options).find(o => o.text === text || o.value === text);
+            if (opt) originalSelect.value = opt.value;
+        }
+    });
+
+    // 默认选中第一项
+    const categoryBtn = document.getElementById('categoryBtn');
+    if (categoryBtn) categoryBtn.textContent = t('optStandard') || 'Standard';
+    const cuisineBtn = document.getElementById('cuisineBtn');
+    if (cuisineBtn) cuisineBtn.textContent = CUISINES[0] || 'American';
+
+    // ========== 发送按钮 ==========
     document.getElementById('qaSendBtn')?.addEventListener('click', handleSend);
 
-    // 回车发送
+    // ========== 回车发送 ==========
     const input = document.getElementById('dishName');
     if (input) {
         input.addEventListener('keydown', (e) => {
@@ -1186,20 +1231,13 @@ function initNewGenerator() {
         });
     }
 
-    // 设置模式按钮多语言文本（初始化时更新一次）
-    document.getElementById('modeBtnRecipe').innerText = getModeBtnText('Generate Recipe');
-    document.getElementById('modeBtnQA').innerText = getModeBtnText('AI Assistant');
+    // ========== 语音按钮（对接已有语音模块） ==========
+    // 语音模块会自动寻找 #dishMicBtn 进行绑定，无需额外代码
 
-    // 初始化下拉
-    populateCuisines();
-    // 默认选中第一项
-    document.getElementById('categoryBtn').innerText = t('optStandard') || 'Standard';
-    document.getElementById('cuisineBtn').innerText = CUISINES[0] || 'American';
-
-    // 启动时重置状态
+    // ========== 启动时重置状态 ==========
     resetGeneratorState();
+    switchMode('recipe');
 }
-
 // 在页面加载后调用 initNewGenerator（整合到原有 init 中）
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
