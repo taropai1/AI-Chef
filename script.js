@@ -1752,6 +1752,8 @@ if (videoBtn) videoBtn.onclick = showVideo;
   document.getElementById('howToModal').addEventListener('click', (e) => { if (e.target === document.getElementById('howToModal')) closeHowToModal(); });
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
+  // ===== 新增：初始化新生成器布局 =====
+    initNewGenerator();
   // 自动填充修改邮箱验证码（从邮件链接跳转过来时）
 const urlParams = new URLSearchParams(window.location.search);
 const autoCode = urlParams.get('code');
@@ -1761,13 +1763,7 @@ if (autoCode && action === 'changeEmail') {
   if (codeInput) {
     codeInput.value = autoCode;
   }
-}
-  // 原有的 init 末尾
-    document.getElementById('editNicknameBtn').onclick = showNicknameModal;
-    document.getElementById('editEmailBtn').onclick = showEmailModal;
-
-    // ===== 新增：初始化新生成器布局 =====
-    initNewGenerator();
+}   
 })();
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
