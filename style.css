@@ -344,163 +344,15 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
-/* ==================== 语音输入与发送图标 ==================== */
-.input-with-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
 
-.input-with-icon input {
-  flex: 1;
-  padding-right: 40px;
-}
-
-.mic-btn, .send-btn {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: background 0.15s ease;
-  color: #9ca3af;
-}
-
-.mic-btn:hover, .send-btn:hover {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-
-.mic-btn:active, .send-btn:active {
-  transform: scale(0.95);
-}
-
-.mic-btn.recording {
-  color: #ef4444;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* 生成器输入框麦克风位置 */
-#dishMicBtn {
-  right: 8px;
-}
-
-/* AI 助手输入框图标位置 */
-.ai-input-wrapper .mic-btn {
-  left: 8px;
-}
-
-.ai-input-wrapper .send-btn {
-  right: 8px;
-}
-
-.ai-input-wrapper input {
-  padding-left: 40px;
-  padding-right: 40px;
-}
-
-/* 纸卷视频按钮 */
-.btn-video {
-    position: absolute;
-    right: 16px;
-    bottom: 0;        /* 只改这里，让按钮紧贴卡片下边线 */
-    width: auto;
-    min-width: 140px;
-    height: 40px;
-    padding: 0 20px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px 8px 0 0;
-    color: #4a90e2;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    white-space: nowrap;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
-    z-index: 10;
-    transition: all 0.2s ease;
-}
-
-#qaLimitNote {
-    text-align: left !important;   /* 强制靠左 */
-    padding-left: 16px !important; /* 左边留空 4格 间距 */
-    line-height: 1.2;
-    z-index: 10;
-}
-
-/* 纸张卷起阴影效果 */
-.btn-video::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: -6px;
-    width: 100%;
-    height: 12px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.03), transparent);
-    border-radius: 0 0 4px 4px;
-    transform: perspective(20px) rotateX(5deg);
-    transform-origin: top;
-}
-
-/* 播放图标 */
-.btn-video::before {
-    content: "▶";
-    font-size: 10px;
-}
-
-/* 悬停效果 */
-.btn-video:hover {
-    background: #f0f4ff;
-    border-color: #4a90e2;
-    color: #2563eb;
-    bottom: -4px;
-}
-
-/* 语音不支持时隐藏图标 */
-.mic-btn.unsupported {
-  display: none !important;
-}
-
-#page-generator .main-wrap {
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 30px;
-}
-/* 输入框只在生成器页面展示，且移动端固定底部 */
-#page-generator .input-container {
-    position: static;
-    margin: 20px auto 0;
-}
-@media (max-width: 767px) {
-    #page-generator .input-container {
-        position: fixed;
-        bottom: 40px;
-        left: 20px;
-        right: 20px;
-        width: calc(100% - 40px);
-    }
-}
 /* 隐藏旧版生成器卡片（新布局不再使用） */
 .card-generator, .card-content, .gen-header, .form, .help-trigger, .generate-btn,
 .recipe-banner, .content-nav, .recover {
     display: none !important;
 }
-/* ========== 生成器新布局样式 (独立隔离) ========== */
+
+/* ========== 生成器新布局样式（命名空间隔离版） ========== */
+
 #page-generator .main-wrap {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
   flex: 1;
@@ -758,6 +610,9 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 #page-generator .dropdown-btn:hover:not(.active) {
   background: #f3f4f6;
   border-color: #d4e8fb;
+}
+#page-generator .dropdown {
+  position: relative;
 }
 #page-generator .dropdown-menu {
   position: absolute;
