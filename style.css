@@ -780,27 +780,24 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .card-ai, .card-generator, .card-content, .recipe-body {
     /* 可根据实际需要决定是否 display:none，但为了安全先保留 */
 }
-/* 修正生成器页面整体布局 */
-#page-generator {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
 #page-generator .main-wrap {
-    width: 100%;
-    max-width: 900px;        /* 与旧版生成器宽度一致 */
-    margin: 0 auto;
-    padding-top: 24px;       /* 顶部留白，不再贴导航栏 */
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 30px;
 }
-
-/* 修复语音/发送按钮重叠 */
-.action-group .icon-btn {
-    position: relative;
-    margin-left: 4px;
+/* 输入框只在生成器页面展示，且移动端固定底部 */
+#page-generator .input-container {
+    position: static;
+    margin: 20px auto 0;
 }
-.action-group .icon-btn:first-child {
-    margin-left: 0;
+@media (max-width: 767px) {
+    #page-generator .input-container {
+        position: fixed;
+        bottom: 40px;
+        left: 20px;
+        right: 20px;
+        width: calc(100% - 40px);
+    }
 }
 /* 隐藏旧版生成器卡片（新布局不再使用） */
 .card-generator, .card-content, .gen-header, .form, .help-trigger, .generate-btn,
