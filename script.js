@@ -1713,7 +1713,6 @@ function updateHistoryButtons() { document.getElementById('prevRecipeBtn').disab
 
 // ==================== URL 参数处理 ====================
 function handleUrlParams() { const urlParams = new URLSearchParams(window.location.search); const action = urlParams.get('action'), email = urlParams.get('email'); if (action && email) { if (action === 'register') { showPage('page-login-register'); switchAuthTab('register'); document.getElementById('registerEmail').value = decodeURIComponent(email); document.getElementById('registerPassword').focus(); } else if (action === 'reset') { showPage('page-login-register'); switchAuthTab('login'); document.getElementById('loginEmail').value = decodeURIComponent(email); showForgotModal(); document.getElementById('forgotEmail').value = decodeURIComponent(email); } window.history.replaceState({}, document.title, window.location.pathname); } }
-function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card-generator'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
 
 // ==================== 头像裁剪 ====================
 (function initAvatarCrop() {
@@ -1744,7 +1743,7 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
   populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
   document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
-  addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
+  handleUrlParams(); if (userData?.email) updateLimitInfo();
 
   const videoBtn = document.getElementById('openVideoBtn');
 if (videoBtn) videoBtn.onclick = showVideo;
@@ -1752,7 +1751,6 @@ if (videoBtn) videoBtn.onclick = showVideo;
   document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
   document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
   document.getElementById('howToModal').addEventListener('click', (e) => { if (e.target === document.getElementById('howToModal')) closeHowToModal(); });
-  document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
   // 自动填充修改邮箱验证码（从邮件链接跳转过来时）
