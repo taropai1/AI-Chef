@@ -1765,6 +1765,12 @@ if (autoCode && action === 'changeEmail') {
     codeInput.value = autoCode;
   }
 }
+  // 原有的 init 末尾
+    document.getElementById('editNicknameBtn').onclick = showNicknameModal;
+    document.getElementById('editEmailBtn').onclick = showEmailModal;
+
+    // ===== 新增：初始化新生成器布局 =====
+    initNewGenerator();
 })();
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
