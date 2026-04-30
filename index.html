@@ -65,7 +65,9 @@
       <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
     </div>
   </div>
-    <div class="main-wrap" id="mainWrap">
+        
+  <div class="page" id="page-generator">
+  <div class="main-wrap" id="mainWrap">
     <div class="top-inner">
       <h1 class="title" id="genTitle">AI Recipe Generator</h1>
       <div class="mode-group">
@@ -97,7 +99,7 @@
           <div class="dropdown">
             <button class="dropdown-btn" id="cuisineBtn">American</button>
             <div class="dropdown-menu" id="cuisineMenu">
-              <!-- 菜系选项由 populateCuisines() 动态生成 -->
+              <!-- 菜系选项由JS动态填充 -->
             </div>
           </div>
         </div>
@@ -121,7 +123,7 @@
       </div>
     </div>
   </div>
-
+</div>
   <!-- 保留的旧功能弹窗（视频、使用说明等，后续导航栏用） -->
   <div class="video-modal" id="videoModal">
     <div class="video-modal-card">
