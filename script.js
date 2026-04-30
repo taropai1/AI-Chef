@@ -1748,7 +1748,6 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   const videoBtn = document.getElementById('openVideoBtn');
 if (videoBtn) videoBtn.onclick = showVideo;
   initVideoPlayerControls();
-  document.getElementById('howToUseBtn').addEventListener('click', openHowToModal);
   document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
   document.getElementById('howToModal').addEventListener('click', (e) => { if (e.target === document.getElementById('howToModal')) closeHowToModal(); });
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
