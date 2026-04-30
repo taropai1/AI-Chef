@@ -780,7 +780,28 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .card-ai, .card-generator, .card-content, .recipe-body {
     /* 可根据实际需要决定是否 display:none，但为了安全先保留 */
 }
+/* 修正生成器页面整体布局 */
+#page-generator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
+#page-generator .main-wrap {
+    width: 100%;
+    max-width: 900px;        /* 与旧版生成器宽度一致 */
+    margin: 0 auto;
+    padding-top: 24px;       /* 顶部留白，不再贴导航栏 */
+}
+
+/* 修复语音/发送按钮重叠 */
+.action-group .icon-btn {
+    position: relative;
+    margin-left: 4px;
+}
+.action-group .icon-btn:first-child {
+    margin-left: 0;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
