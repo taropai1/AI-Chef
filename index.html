@@ -65,11 +65,7 @@
       <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
     </div>
   </div>
-
-  <!-- 生成器页 -->
-<div class="page" id="page-generator">
-  <!-- 新设计稿结构 -->
-  <div class="main-wrap" id="mainWrap">
+    <div class="main-wrap" id="mainWrap">
     <div class="top-inner">
       <h1 class="title" id="genTitle">AI Recipe Generator</h1>
       <div class="mode-group">
@@ -91,34 +87,34 @@
       <div class="func-row">
         <div class="dropdown-group">
           <div class="dropdown">
-            <button class="dropdown-btn" id="categoryBtn" onclick="toggleDropdown('category')">Standard</button>
+            <button class="dropdown-btn" id="categoryBtn">Standard</button>
             <div class="dropdown-menu" id="categoryMenu">
-              <div class="dropdown-item" onclick="selectItem('category', this)">Standard</div>
-              <div class="dropdown-item" onclick="selectItem('category', this)">Baby</div>
-              <div class="dropdown-item" onclick="selectItem('category', this)">Pregnancy</div>
+              <div class="dropdown-item" data-value="standard">Standard</div>
+              <div class="dropdown-item" data-value="baby">Baby</div>
+              <div class="dropdown-item" data-value="pregnancy">Pregnancy</div>
             </div>
           </div>
           <div class="dropdown">
-            <button class="dropdown-btn" id="cuisineBtn" onclick="toggleDropdown('cuisine')">American</button>
+            <button class="dropdown-btn" id="cuisineBtn">American</button>
             <div class="dropdown-menu" id="cuisineMenu">
-              <!-- 由 populateCuisines() 动态填充 -->
+              <!-- 菜系选项由 populateCuisines() 动态生成 -->
             </div>
           </div>
         </div>
 
         <div class="action-group">
-          <button class="icon-btn voice-btn" id="dishMicBtn" title="语音输入">
+          <button class="icon-btn voice-btn" id="dishMicBtn">
             <svg viewBox="0 0 24 24">
-              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-              <line x1="12" y1="19" x2="12" y2="23"></line>
-              <line x1="8" y1="23" x2="16" y2="23"></line>
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
             </svg>
           </button>
           <button class="icon-btn send-btn" id="qaSendBtn">
             <svg viewBox="0 0 24 24">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
             </svg>
           </button>
         </div>
@@ -126,6 +122,44 @@
     </div>
   </div>
 
+  <!-- 保留的旧功能弹窗（视频、使用说明等，后续导航栏用） -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-modal-card">
+      <div class="video-modal-head">
+        <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
+        <button class="video-modal-close" id="closeVideoModal">×</button>
+      </div>
+      <div class="video-grid" id="videoGrid"></div>
+    </div>
+  </div>
+
+  <div class="video-player" id="videoPlayer">
+    <div class="video-player-container">
+      <div class="video-frame" id="videoFrameContainer"></div>
+      <div class="video-row">
+        <div class="video-thumb" id="videoThumb">Video</div>
+        <div class="video-info">
+          <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
+          <div class="video-info-desc">Step-by-step cooking</div>
+        </div>
+        <div class="video-controls">
+          <button class="video-control-btn" id="togglePlayer">⤢</button>
+          <button class="video-control-btn" id="closePlayer">×</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="howToModal">
+    <div class="modal">
+      <h4 id="howToTitle">How to use</h4>
+      <ul id="howToList"></ul>
+      <p class="modal-highlight-text" id="howToHighlight"></p>
+      <button class="close-btn" onclick="closeHowToModal()">Got it</button>
+    </div>
+  </div>
+</div> <!-- 结束 page-generator -->
+  
   <!-- 保留：视频弹窗 / 使用说明弹窗（隐藏入口，代码不动） -->
   <div class="video-modal" id="videoModal">
     <div class="video-modal-card">
