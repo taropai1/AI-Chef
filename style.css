@@ -802,6 +802,11 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .action-group .icon-btn:first-child {
     margin-left: 0;
 }
+/* 隐藏旧版生成器卡片（新布局不再使用） */
+.card-generator, .card-content, .gen-header, .form, .help-trigger, .generate-btn,
+.recipe-banner, .content-nav, .recover {
+    display: none !important;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
