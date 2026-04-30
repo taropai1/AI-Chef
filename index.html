@@ -67,130 +67,101 @@
   </div>
 
   <!-- 生成器页 -->
-  <div class="page" id="page-generator">
-    <div class="generator-wrap">
-      <div class="card-generator">
-        <div class="gen-header">
-          <div>
-            <div class="gen-title" id="genTitle">AI Recipe Generator</div>
-            <div class="gen-sub" id="limitInfo">Please log in to continue</div>
-          </div>
-          <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" title="Add to Home">+</button>
-        </div>
-        <div class="form">
-          <div class="row">
-            <div class="label" id="genMealType">Category</div>
-            <select id="mealType">
-              <option value="standard" id="optStandard">Standard</option>
-              <option value="baby" id="optBaby">Baby</option>
-              <option value="pregnancy" id="optPregnancy">Pregnancy</option>
-            </select>
-          </div>
-          <div class="row">
-            <div class="label" id="genCuisine">Cuisine</div>
-            <select id="cuisine"></select>
-          </div>
-          <div class="row">
-            <div class="label" id="genDishName">What to eat?</div>
-        
-            <div class="input-with-icon">
-  <input type="text" id="dishName" placeholder="Ingredients, dish names...">
-  <button class="mic-btn" id="dishMicBtn" title="语音输入">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-      <line x1="12" y1="19" x2="12" y2="23"></line>
-      <line x1="8" y1="23" x2="16" y2="23"></line>
-    </svg>
-  </button>
-</div>
-
-            <div class="hint" id="dishNameHint">Enter ingredients, dish names or food items</div>
-          </div>
-        </div>
-        <div class="help-trigger">
-          <button class="help-btn" id="howToUseBtn">How to use</button>
-        </div>
-        <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()">Generate Recipe</button>
+<div class="page" id="page-generator">
+  <!-- 新设计稿结构 -->
+  <div class="main-wrap" id="mainWrap">
+    <div class="top-inner">
+      <h1 class="title" id="genTitle">AI Recipe Generator</h1>
+      <div class="mode-group">
+        <div class="mode-slider" id="modeSlider"></div>
+        <button class="mode-btn active" id="modeBtnRecipe">Generate Recipe</button>
+        <button class="mode-btn" id="modeBtnQA">AI Assistant</button>
       </div>
+      <p class="mode-desc left-indent" id="modeDesc">Enter ingredients, dish names or food items.</p>
+    </div>
 
-      <div class="card-content">
-        <div class="content-header">
-          <div class="recipe-banner" id="personalizedGreeting">Dear Gourmet! Enjoy your meal!</div>
-          <div class="content-nav">
-            <button class="nav-icon" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>←</button>
-            <button class="nav-icon" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>→</button>
+    <div class="content-block" id="contentBlock">
+      <div class="recipe-area" id="recipeArea"></div>
+      <div class="divider-dash"></div>
+      <div class="qa-area" id="qaArea"></div>
+    </div>
+
+    <div class="input-container">
+      <textarea class="input-area" id="dishName" placeholder="Type a message or hold to speak"></textarea>
+      <div class="func-row">
+        <div class="dropdown-group">
+          <div class="dropdown">
+            <button class="dropdown-btn" id="categoryBtn" onclick="toggleDropdown('category')">Standard</button>
+            <div class="dropdown-menu" id="categoryMenu">
+              <div class="dropdown-item" onclick="selectItem('category', this)">Standard</div>
+              <div class="dropdown-item" onclick="selectItem('category', this)">Baby</div>
+              <div class="dropdown-item" onclick="selectItem('category', this)">Pregnancy</div>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="dropdown-btn" id="cuisineBtn" onclick="toggleDropdown('cuisine')">American</button>
+            <div class="dropdown-menu" id="cuisineMenu">
+              <!-- 由 populateCuisines() 动态填充 -->
+            </div>
           </div>
         </div>
-        <div class="recipe-title" id="recipeNameDisplay"></div>
-        <div class="recipe-body" id="recipeContent"></div>
-        <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()">↻ Recover last 3</button>
-      </div>
 
-      <div class="card-ai">
-    <div class="ai-title" id="aiAssistTitle">AI Assistant</div>
-    <div class="qa-list" id="qaHistory"></div>
-    <div class="ai-row">
-        <div class="input-with-icon ai-input-wrapper">
-            <button class="mic-btn" id="qaMicBtn" title="语音输入">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" y1="19" x2="12" y2="23"></line>
-                    <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-            </button>
-            <input class="ai-input" id="qaInput" placeholder="Ask about this recipe..." disabled>
-            <button class="send-btn" id="qaSendBtn" title="发送">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
+        <div class="action-group">
+          <button class="icon-btn voice-btn" id="dishMicBtn" title="语音输入">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </button>
+          <button class="icon-btn send-btn" id="qaSendBtn">
+            <svg viewBox="0 0 24 24">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
         </div>
+      </div>
     </div>
-    <div class="ai-bottom">
-        <div class="limit" id="qaLimitNote"></div>
-        <button class="btn-video" id="openVideoBtn">Watch Video Guides</button>
-    </div>
-</div>
+  </div>
 
-<div class="video-modal" id="videoModal">
+  <!-- 保留：视频弹窗 / 使用说明弹窗（隐藏入口，代码不动） -->
+  <div class="video-modal" id="videoModal">
     <div class="video-modal-card">
-        <div class="video-modal-head">
-            <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
-            <button class="video-modal-close" id="closeVideoModal">×</button>
-        </div>
-        <div class="video-grid" id="videoGrid"></div>
+      <div class="video-modal-head">
+        <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
+        <button class="video-modal-close" id="closeVideoModal">×</button>
+      </div>
+      <div class="video-grid" id="videoGrid"></div>
     </div>
-</div>
+  </div>
 
-    <div class="video-player" id="videoPlayer">
-      <div class="video-player-container">
-        <div class="video-frame" id="videoFrameContainer"></div>
-        <div class="video-row">
-          <div class="video-thumb" id="videoThumb">Video</div>
-          <div class="video-info">
-            <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
-            <div class="video-info-desc">Step-by-step cooking</div>
-          </div>
-          <div class="video-controls">
-            <button class="video-control-btn" id="togglePlayer">⤢</button>
-            <button class="video-control-btn" id="closePlayer">×</button>
-          </div>
+  <div class="video-player" id="videoPlayer">
+    <div class="video-player-container">
+      <div class="video-frame" id="videoFrameContainer"></div>
+      <div class="video-row">
+        <div class="video-thumb" id="videoThumb">Video</div>
+        <div class="video-info">
+          <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
+          <div class="video-info-desc">Step-by-step cooking</div>
+        </div>
+        <div class="video-controls">
+          <button class="video-control-btn" id="togglePlayer">⤢</button>
+          <button class="video-control-btn" id="closePlayer">×</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="modal-overlay" id="howToModal">
-      <div class="modal">
-        <h4 id="howToTitle">How to use</h4>
-        <ul id="howToList"></ul>
-        <p class="modal-highlight-text" id="howToHighlight"></p>
-        <button class="close-btn" onclick="closeHowToModal()">Got it</button>
-      </div>
+  <div class="modal-overlay" id="howToModal">
+    <div class="modal">
+      <h4 id="howToTitle">How to use</h4>
+      <ul id="howToList"></ul>
+      <p class="modal-highlight-text" id="howToHighlight"></p>
+      <button class="close-btn" onclick="closeHowToModal()">Got it</button>
     </div>
- </div>
+  </div>
 </div>
   <!-- 登录/注册页 -->
   <div class="page" id="page-login-register">
