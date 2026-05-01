@@ -1091,20 +1091,22 @@ async function handleSend() {
     const val = input.value.trim();
     if (!val) return;
 
+    // 未登录 → 提示并跳转
     if (!userData) {
         alert(t('pleaseLogin'));
+        showPage('page-login-register');
         return;
     }
 
     if (currentMode === 'recipe') {
         await generateRecipe();
     } else {
+        // AI 问答模式：需先生成过食谱
         if (!userData || !userData.lastRecipeText) {
             alert(t('alertNoRecipe') || 'Please generate a recipe first.');
             return;
         }
-        const qaInput = document.getElementById('qaInput');
-        if (qaInput) qaInput.value = val;
+        // 直接调用 askQuestion，它会从 dishName 读取内容
         await askQuestion();
     }
 
