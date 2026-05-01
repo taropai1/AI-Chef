@@ -988,15 +988,16 @@ if (sendBtn) sendBtn.disabled = false;
         document.getElementById('qaInput').value = '';
     }
 }
-
-// ==================== 生成器新布局精简版 ====================
+// ==================== 生成器新布局（极简适配版） ====================
 let currentMode = 'recipe';
 
+// 模式按钮多语言限制
 function getModeBtnText(key) {
     const text = t(key);
     return text && text.length <= 8 ? text : key;
 }
 
+// 切换模式
 function switchMode(mode) {
     currentMode = mode;
     const slider = document.getElementById('modeSlider');
@@ -1012,6 +1013,7 @@ function switchMode(mode) {
             desc.classList.add('left-indent');
             desc.classList.remove('right-normal');
         }
+        // 清空可能残留的 QA 高亮
     } else {
         if (slider) slider.classList.add('right');
         if (btns[1]) btns[1].classList.add('active');
@@ -1023,14 +1025,17 @@ function switchMode(mode) {
     }
 }
 
+// 下拉菜单控制
 function toggleDropdown(type) {
     const menu = document.getElementById(`${type}Menu`);
     if (!menu) return;
     const isShow = menu.classList.contains('show');
+    // 关闭所有下拉
     document.querySelectorAll('#page-generator .dropdown-menu').forEach(m => m.classList.remove('show'));
     if (!isShow) menu.classList.add('show');
 }
 
+// 选择项目（同步到原有隐藏 <select>）
 function selectItem(type, el) {
     const btn = document.querySelector(`#page-generator .dropdown:has(#${type}Menu) .dropdown-btn`);
     if (btn) {
@@ -1039,30 +1044,35 @@ function selectItem(type, el) {
     }
     document.getElementById(`${type}Menu`)?.classList.remove('show');
 
-    // 同步到原有隐藏的 select
+    // 同步值到原有选择器 (确保 generateRecipe 能读到)
     if (type === 'category') {
         const mealType = document.getElementById('mealType');
         if (mealType) {
-            const value = el.textContent.toLowerCase();
-            if (value === 'standard') mealType.value = 'standard';
-            else if (value === 'baby') mealType.value = 'baby';
-            else if (value === 'pregnancy') mealType.value = 'pregnancy';
+            const val = el.getAttribute('data-value') || el.textContent.toLowerCase();
+            if (val === 'standard' || val === 'baby' || val === 'pregnancy') {
+                mealType.value = val;
+            }
         }
     } else if (type === 'cuisine') {
         const cuisineSelect = document.getElementById('cuisine');
         if (cuisineSelect) {
-            const match = Array.from(cuisineSelect.options).find(o => o.text === el.textContent);
+            const val = el.getAttribute('data-value') || el.textContent;
+            const match = Array.from(cuisineSelect.options).find(o => o.value === val || o.text === val);
             if (match) cuisineSelect.value = match.value;
         }
     }
 }
 
+// 点击其他地方关闭下拉
 document.addEventListener('click', function(e) {
     if (!e.target.closest('#page-generator .dropdown')) {
-        document.querySelectorAll('#page-generator .dropdown-menu').forEach(function(m) { m.classList.remove('show'); });
+        document.querySelectorAll('#page-generator .dropdown-menu').forEach(function(m) {
+            m.classList.remove('show');
+        });
     }
 });
 
+// 气泡消息 (用于问答)
 function addBubble(text, isUser) {
     const qaArea = document.getElementById('qaArea');
     if (!qaArea) return;
@@ -1075,13 +1085,14 @@ function addBubble(text, isUser) {
     });
 }
 
-// 核心发送：直接调用原函数，不做任何 wrapper
+// 核心发送：直接调用原函数，不做任何包装
 async function handleSend() {
     const input = document.getElementById('dishName');
     if (!input) return;
     const val = input.value.trim();
     if (!val) return;
 
+    // 未登录 -> 提示并跳转
     if (!userData) {
         alert(t('pleaseLogin'));
         showPage('page-login-register');
@@ -1089,15 +1100,19 @@ async function handleSend() {
     }
 
     if (currentMode === 'recipe') {
+        // 生成食谱模式：直接调用原有 generateRecipe()
         await generateRecipe();
     } else {
+        // AI 问答模式：必须已生成过食谱
         if (!userData.lastRecipeText) {
             alert(t('alertNoRecipe') || 'Please generate a recipe first.');
             return;
         }
+        // 直接调用原有 askQuestion()，它会读取 dishName 的值
         await askQuestion();
     }
 
+    // 发送后清空输入框，并让页面切换到“内容展示”状态
     input.value = '';
     const mainWrap = document.getElementById('mainWrap');
     const contentBlock = document.getElementById('contentBlock');
@@ -1105,53 +1120,60 @@ async function handleSend() {
     if (contentBlock) contentBlock.classList.add('show');
 }
 
-// 初始化事件绑定
+// 初始化所有新布局的事件和默认值
 function initNewGenerator() {
-    document.getElementById('modeBtnRecipe')?.addEventListener('click', () => switchMode('recipe'));
-    document.getElementById('modeBtnQA')?.addEventListener('click', () => switchMode('qa'));
+    // 1. 模式按钮
+    document.getElementById('modeBtnRecipe')?.addEventListener('click', function() { switchMode('recipe'); });
+    document.getElementById('modeBtnQA')?.addEventListener('click', function() { switchMode('qa'); });
 
+    // 设置模式按钮多语言文本
     const recipeBtn = document.getElementById('modeBtnRecipe');
     const qaBtn = document.getElementById('modeBtnQA');
     if (recipeBtn) recipeBtn.innerText = getModeBtnText('Generate Recipe');
     if (qaBtn) qaBtn.innerText = getModeBtnText('AI Assistant');
 
-    // 填充菜系
+    // 2. 动态填充菜系弹窗
     const cuisineMenu = document.getElementById('cuisineMenu');
     if (cuisineMenu) {
         const lang = getCurrentLang();
         const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-        cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map[c] || c}</div>`).join('');
+        cuisineMenu.innerHTML = CUISINES.map(function(c) {
+            return `<div class="dropdown-item" data-value="${c}">${map[c] || c}</div>`;
+        }).join('');
     }
 
-    // 分类事件
-    document.querySelectorAll('#page-generator #categoryMenu .dropdown-item').forEach(item => {
+    // 3. 分类/菜系选项点击事件
+    document.querySelectorAll('#page-generator #categoryMenu .dropdown-item').forEach(function(item) {
         item.addEventListener('click', function() { selectItem('category', this); });
     });
 
-    // 菜系事件
     cuisineMenu?.addEventListener('click', function(e) {
         const item = e.target.closest('.dropdown-item');
         if (!item) return;
         selectItem('cuisine', item);
     });
 
+    // 4. 下拉按钮打开菜单
     const categoryBtn = document.getElementById('categoryBtn');
     const cuisineBtn = document.getElementById('cuisineBtn');
-    categoryBtn?.addEventListener('click', () => toggleDropdown('category'));
-    cuisineBtn?.addEventListener('click', () => toggleDropdown('cuisine'));
+    categoryBtn?.addEventListener('click', function() { toggleDropdown('category'); });
+    cuisineBtn?.addEventListener('click', function() { toggleDropdown('cuisine'); });
 
-    // 默认值同步
+    // 5. 同步默认选中值到按钮文字和隐藏 select
     if (categoryBtn) categoryBtn.textContent = t('optStandard') || 'Standard';
     if (cuisineBtn) cuisineBtn.textContent = CUISINES[0] || 'American';
+
     const mealTypeSelect = document.getElementById('mealType');
     if (mealTypeSelect) mealTypeSelect.value = 'standard';
-    const cuisineSelect = document.getElementById('cuisine');
-    if (cuisineSelect) cuisineSelect.value = CUISINES[0] || 'American';
 
-    // 发送按钮
+    const cuisineSelect = document.getElementById('cuisine');
+    if (cuisineSelect && CUISINES.length > 0) {
+        cuisineSelect.value = CUISINES[0]; // 'American'
+    }
+
+    // 6. 发送按钮和回车
     document.getElementById('qaSendBtn')?.addEventListener('click', handleSend);
 
-    // 回车
     const input = document.getElementById('dishName');
     if (input) {
         input.addEventListener('keydown', function(e) {
@@ -1162,25 +1184,27 @@ function initNewGenerator() {
         });
     }
 
-    // 初始状态
+    // 7. 初始页面状态
     const mainWrap = document.getElementById('mainWrap');
     const contentBlock = document.getElementById('contentBlock');
-    const recipeArea = document.getElementById('recipeArea');
-    const qaArea = document.getElementById('qaArea');
     if (mainWrap) mainWrap.classList.remove('top-fixed');
     if (contentBlock) contentBlock.classList.remove('show');
+    // 清空内容区
+    const recipeArea = document.getElementById('recipeArea');
+    const qaArea = document.getElementById('qaArea');
     if (recipeArea) recipeArea.innerHTML = '';
     if (qaArea) qaArea.innerHTML = '';
+
+    // 8. 默认激活 recipe 模式
     switchMode('recipe');
 }
 
+// 页面加载完毕后执行初始化
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initNewGenerator);
 } else {
     initNewGenerator();
 }
-
-// 在页面加载后调用 initNewGenerator（整合到原有 init 中）
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
 
