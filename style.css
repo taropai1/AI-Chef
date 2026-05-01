@@ -679,12 +679,13 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
   stroke-linejoin: round;
   fill: none;
 }
-/* 生成器页面：强制弹性居中布局 */
+/* 生成器页面强制弹性居中 */
 #page-generator.page.active {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
+    min-height: calc(100vh - 120px); /* 减去导航栏高度，避免太顶 */
 }
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
