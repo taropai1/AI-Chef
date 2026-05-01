@@ -992,7 +992,6 @@ if (sendBtn) sendBtn.disabled = false;
         document.getElementById('qaInput').value = '';
     }
 }
-
 // ==================== 生成器新布局（最简同步版） ====================
 let currentMode = 'recipe';
 
@@ -1074,13 +1073,13 @@ async function handleSend() {
     const input = document.getElementById('dishName');
     if (!input) return;
     const val = input.value.trim();
+    
     if (!userData) {
         alert(t('pleaseLogin'));
         showPage('page-login-register');
         return;
     }
     if (!val) return;
-}
 
     if (currentMode === 'recipe') {
         // 确保隐藏的 select 有值 (初始化时已设置，这里做兜底)
@@ -1149,7 +1148,6 @@ function initNewGenerator() {
     
     const cuisineSelect = document.getElementById('cuisine');
     if (cuisineSelect) {
-        // 原生 select 的选项由 populateCuisines 填充，这里直接设置 value
         if (CUISINES.length > 0) cuisineSelect.value = CUISINES[0];
     }
 
@@ -1181,7 +1179,6 @@ if (document.readyState === 'loading') {
 } else {
     initNewGenerator();
 }
-
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
 
