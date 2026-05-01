@@ -989,20 +989,14 @@ if (sendBtn) sendBtn.disabled = false;
     }
 }
 
-// ==================== 生成器新布局功能对接（完整版，已处理重复定义） ====================
+// ==================== 生成器新布局精简版 ====================
+let currentMode = 'recipe';
 
-// 仅当变量未定义时才声明，避免重复声明错误
-if (typeof currentMode === 'undefined') {
-    var currentMode = 'recipe';
-}
-
-// 模式按钮多语言限制（≤8字符用翻译，否则保留英文）
 function getModeBtnText(key) {
     const text = t(key);
     return text && text.length <= 8 ? text : key;
 }
 
-// 切换模式
 function switchMode(mode) {
     currentMode = mode;
     const slider = document.getElementById('modeSlider');
@@ -1029,7 +1023,6 @@ function switchMode(mode) {
     }
 }
 
-// 下拉菜单
 function toggleDropdown(type) {
     const menu = document.getElementById(`${type}Menu`);
     if (!menu) return;
@@ -1046,7 +1039,7 @@ function selectItem(type, el) {
     }
     document.getElementById(`${type}Menu`)?.classList.remove('show');
 
-    // 同步到原有的隐藏 select 元素（业务逻辑依赖它们）
+    // 同步到原有隐藏的 select
     if (type === 'category') {
         const mealType = document.getElementById('mealType');
         if (mealType) {
@@ -1064,14 +1057,12 @@ function selectItem(type, el) {
     }
 }
 
-// 点击其他地方关闭下拉
 document.addEventListener('click', function(e) {
     if (!e.target.closest('#page-generator .dropdown')) {
         document.querySelectorAll('#page-generator .dropdown-menu').forEach(function(m) { m.classList.remove('show'); });
     }
 });
 
-// 气泡
 function addBubble(text, isUser) {
     const qaArea = document.getElementById('qaArea');
     if (!qaArea) return;
@@ -1084,14 +1075,13 @@ function addBubble(text, isUser) {
     });
 }
 
-// 核心发送路由
+// 核心发送：直接调用原函数，不做任何 wrapper
 async function handleSend() {
     const input = document.getElementById('dishName');
     if (!input) return;
     const val = input.value.trim();
     if (!val) return;
 
-    // 未登录 → 提示并跳转
     if (!userData) {
         alert(t('pleaseLogin'));
         showPage('page-login-register');
@@ -1101,12 +1091,10 @@ async function handleSend() {
     if (currentMode === 'recipe') {
         await generateRecipe();
     } else {
-        // AI 问答模式：需先生成过食谱
-        if (!userData || !userData.lastRecipeText) {
+        if (!userData.lastRecipeText) {
             alert(t('alertNoRecipe') || 'Please generate a recipe first.');
             return;
         }
-        // 直接调用 askQuestion，它会从 dishName 读取内容
         await askQuestion();
     }
 
@@ -1117,81 +1105,30 @@ async function handleSend() {
     if (contentBlock) contentBlock.classList.add('show');
 }
 
-// 重写 generateRecipe
-if (typeof generateRecipe === 'function') {
-    const originalGenerateRecipe = generateRecipe;
-    window.generateRecipe = async function() {
-        await originalGenerateRecipe();
-        renderRecipeToArea();
-        if (userData && userData.lastRecipeText) {
-            window._lastRecipeText = userData.lastRecipeText;
-        }
-    };
-}
-
-function renderRecipeToArea() {
-    const recipeArea = document.getElementById('recipeArea');
-    const recipeName = document.getElementById('recipeNameDisplay')?.innerText || '';
-    const recipeContent = document.getElementById('recipeContent')?.innerHTML || '';
-    if (recipeArea) {
-        recipeArea.innerHTML = `<h4 style="margin-top:0;margin-bottom:12px;">${recipeName}</h4>${recipeContent}`;
-        recipeArea.scrollTop = 0;
-    }
-}
-
-// 重写 askQuestion
-if (typeof askQuestion === 'function') {
-    const originalAskQuestion = askQuestion;
-    window.askQuestion = async function() {
-        const question = document.getElementById('dishName')?.value.trim() || document.getElementById('qaInput')?.value.trim();
-        if (!question) return;
-        addBubble(question, true);
-        await originalAskQuestion();
-        const qaHistory = document.getElementById('qaHistory');
-        if (qaHistory) {
-            const lastQA = qaHistory.lastElementChild;
-            if (lastQA && lastQA.classList.contains('qa')) {
-                const answer = lastQA.querySelector('a')?.innerText || lastQA.innerText || '';
-                if (answer) addBubble(answer, false);
-            }
-            qaHistory.innerHTML = '';
-        }
-    };
-}
-
-// 重置状态
-function resetGeneratorState() {
-    const mainWrap = document.getElementById('mainWrap');
-    const contentBlock = document.getElementById('contentBlock');
-    const recipeArea = document.getElementById('recipeArea');
-    const qaArea = document.getElementById('qaArea');
-    if (mainWrap) mainWrap.classList.remove('top-fixed');
-    if (contentBlock) contentBlock.classList.remove('show');
-    if (recipeArea) recipeArea.innerHTML = '';
-    if (qaArea) qaArea.innerHTML = '';
-}
-
-// 初始化
+// 初始化事件绑定
 function initNewGenerator() {
-    document.getElementById('modeBtnRecipe')?.addEventListener('click', function() { switchMode('recipe'); });
-    document.getElementById('modeBtnQA')?.addEventListener('click', function() { switchMode('qa'); });
+    document.getElementById('modeBtnRecipe')?.addEventListener('click', () => switchMode('recipe'));
+    document.getElementById('modeBtnQA')?.addEventListener('click', () => switchMode('qa'));
 
     const recipeBtn = document.getElementById('modeBtnRecipe');
     const qaBtn = document.getElementById('modeBtnQA');
     if (recipeBtn) recipeBtn.innerText = getModeBtnText('Generate Recipe');
     if (qaBtn) qaBtn.innerText = getModeBtnText('AI Assistant');
 
+    // 填充菜系
     const cuisineMenu = document.getElementById('cuisineMenu');
     if (cuisineMenu) {
         const lang = getCurrentLang();
         const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-        cuisineMenu.innerHTML = CUISINES.map(function(c) { return `<div class="dropdown-item" data-value="${c}">${map[c] || c}</div>`; }).join('');
+        cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map[c] || c}</div>`).join('');
     }
 
-    document.querySelectorAll('#page-generator #categoryMenu .dropdown-item').forEach(function(item) {
+    // 分类事件
+    document.querySelectorAll('#page-generator #categoryMenu .dropdown-item').forEach(item => {
         item.addEventListener('click', function() { selectItem('category', this); });
     });
 
+    // 菜系事件
     cuisineMenu?.addEventListener('click', function(e) {
         const item = e.target.closest('.dropdown-item');
         if (!item) return;
@@ -1200,14 +1137,21 @@ function initNewGenerator() {
 
     const categoryBtn = document.getElementById('categoryBtn');
     const cuisineBtn = document.getElementById('cuisineBtn');
-    categoryBtn?.addEventListener('click', function() { toggleDropdown('category'); });
-    cuisineBtn?.addEventListener('click', function() { toggleDropdown('cuisine'); });
+    categoryBtn?.addEventListener('click', () => toggleDropdown('category'));
+    cuisineBtn?.addEventListener('click', () => toggleDropdown('cuisine'));
 
+    // 默认值同步
     if (categoryBtn) categoryBtn.textContent = t('optStandard') || 'Standard';
     if (cuisineBtn) cuisineBtn.textContent = CUISINES[0] || 'American';
+    const mealTypeSelect = document.getElementById('mealType');
+    if (mealTypeSelect) mealTypeSelect.value = 'standard';
+    const cuisineSelect = document.getElementById('cuisine');
+    if (cuisineSelect) cuisineSelect.value = CUISINES[0] || 'American';
 
+    // 发送按钮
     document.getElementById('qaSendBtn')?.addEventListener('click', handleSend);
 
+    // 回车
     const input = document.getElementById('dishName');
     if (input) {
         input.addEventListener('keydown', function(e) {
@@ -1218,11 +1162,18 @@ function initNewGenerator() {
         });
     }
 
-    resetGeneratorState();
+    // 初始状态
+    const mainWrap = document.getElementById('mainWrap');
+    const contentBlock = document.getElementById('contentBlock');
+    const recipeArea = document.getElementById('recipeArea');
+    const qaArea = document.getElementById('qaArea');
+    if (mainWrap) mainWrap.classList.remove('top-fixed');
+    if (contentBlock) contentBlock.classList.remove('show');
+    if (recipeArea) recipeArea.innerHTML = '';
+    if (qaArea) qaArea.innerHTML = '';
     switchMode('recipe');
 }
 
-// 启动
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initNewGenerator);
 } else {
