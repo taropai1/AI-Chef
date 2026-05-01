@@ -735,7 +735,8 @@ async function generateRecipe() {
   const mealType = document.getElementById('mealType').value;
   const cuisine = document.getElementById('cuisine').value;
   const genBtn = document.getElementById('btnGenerate');
-  genBtn.disabled = true; genBtn.innerText = t('generating');
+  genBtn.disabled = true;
+genBtn.style.opacity = '0.5';  // 半透明表示正在生成，不破坏内部SVG图标
   
   const lang = getCurrentLang();
 const langMap = {
