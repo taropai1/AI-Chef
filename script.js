@@ -832,7 +832,10 @@ if (sendBtn) sendBtn.disabled = false;
     } else {
       document.getElementById('recipeNameDisplay').innerText = '生成失败：' + error.message;
     }
-  } finally { genBtn.disabled = false; genBtn.innerText = t('generate'); }
+  }finally {
+    genBtn.disabled = false;
+    genBtn.style.opacity = '1';  // 恢复完全不透明
+}
 }
 
 function renderRecipeContent(text) {
