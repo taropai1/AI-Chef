@@ -1074,13 +1074,13 @@ async function handleSend() {
     const input = document.getElementById('dishName');
     if (!input) return;
     const val = input.value.trim();
-    if (!val) return;
-
     if (!userData) {
         alert(t('pleaseLogin'));
         showPage('page-login-register');
         return;
     }
+    if (!val) return;
+}
 
     if (currentMode === 'recipe') {
         // 确保隐藏的 select 有值 (初始化时已设置，这里做兜底)
