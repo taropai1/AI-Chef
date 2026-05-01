@@ -1150,7 +1150,7 @@ function initNewGenerator() {
     }
 
     // 发送按钮 + 回车
-    document.getElementById('qaSendBtn')?.addEventListener('click', handleSend);
+    document.getElementById('btnGenerate')?.addEventListener('click', handleSend);
     const input = document.getElementById('dishName');
     if (input) {
         input.addEventListener('keydown', function(e) {
