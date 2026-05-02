@@ -645,9 +645,9 @@ const translations = {
     it: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!',
     pt: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!',
     'zh-CN': '点开分类和菜系按钮，选择你想吃的美味！'
-}
+},
   generating: { en: 'Generating your recipe...', es: 'Generando tu receta...', fr: 'Génération de votre recette...', de: 'Ihr Rezept wird erstellt...', it: 'Generando la tua ricetta...', pt: 'Gerando sua receita...', 'zh-CN': '正在生成食谱...' },
-  generateFailed: { en: 'Generation failed, please try again.', es: 'Falló la generación, inténtelo de nuevo.', fr: 'Échec de la génération, veuillez réessayer.', de: 'Erstellung fehlgeschlagen, bitte versuchen Sie es erneut.', it: 'Generazione fallita, riprova.', pt: 'Falha na geração, tente novamente.', 'zh-CN': '食谱生成失败，请重新生成' }
+  generateFailed: { en: 'Generation failed, please try again.', es: 'Falló la generación, inténtelo de nuevo.', fr: 'Échec de la génération, veuillez réessayer.', de: 'Erstellung fehlgeschlagen, bitte versuchen Sie es erneut.', it: 'Generazione fallita, riprova.', pt: 'Falha na geração, tente novamente.', 'zh-CN': '食谱生成失败，请重新生成' },
 };
 
 function t(key, params) {
