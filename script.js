@@ -1133,12 +1133,18 @@ function renderRecipeToArea() {
     const recipeName = document.getElementById('recipeNameDisplay')?.innerText || '';
     const recipeContent = document.getElementById('recipeContent')?.innerHTML || '';
     if (recipeArea) {
+        // 关键：移除可能存在的加载动画元素，解决遮挡问题
         const tip = recipeArea.querySelector('.generating-tip');
         if (tip) tip.remove();
-        recipeArea.innerHTML += `<div class="recipe-entry" style="margin-bottom:20px;border-bottom:1px solid #e5e7eb;padding-bottom:16px;">
-            <div style="text-align:center;color:#6b7280;font-size:20px;font-weight:400;margin-bottom:12px;">${recipeName}</div>
-            <div>${recipeContent}</div>
-        </div>`;
+
+        // 追加新食谱条目，保留历史记录
+        recipeArea.innerHTML += `
+            <div class="recipe-entry" style="margin-bottom:20px; border-bottom:1px solid #e5e7eb; padding-bottom:16px;">
+                <div style="text-align:center; color:#6b7280; font-size:20px; font-weight:400; margin-bottom:12px;">${recipeName}</div>
+                <div>${recipeContent}</div>
+            </div>
+        `;
+        // 自动滚到最下方
         recipeArea.scrollTop = recipeArea.scrollHeight;
     }
 }
