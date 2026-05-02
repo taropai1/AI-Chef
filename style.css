@@ -805,6 +805,35 @@ html body #page-generator.page.active,
     z-index: 40;                        /* 高于普通内容，低于语言弹窗 */
     background-color: #f8f9fa;          /* 防止背景内容穿透 */
 }
+/* 强制导航栏永远在最顶层，不被任何页面内容遮挡 */
+.nav {
+    z-index: 9999 !important;
+}
+/* 1. 锁定整个生成器页面为全屏高度，不让它被内容撑开 */
+html body #page-generator.page.active {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;          /* 防止整体页面滚动 */
+}
+
+/* 2. 让内容展示块占据剩余空间，内部区域各自滚动 */
+#page-generator .content-block {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 3. 食谱区和问答区各自独立滚动，不撑开父容器 */
+#page-generator .recipe-area {
+    overflow-y: auto;
+    flex-shrink: 1;
+}
+#page-generator .qa-area {
+    overflow-y: auto;
+    flex-shrink: 0;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
