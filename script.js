@@ -1133,10 +1133,14 @@ function renderRecipeToArea() {
     const recipeName = document.getElementById('recipeNameDisplay')?.innerText || '';
     const recipeContent = document.getElementById('recipeContent')?.innerHTML || '';
     if (recipeArea) {
+        // 移除可能存在的加载动画
+        const tip = recipeArea.querySelector('.generating-tip');
+        if (tip) tip.remove();
+        // 追加新食谱
         recipeArea.innerHTML += `
             <div class="recipe-entry" style="margin-bottom:20px; border-bottom:1px solid #e5e7eb; padding-bottom:16px;">
-                <div class="recipe-name-old-style" style="text-align:center; color:#6b7280; font-size:20px; font-weight:400; margin-bottom:12px;">${recipeName}</div>
-                <div class="recipe-content-old-style">${recipeContent}</div>
+                <div style="text-align:center; color:#6b7280; font-size:20px; font-weight:400; margin-bottom:12px;">${recipeName}</div>
+                <div>${recipeContent}</div>
             </div>
         `;
         recipeArea.scrollTop = recipeArea.scrollHeight;
