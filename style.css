@@ -765,6 +765,46 @@ html body #page-generator.page.active {
     66% { content: '..'; }
     100% { content: '...'; }
 }
+/* ========== 一次性修复：导航栏语言弹窗不被遮挡 + 生成器页面布局 ========== */
+
+/* 1. 确保语言弹窗激活时处于最顶层，覆盖任何元素（包括PayPal按钮） */
+.lang-dropdown[style*="display: block"] {
+    z-index: 9999 !important;
+}
+
+/* 2. 生成器页面父容器允许 sticky 和弹窗正常显示 */
+html body #page-generator.page.active,
+#page-generator .main-wrap.top-fixed {
+    overflow: visible !important;
+}
+
+/* 3. 初始状态按钮区层级降低，避免意外遮挡 */
+#page-generator .top-inner {
+    position: relative;
+    z-index: 5;
+    background: transparent;
+}
+
+/* 4. 平板/电脑端初始状态（发送前）：垂直居中，考虑导航栏高度 */
+@media (min-width: 768px) {
+    html body #page-generator.page.active {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: calc(100vh - 60px) !important;
+        margin-top: 60px;               /* 导航栏高度 */
+    }
+}
+
+/* 5. 内容展示状态（发送后）：按钮区固定在导航栏下方 20px，不随滚动遮挡 */
+#page-generator .top-fixed .top-inner {
+    position: sticky;
+    top: 0;
+    padding-top: 80px;                  /* 60px导航栏 + 20px间距 */
+    z-index: 40;                        /* 高于普通内容，低于语言弹窗 */
+    background-color: #f8f9fa;          /* 防止背景内容穿透 */
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
