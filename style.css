@@ -681,34 +681,57 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
   stroke-linejoin: round;
   fill: none;
 }
-/* 生成器页面强制弹性居中 */
-#page-generator.page.active {
+/* ========== 生成器页面最终布局（独立隔离，不影响其他页面） ========== */
+
+/* 1. 初始状态：页面整体居中，给导航栏留出空间 */
+html body #page-generator.page.active {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    min-height: calc(100vh - 120px); /* 减去导航栏高度，避免太顶 */
+    min-height: 100vh !important;
+    padding-top: 60px;          /* 避开导航栏 */
+    box-sizing: border-box;
 }
+
+/* 2. 顶部模式切换区（初始状态：相对定位，有主标题） */
 #page-generator .top-inner {
-    position: sticky;
-    top: 20px;
+    position: relative;
     z-index: 50;
+    padding-top: 35px;          /* 标题与导航栏的间距 */
+    background: transparent;
+}
+
+/* 3. 内容展示状态：标题隐藏，模式按钮固定在顶部 */
+#page-generator .top-fixed .top-inner {
+    position: sticky;
+    top: 20px;                  /* 距导航栏 20px */
     background: #f8f9fa;
     padding-top: 8px;
     padding-bottom: 8px;
+    z-index: 50;
 }
+#page-generator .top-fixed .title {
+    display: none;              /* 隐藏主标题 */
+}
+#page-generator .top-fixed .mode-desc {
+    margin-bottom: 20px;        /* 副标题与内容区间距 */
+}
+
+/* 4. 手机端输入框位置微调（向下 10px） */
 @media (max-width: 767px) {
     #page-generator .input-container {
         bottom: 30px;
     }
 }
-/* 分类/菜系弹窗优化 */
+
+/* 5. 分类/菜系弹窗：圆角/半透明/滚动/不遮挡按钮 */
 #page-generator .dropdown-menu {
-    max-height: 40vh;          /* 高度适中，不遮挡上方按钮 */
-    overflow-y: auto;          /* 内容可滚动 */
-    border-radius: 12px;       /* 四角圆润 */
-    background: rgba(255,255,255,0.95); /* 半透明背景 */
-    backdrop-filter: blur(6px);          /* 毛玻璃效果 */
+    max-height: 40vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(6px);
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     padding: 6px 0;
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -718,16 +741,14 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     font-size: 14px;
     white-space: nowrap;
 }
+
+/* 6. 问答区独立滚动 */
 #page-generator .qa-area {
     overflow-y: auto;
-    flex-shrink: 0;   /* 不参与弹性伸缩 */
-}
-#page-generator .content-block {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 200px); /* 或者固定高度 */
+    flex-shrink: 0;
 }
 
+/* 7. 加载动画（三个点） */
 .generating-tip {
     text-align: center;
     padding: 40px;
@@ -743,28 +764,6 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     33% { content: '.'; }
     66% { content: '..'; }
     100% { content: '...'; }
-}
-
-/* 初始状态：标题可见 */
-#page-generator .top-inner {
-    position: relative;
-    z-index: 50;
-    padding-top: 35px;  /* 距导航栏 35px */
-}
-/* 内容展示状态：标题隐藏，模式按钮固定 */
-#page-generator .top-fixed .top-inner {
-    position: sticky;
-    top: 20px;
-    background: #f8f9fa;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    z-index: 50;
-}
-#page-generator .top-fixed .title {
-    display: none;  /* 隐藏主标题 */
-}
-#page-generator .top-fixed .mode-desc {
-    margin-bottom: 20px; /* 副标题与内容区间距 20px */
 }
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
