@@ -1773,7 +1773,6 @@ if (cuisineBtn) {
     }
 }
 // 更新菜系弹窗内容
-const cuisineMenu = document.getElementById('cuisineMenu');
 if (cuisineMenu) {
     const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
     cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
