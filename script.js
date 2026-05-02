@@ -1184,6 +1184,8 @@ async function handleSend() {
         renderLastAnswerToQa();
     }
     input.value = '';
+    const recipeArea = document.getElementById('recipeArea');
+if (recipeArea) recipeArea.innerHTML = `<div class="generating-tip">${t('generating')}<span class="dot-anim"></span></div>`;
 }
 
 function initNewGenerator() {
