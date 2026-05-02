@@ -69,7 +69,7 @@ let deviceId = null;
 let userData = null;
 let recipeHistory = [];
 let historyIndex = -1;
-const MAX_HISTORY = 6;
+const MAX_HISTORY = 12;
 
 // ==================== 多语言翻译（7种语言完整） ====================
 const translations = {
