@@ -779,64 +779,85 @@ CRITICAL: You MUST translate ALL section headings (e.g. "Ingredients", "Instruct
       window.lastSixDishNames.push(generatedName);
       if (window.lastSixDishNames.length > 6) window.lastSixDishNames.shift();
     }
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const response = await fetch(DEEPSEEK_API, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'deepseek-v4-flash', temperature: 0.9, max_tokens: 1200,
-        messages: [
-          { role: 'system', content: systemPrompt },
-        { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法。随机种子：${Date.now()}_${Math.random().toString(36)}` }
-        ],
-        cache_prefix: 'ai_chef_recipe_',
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    const recipe = data.choices[0].message.content;
 
-    renderRecipeContent(recipe);
+     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    let displayName = 'Gourmet';
-    if (userData && userData.nickname) {
-      displayName = userData.nickname;
-    } else if (userData && userData.email) {
-      displayName = userData.email.split('@')[0];
-    }
+        const response = await fetch(DEEPSEEK_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'deepseek-v4-flash',
+                temperature: 0.9,
+                max_tokens: 1200,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法。随机种子：${Date.now()}_${Math.random().toString(36)}` }
+                ],
+                cache_prefix: 'ai_chef_recipe_'
+            }),
+            signal: controller.signal
+        });
 
-    addToHistory(recipe);
-    userData.lastRecipeText = recipe;
+        clearTimeout(timeoutId);
 
-    await initDeviceId();
-    const res = await apiCall('/api/user/record-generation', { method: 'POST', body: JSON.stringify({ deviceId }) });
-    if (plan === 'free') { userData.freeUsed = res.freeUsed; }
-    else {
-      userData.dailyUsed = res.dailyUsed;
-      userData.qLeft = res.qLeft;
-      const qaInputEl = document.getElementById('qaInput');
-const sendBtn = document.getElementById('qaSendBtn');
-if (qaInputEl) qaInputEl.disabled = false;
-if (sendBtn) sendBtn.disabled = false;
-      document.getElementById('qaHistory').innerHTML = '';
-      document.getElementById('qaLimitNote').innerText = `${t('qLeft')}: ${userData.qLeft}`;
-    }
-    updateLimitInfo();
-  } catch (error) {
-    console.error(error);
-    if (error.message.includes('Free trial expired') || error.message.includes('limit reached')) {
-        alert(t('alertNoPermission'));
-        showPage('page-subscribe');
-    } else {
-        const recipeArea = document.getElementById('recipeArea');
-        if (recipeArea) {
-            recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ 生成失败：' + error.message + '</div>';
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        const recipe = data.choices[0].message.content;
+
+        renderRecipeContent(recipe);
+
+        let displayName = 'Gourmet';
+        if (userData && userData.nickname) {
+            displayName = userData.nickname;
+        } else if (userData && userData.email) {
+            displayName = userData.email.split('@')[0];
+        }
+
+        addToHistory(recipe);
+        userData.lastRecipeText = recipe;
+
+        await initDeviceId();
+        const res = await apiCall('/api/user/record-generation', { method: 'POST', body: JSON.stringify({ deviceId }) });
+
+        if (plan === 'free') {
+            userData.freeUsed = res.freeUsed;
+        } else {
+            userData.dailyUsed = res.dailyUsed;
+            userData.qLeft = res.qLeft;
+            const qaInputEl = document.getElementById('qaInput');
+            const sendBtn = document.getElementById('btnGenerate');
+            if (qaInputEl) qaInputEl.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
+            const qaHistory = document.getElementById('qaHistory');
+            if (qaHistory) qaHistory.innerHTML = '';
+            const qaLimitNote = document.getElementById('qaLimitNote');
+            if (qaLimitNote) qaLimitNote.innerText = `${t('qLeft')}: ${userData.qLeft}`;
+        }
+
+        updateLimitInfo();
+
+    } catch (error) {
+        console.error(error);
+        if (error.message.includes('Free trial expired') || error.message.includes('limit reached')) {
+            alert(t('alertNoPermission'));
+            showPage('page-subscribe');
+        } else {
+            const recipeArea = document.getElementById('recipeArea');
+            if (recipeArea) {
+                recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ 生成失败：' + error.message + '</div>';
+            }
+        }
+    } finally {
+        const genBtn = document.getElementById('btnGenerate');
+        if (genBtn) {
+            genBtn.disabled = false;
+            genBtn.style.opacity = '1';
         }
     }
-}
+  
   }finally {
     genBtn.disabled = false;
     genBtn.style.opacity = '1';  // 恢复完全不透明
