@@ -1238,18 +1238,14 @@ function initNewGenerator() {
         });
     }
 
-    const mainWrap = document.getElementById('mainWrap');
-    const contentBlock = document.getElementById('contentBlock');
-    if (mainWrap) mainWrap.classList.remove('top-fixed');
-    if (contentBlock) contentBlock.classList.remove('show');
-    document.getElementById('recipeArea').innerHTML = '';
-    document.getElementById('qaArea').innerHTML = '';
     switchMode('recipe');
-    
+
 const mainWrap = document.getElementById('mainWrap');
 const contentBlock = document.getElementById('contentBlock');
 if (mainWrap) mainWrap.classList.remove('top-fixed');
 if (contentBlock) contentBlock.classList.remove('show');
+document.getElementById('recipeArea').innerHTML = '';
+document.getElementById('qaArea').innerHTML = '';
 
 const sendBtn = document.getElementById('btnGenerate');
 if (sendBtn) {
