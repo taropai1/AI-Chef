@@ -1002,6 +1002,10 @@ async function askQuestion() {
 
         const res = await apiCall('/api/user/record-question', { method: 'POST' });
         userData.qLeft = res.qLeft;
+        if (userData.qLeft <= 0) {
+    switchMode('recipe');
+    alert(t('qLimitReached'));
+}
         const note = document.getElementById('qaLimitNote');
         if (note) note.innerText = `${t('qLeft')}: ${userData.qLeft}`;
     } catch (error) {
