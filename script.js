@@ -1558,7 +1558,6 @@ function renderLanguage() {
   safeText('genMealType', 'genMealType'); safeText('genCuisine', 'genCuisine');
   safeText('genDishName', 'genDishName');
   safeText('optStandard', 'optStandard'); safeText('optBaby', 'optBaby'); safeText('optPregnancy', 'optPregnancy');
-  safeText('btnGenerate', 'generate');
   safeText('aiAssistTitle', 'aiAssistTitle');
   safePlaceholder('qaInput', 'enterQuestion');
   safeText('dishNameHint', 'dishNameHint');
