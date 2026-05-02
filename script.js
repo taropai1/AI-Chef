@@ -1249,6 +1249,10 @@ function initNewGenerator() {
     document.getElementById('recipeArea').innerHTML = '';
     document.getElementById('qaArea').innerHTML = '';
     switchMode('recipe');
+    const mainWrap = document.getElementById('mainWrap');
+    const contentBlock = document.getElementById('contentBlock');
+    if (mainWrap) mainWrap.classList.remove('top-fixed');
+    if (contentBlock) contentBlock.classList.remove('show');
     const sendBtn = document.getElementById('btnGenerate');
 if (sendBtn) sendBtn.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
 }
@@ -1788,6 +1792,43 @@ if (cuisineMenu) {
 const categoryMenu = document.getElementById('categoryMenu');
 if (categoryMenu) {
     const items = categoryMenu.querySelectorAll('.dropdown-item');
+    if (items.length >= 3) {
+        items[0].textContent = t('optStandard');
+        items[1].textContent = t('optBaby');
+        items[2].textContent = t('optPregnancy');
+    }
+}
+    // 在 switchLang 末尾，document.getElementById('langDropdown').style.display = 'none'; 之前添加
+const catBtn = document.getElementById('categoryBtn');
+const cuiBtn = document.getElementById('cuisineBtn');
+if (catBtn) {
+    const mealType = document.getElementById('mealType');
+    if (mealType && mealType.value !== 'standard') {
+        const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
+        catBtn.textContent = catMap[mealType.value] || mealType.value;
+    } else {
+        catBtn.textContent = t('category') || '分类';
+    }
+}
+if (cuiBtn) {
+    const cuiSelect = document.getElementById('cuisine');
+    if (cuiSelect && cuiSelect.value) {
+        const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+        cuiBtn.textContent = map[cuiSelect.value] || cuiSelect.value;
+    } else {
+        cuiBtn.textContent = t('cuisine') || '菜系';
+    }
+}
+// 更新菜系弹窗
+const cuiMenu = document.getElementById('cuisineMenu');
+if (cuiMenu) {
+    const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+    cuiMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
+}
+// 更新分类弹窗
+const catMenu = document.getElementById('categoryMenu');
+if (catMenu) {
+    const items = catMenu.querySelectorAll('.dropdown-item');
     if (items.length >= 3) {
         items[0].textContent = t('optStandard');
         items[1].textContent = t('optBaby');
