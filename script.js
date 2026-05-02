@@ -1164,27 +1164,33 @@ async function handleSend() {
     if (contentBlock) contentBlock.classList.add('show');
 
     if (currentMode === 'recipe') {
-        const mealType = document.getElementById('mealType');
-        const cuisine = document.getElementById('cuisine');
-        if (mealType && !mealType.value) mealType.value = 'standard';
-        if (cuisine && !cuisine.value && CUISINES.length > 0) cuisine.value = CUISINES[0];
+    const mealType = document.getElementById('mealType');
+    const cuisine = document.getElementById('cuisine');
+    if (mealType && !mealType.value) mealType.value = 'standard';
+    if (cuisine && !cuisine.value && CUISINES.length > 0) cuisine.value = CUISINES[0];
 
-        const recipeArea = document.getElementById('recipeArea');
-        if (recipeArea) recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;">' + t('generating') + '</div>';
-        const qaArea = document.getElementById('qaArea');
-        if (qaArea) qaArea.innerHTML = '';
+    const recipeArea = document.getElementById('recipeArea');
+    if (recipeArea) recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;">' + t('generating') + '<span class="dot-anim"></span></div>';
+    const qaArea = document.getElementById('qaArea');
+    if (qaArea) qaArea.innerHTML = '';
 
+    try {
         await generateRecipe();
         renderRecipeToArea();
-    } else {
-        if (!userData.lastRecipeText) {
-            alert(t('alertNoRecipe') || 'Please generate a recipe first.');
-            return;
+    } catch (err) {
+        if (recipeArea) {
+            recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ ' + t('generateFailed') + '</div>';
         }
-        addBubble(val, true);
-        await askQuestion();
-        renderLastAnswerToQa();
     }
+} else {
+    if (!userData.lastRecipeText) {
+        alert(t('alertNoRecipe') || 'Please generate a recipe first.');
+        return;
+    }
+    addBubble(val, true);
+    await askQuestion();
+    renderLastAnswerToQa();
+}
     input.value = '';
     const recipeArea = document.getElementById('recipeArea');
 if (recipeArea) recipeArea.innerHTML = '<div class="generating-tip" style="text-align:center;padding:40px;color:#9ca3af;">' + t('generating') + '<span class="dot-anim"></span></div>';
