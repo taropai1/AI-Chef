@@ -1118,8 +1118,13 @@ function renderRecipeToArea() {
     const recipeName = document.getElementById('recipeNameDisplay')?.innerText || '';
     const recipeContent = document.getElementById('recipeContent')?.innerHTML || '';
     if (recipeArea) {
-        recipeArea.innerHTML = `<h4 style="margin-top:0;margin-bottom:12px;">${recipeName}</h4>${recipeContent}`;
-        recipeArea.scrollTop = 0;
+        // 追加新食谱条目，保留历史内容
+        recipeArea.innerHTML += `<div class="recipe-entry" style="margin-bottom:20px; border-bottom:1px solid #e5e7eb; padding-bottom:16px;">
+            <h4 style="margin-top:0;margin-bottom:12px;">${recipeName}</h4>
+            ${recipeContent}
+        </div>`;
+        // 自动滚动到最新内容（最下面）
+        recipeArea.scrollTop = recipeArea.scrollHeight;
     }
 }
 
