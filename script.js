@@ -828,10 +828,15 @@ if (sendBtn) sendBtn.disabled = false;
   } catch (error) {
     console.error(error);
     if (error.message.includes('Free trial expired') || error.message.includes('limit reached')) {
-      alert(t('alertNoPermission')); showPage('page-subscribe');
+        alert(t('alertNoPermission'));
+        showPage('page-subscribe');
     } else {
-      document.getElementById('recipeNameDisplay').innerText = '生成失败：' + error.message;
+        const recipeArea = document.getElementById('recipeArea');
+        if (recipeArea) {
+            recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ 生成失败：' + error.message + '</div>';
+        }
     }
+}
   }finally {
     genBtn.disabled = false;
     genBtn.style.opacity = '1';  // 恢复完全不透明
