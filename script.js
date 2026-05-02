@@ -1097,6 +1097,7 @@ async function handleSend() {
             return;
         }
         await askQuestion();
+        renderLastAnswerToQa();
     }
 
     input.value = '';
