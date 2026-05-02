@@ -702,6 +702,69 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
         bottom: 30px;
     }
 }
+/* 分类/菜系弹窗优化 */
+#page-generator .dropdown-menu {
+    max-height: 40vh;          /* 高度适中，不遮挡上方按钮 */
+    overflow-y: auto;          /* 内容可滚动 */
+    border-radius: 12px;       /* 四角圆润 */
+    background: rgba(255,255,255,0.95); /* 半透明背景 */
+    backdrop-filter: blur(6px);          /* 毛玻璃效果 */
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 6px 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+#page-generator .dropdown-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+#page-generator .qa-area {
+    overflow-y: auto;
+    flex-shrink: 0;   /* 不参与弹性伸缩 */
+}
+#page-generator .content-block {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px); /* 或者固定高度 */
+}
+/* 初始状态：标题可见 */
+#page-generator .top-inner {
+    position: relative;
+    z-index: 50;
+    padding-top: 35px;  /* 距导航栏 35px */
+}
+/* 内容展示状态：标题隐藏，模式按钮固定 */
+#page-generator .top-fixed .top-inner {
+    position: sticky;
+    top: 20px;
+    background: #f8f9fa;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    z-index: 50;
+}
+#page-generator .top-fixed .title {
+    display: none;  /* 隐藏主标题 */
+}
+#page-generator .top-fixed .mode-desc {
+    margin-bottom: 20px; /* 副标题与内容区间距 20px */
+}
+.generating-tip {
+    text-align: center;
+    padding: 40px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+.dot-anim::after {
+    content: '';
+    animation: dots 1.5s steps(3, end) infinite;
+}
+@keyframes dots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+}
+
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
