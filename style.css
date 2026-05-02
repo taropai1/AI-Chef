@@ -834,6 +834,79 @@ html body #page-generator.page.active {
     overflow-y: auto;
     flex-shrink: 0;
 }
+/* ===== 完整的页面骨架与内容窗口方案 ===== */
+
+/* 1. 将生成器页面锁定为全屏的“纸张”，防止整体滚动 */
+html body #page-generator.page.active {
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* 2. 主容器占据所有剩余空间，作为顶部按钮和底部输入框的隔离带 */
+#page-generator .main-wrap {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 3. 内容展示块成为真正的“窗口”容器，自动填充可用空间 */
+#page-generator .content-block {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 700px;
+    padding: 0 20px;        /* 左右边距 */
+    box-sizing: border-box;
+}
+
+/* 4. 食谱内容“窗口”：独立滚动，占据更多空间，并设置上下间距 */
+#page-generator .recipe-area {
+    flex: 1 1 auto;         /* 自动填充可用空间 */
+    overflow-y: auto;        /* 开启垂直滚动 */
+    min-height: 0;
+    margin-top: 20px;        /* 副标题与食谱区的间距 */
+    margin-bottom: 10px;     /* 食谱区与问答区间距 */
+    padding-bottom: 20px;    /* 下边线向下扩大20px，增加视觉空间 */
+    scroll-behavior: smooth; /* 平滑滚动体验 */
+}
+
+/* 5. 问答内容“窗口”：独立滚动，固定高度 */
+#page-generator .qa-area {
+    flex: 0 0 180px;         /* 固定高度180px，不伸缩 */
+    overflow-y: auto;        /* 开启垂直滚动 */
+    min-height: 0;
+    margin-bottom: 10px;     /* 问答区与输入框间距 */
+}
+
+/* 6. 虚线分割线间距 */
+#page-generator .divider-dash {
+    margin: 10px 0;
+}
+
+/* 7. 按钮区在内容展示状态下的固定方式（层级恢复正常，不再遮盖导航栏） */
+#page-generator .top-fixed .top-inner {
+    position: sticky;
+    top: 60px;
+    z-index: 5;              /* 低于导航栏的层级 */
+    background-color: #f8f9fa;
+    padding-top: 20px;       /* 导航栏与按钮区上缘间距 */
+    padding-bottom: 8px;
+    margin-top: 0;
+}
+
+/* 8. 隐藏主标题，显示副标题，并设置其下边距 */
+#page-generator .top-fixed .title {
+    display: none;
+}
+#page-generator .top-fixed .mode-desc {
+    margin-bottom: 0;        /* 副标题与食谱区之间的间距已由食谱区的 margin-top 控制 */
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
