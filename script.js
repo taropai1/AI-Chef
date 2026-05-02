@@ -1190,6 +1190,7 @@ async function handleSend() {
     input.value = '';
     const recipeArea = document.getElementById('recipeArea');
 if (recipeArea) recipeArea.innerHTML = `<div class="generating-tip">${t('generating')}<span class="dot-anim"></span></div>`;
+recipeArea.innerHTML = '<div class="generating-tip" style="text-align:center;padding:40px;color:#9ca3af;">' + t('generating') + '</div>';
 }
 
 function initNewGenerator() {
