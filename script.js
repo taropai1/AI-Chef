@@ -636,7 +636,7 @@ const translations = {
     homeFeature6Title: 'Ideias ilimitadas', homeFeature6Desc: 'Toque Gerar novamente para novas ideias culinárias quando quiser.',
     homeBottomTitle: 'Simples. Rápido. Delicioso.', homeBottomDesc: 'Digite qualquer palavra-chave relacionada a comida para explorar receitas infinitas. Obtenha pratos populares e autênticos de culinárias do mundo com IA.',
     homeSubscriptionLink: 'Assinatura'
-  }
+  },
   inputPlaceholder: {
     en: 'Tap the category and cuisine buttons, choose what you want to eat!',
     es: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!',
