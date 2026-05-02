@@ -1731,8 +1731,6 @@ function switchLang(lang) {
     updateLimitInfo();
     if (userData) renderProfile();
     // 同步生成器页面的分类/菜系按钮文字
-const categoryBtn = document.getElementById('categoryBtn');
-const cuisineBtn = document.getElementById('cuisineBtn');
 if (categoryBtn) {
     const mealType = document.getElementById('mealType');
     const catVal = mealType ? mealType.value : 'standard';
