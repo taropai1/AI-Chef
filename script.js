@@ -858,12 +858,6 @@ CRITICAL: You MUST translate ALL section headings (e.g. "Ingredients", "Instruct
         }
     }
   
-  }finally {
-    genBtn.disabled = false;
-    genBtn.style.opacity = '1';  // 恢复完全不透明
-}
-}
-
 function renderRecipeContent(text) {
   const blocks = text.split(/\n\s*\n/);
   const name = blocks[0]?.trim() || '';
