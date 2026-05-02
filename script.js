@@ -926,34 +926,34 @@ async function askQuestion() {
         alert(t('qLimitReached') + ' ' + t('alertNoPoints'));
         return;
     }
-    const question = document.getElementById('qaInput').value.trim();
-    if (!question)
-        return;
+    const question = document.getElementById('dishName').value.trim();
+    if (!question) return;
 
-    const sendBtn = document.getElementById('qaSendBtn');
-if (sendBtn) sendBtn.disabled = true;
-    const historyEl = document.getElementById('qaHistory');  // 注意 ID 是 qaHistory
+    const sendBtn = document.getElementById('btnGenerate');
+    if (sendBtn) sendBtn.disabled = true;
+    const historyEl = document.getElementById('qaHistory');
     historyEl.innerHTML += `<div class="qa"><q>${question}</q></div>`;
-    historyEl.scrollTop = historyEl.scrollHeight;  //  自动滚动到底部
+    historyEl.scrollTop = historyEl.scrollHeight;
 
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
 
         const lang = getCurrentLang();
-const langMap = {
-    'en': 'English',
-    'es': 'Español',
-    'fr': 'Français',
-    'de': 'Deutsch',
-    'it': 'Italiano',
-    'pt': 'Português',
-    'zh-CN': '中文'
-};
-const targetLang = langMap[lang] || 'English';
+        const langMap = {
+            'en': 'English',
+            'es': 'Español',
+            'fr': 'Français',
+            'de': 'Deutsch',
+            'it': 'Italiano',
+            'pt': 'Português',
+            'zh-CN': '中文'
+        };
+        const targetLang = langMap[lang] || 'English';
 
-      const systemContent = `You are a professional nutrition chef assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks. The following recipe is for reference:\n\n${userData.lastRecipeText}`;
-       const response = await fetch(DEEPSEEK_API, {
+        const systemContent = `You are a professional nutrition chef assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks. The following recipe is for reference:\n\n${userData.lastRecipeText}`;
+
+        const response = await fetch(DEEPSEEK_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -978,18 +978,20 @@ const targetLang = langMap[lang] || 'English';
         if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
 
         historyEl.innerHTML += `<div class="qa"><a>${answer}</a></div>`;
-        historyEl.scrollTop = historyEl.scrollHeight;  // 再次滚动到底部
+        historyEl.scrollTop = historyEl.scrollHeight;
 
         const res = await apiCall('/api/user/record-question', { method: 'POST' });
         userData.qLeft = res.qLeft;
-        document.getElementById('qaLimitNote').innerText = `${t('qLeft')}: ${userData.qLeft}`;
+        const note = document.getElementById('qaLimitNote');
+        if (note) note.innerText = `${t('qLeft')}: ${userData.qLeft}`;
     } catch (error) {
         historyEl.innerHTML += `<div class="qa"><a>Error, please try again.</a></div>`;
         historyEl.scrollTop = historyEl.scrollHeight;
     } finally {
-        const sendBtn = document.getElementById('qaSendBtn');
-if (sendBtn) sendBtn.disabled = false;
-        document.getElementById('qaInput').value = '';
+        const sendBtn = document.getElementById('btnGenerate');
+        if (sendBtn) sendBtn.disabled = false;
+        const input = document.getElementById('dishName');
+        if (input) input.value = '';
     }
 }
 // ==================== 生成器新布局（最简同步版） ====================
