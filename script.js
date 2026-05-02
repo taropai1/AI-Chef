@@ -1245,12 +1245,15 @@ function initNewGenerator() {
     document.getElementById('recipeArea').innerHTML = '';
     document.getElementById('qaArea').innerHTML = '';
     switchMode('recipe');
-    const mainWrap = document.getElementById('mainWrap');
-    const contentBlock = document.getElementById('contentBlock');
-    if (mainWrap) mainWrap.classList.remove('top-fixed');
-    if (contentBlock) contentBlock.classList.remove('show');
-    const sendBtn = document.getElementById('btnGenerate');
-if (sendBtn) sendBtn.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+    
+const mainWrap = document.getElementById('mainWrap');
+const contentBlock = document.getElementById('contentBlock');
+if (mainWrap) mainWrap.classList.remove('top-fixed');
+if (contentBlock) contentBlock.classList.remove('show');
+
+const sendBtn = document.getElementById('btnGenerate');
+if (sendBtn) {
+    sendBtn.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
 }
 
 if (document.readyState === 'loading') {
