@@ -727,6 +727,24 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
     flex-direction: column;
     height: calc(100vh - 200px); /* 或者固定高度 */
 }
+
+.generating-tip {
+    text-align: center;
+    padding: 40px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+.dot-anim::after {
+    content: '';
+    animation: dots 1.5s steps(3, end) infinite;
+}
+@keyframes dots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+}
+
 /* 初始状态：标题可见 */
 #page-generator .top-inner {
     position: relative;
@@ -748,23 +766,6 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 #page-generator .top-fixed .mode-desc {
     margin-bottom: 20px; /* 副标题与内容区间距 20px */
 }
-.generating-tip {
-    text-align: center;
-    padding: 40px;
-    color: #9ca3af;
-    font-size: 14px;
-}
-.dot-anim::after {
-    content: '';
-    animation: dots 1.5s steps(3, end) infinite;
-}
-@keyframes dots {
-    0% { content: ''; }
-    33% { content: '.'; }
-    66% { content: '..'; }
-    100% { content: '...'; }
-}
-
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
