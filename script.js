@@ -637,6 +637,17 @@ const translations = {
     homeBottomTitle: 'Simples. Rápido. Delicioso.', homeBottomDesc: 'Digite qualquer palavra-chave relacionada a comida para explorar receitas infinitas. Obtenha pratos populares e autênticos de culinárias do mundo com IA.',
     homeSubscriptionLink: 'Assinatura'
   }
+  inputPlaceholder: {
+    en: 'Tap the category and cuisine buttons, choose what you want to eat!',
+    es: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!',
+    fr: 'Cliquez sur les boutons des catégories et cuisines, choisissez ce que vous voulez déguster!',
+    de: 'Tippe auf Kategorie- und Küchenbuttons, wähle was du essen möchtest!',
+    it: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!',
+    pt: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!',
+    'zh-CN': '点开分类和菜系按钮，选择你想吃的美味！'
+}
+  generating: { en: 'Generating your recipe...', es: 'Generando tu receta...', fr: 'Génération de votre recette...', de: 'Ihr Rezept wird erstellt...', it: 'Generando la tua ricetta...', pt: 'Gerando sua receita...', 'zh-CN': '正在生成食谱...' },
+  generateFailed: { en: 'Generation failed, please try again.', es: 'Falló la generación, inténtelo de nuevo.', fr: 'Échec de la génération, veuillez réessayer.', de: 'Erstellung fehlgeschlagen, bitte versuchen Sie es erneut.', it: 'Generazione fallita, riprova.', pt: 'Falha na geração, tente novamente.', 'zh-CN': '食谱生成失败，请重新生成' }
 };
 
 function t(key, params) {
@@ -1205,8 +1216,8 @@ function initNewGenerator() {
 
     const categoryBtn = document.getElementById('categoryBtn');
     const cuisineBtn = document.getElementById('cuisineBtn');
-    if (categoryBtn) categoryBtn.textContent = t('optStandard') || 'Standard';
-    if (cuisineBtn) cuisineBtn.textContent = CUISINES[0] || 'American';
+    if (categoryBtn) categoryBtn.textContent = t('category') || t('genMealType') || 'Category';
+    if (cuisineBtn) cuisineBtn.textContent = t('cuisine') || t('genCuisine') || 'Cuisine';
 
     const mealTypeSelect = document.getElementById('mealType');
     if (mealTypeSelect) mealTypeSelect.value = 'standard';
@@ -1738,6 +1749,46 @@ const cuisineMenu = document.getElementById('cuisineMenu');
 if (cuisineMenu) {
     const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
     cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
+}
+    // 同步生成器页面的分类/菜系按钮文字
+const categoryBtn = document.getElementById('categoryBtn');
+const cuisineBtn = document.getElementById('cuisineBtn');
+if (categoryBtn) {
+    const mealType = document.getElementById('mealType');
+    if (mealType && mealType.value !== 'standard') {
+        // 用户已手动选过，保持具体选项名
+        const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
+        categoryBtn.textContent = catMap[mealType.value] || mealType.value;
+    } else {
+        // 未选过，显示“分类”
+        categoryBtn.textContent = t('category') || t('genMealType') || 'Category';
+    }
+}
+if (cuisineBtn) {
+    const cuisineSelect = document.getElementById('cuisine');
+    if (cuisineSelect && cuisineSelect.value) {
+        const curCui = cuisineSelect.value;
+        const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+        cuisineBtn.textContent = map[curCui] || curCui;
+    } else {
+        cuisineBtn.textContent = t('cuisine') || t('genCuisine') || 'Cuisine';
+    }
+}
+// 更新菜系弹窗内容
+const cuisineMenu = document.getElementById('cuisineMenu');
+if (cuisineMenu) {
+    const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+    cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
+}
+// 更新分类弹窗内容
+const categoryMenu = document.getElementById('categoryMenu');
+if (categoryMenu) {
+    const items = categoryMenu.querySelectorAll('.dropdown-item');
+    if (items.length >= 3) {
+        items[0].textContent = t('optStandard');
+        items[1].textContent = t('optBaby');
+        items[2].textContent = t('optPregnancy');
+    }
 }
     document.getElementById('langDropdown').style.display = 'none';
 }
