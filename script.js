@@ -1710,6 +1710,26 @@ function switchLang(lang) {
     renderLanguage(); 
     updateLimitInfo();
     if (userData) renderProfile();
+    // 同步生成器页面的分类/菜系按钮文字
+const categoryBtn = document.getElementById('categoryBtn');
+const cuisineBtn = document.getElementById('cuisineBtn');
+if (categoryBtn) {
+    const mealType = document.getElementById('mealType');
+    const catVal = mealType ? mealType.value : 'standard';
+    const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
+    categoryBtn.textContent = catMap[catVal] || catVal;
+}
+if (cuisineBtn) {
+    const cuisineSelect = document.getElementById('cuisine');
+    const curCui = cuisineSelect ? cuisineSelect.value : CUISINES[0];
+    const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+    cuisineBtn.textContent = map[curCui] || curCui;
+}
+const cuisineMenu = document.getElementById('cuisineMenu');
+if (cuisineMenu) {
+    const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+    cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
+}
     document.getElementById('langDropdown').style.display = 'none';
 }
 function addToHome() { if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) { alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。'); } else if (navigator.share) { navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{}); } else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); } }
