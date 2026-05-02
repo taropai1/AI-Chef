@@ -1170,7 +1170,7 @@ async function handleSend() {
     if (cuisine && !cuisine.value && CUISINES.length > 0) cuisine.value = CUISINES[0];
 
     const recipeArea = document.getElementById('recipeArea');
-    if (recipeArea) recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;">' + t('generating') + '<span class="dot-anim"></span></div>';
+    if (recipeArea) recipeArea.innerHTML = '<div class="generating-tip" style="text-align:center;padding:40px;color:#9ca3af;">' + t('generating') + '<span class="dot-anim"></span></div>';
     const qaArea = document.getElementById('qaArea');
     if (qaArea) qaArea.innerHTML = '';
 
