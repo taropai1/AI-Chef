@@ -296,9 +296,9 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
-/* ==================== 生成器页面最终稳定版 ==================== */
+/* ==================== 生成器页面最终完整版 ==================== */
 
-/* 1. 锁定页面，禁止全局滚动 */
+/* 1. 锁定页面骨架，禁止全局滚动 */
 html body #page-generator.page.active {
     height: 100vh !important;
     overflow: hidden !important;
@@ -310,15 +310,15 @@ html body #page-generator.page.active {
     margin: 0;
 }
 
-/* 2. 主容器：自动填充空间，内部两个窗口独立滚动 */
+/* 2. 主容器：弹性填充，内部两个独立滚动窗口 */
 #page-generator .main-wrap {
     width: 100%;
     max-width: 900px;
     flex: 1;
     overflow: hidden;
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 /* 3. 顶部按钮区：固定在导航栏下方 */
@@ -367,7 +367,7 @@ html body #page-generator.page.active {
     text-align: right;
 }
 
-/* 4. 内容展示块：默认隐藏，发送后显示，包含食谱和问答两个独立窗口 */
+/* 4. 内容展示块：默认隐藏，内有两个独立滚动窗口 */
 #page-generator .content-block {
     display: none;
     flex-direction: column;
@@ -383,7 +383,7 @@ html body #page-generator.page.active {
     display: flex;
 }
 
-/* 4.1 食谱内容窗口：独立滚动，占据剩余空间 */
+/* 4.1 食谱内容窗口 */
 #page-generator .recipe-area {
     flex: 1 1 auto;
     overflow-y: auto;
@@ -393,11 +393,10 @@ html body #page-generator.page.active {
     padding-bottom: 20px;
 }
 
-/* 4.2 问答内容窗口：固定高度（手机端3-5行），内部独立滚动 */
+/* 4.2 问答内容窗口 */
 #page-generator .qa-area {
-    flex: 0 0 auto;
     overflow-y: auto;
-    margin-bottom: 10px;           /* 与输入框的间距 */
+    margin-bottom: 10px;
 }
 
 /* 虚线分割 */
@@ -444,11 +443,11 @@ html body #page-generator.page.active {
     color: #4a90e2;
 }
 
-/* 6. 输入框卡片区 */
+/* 6. 输入框卡片区：默认右上间距50px */
 #page-generator .input-container {
     width: 100%;
     max-width: 700px;
-    margin: 0 auto;
+    margin: 50px auto 0;
     border: 1px solid #e5e7eb;
     border-radius: 24px;
     padding: 12px 18px;
@@ -461,7 +460,7 @@ html body #page-generator.page.active {
     flex-shrink: 0;
 }
 
-/* 手机端：输入框固定在底部，卡片下方留20px */
+/* 手机端：输入框固定在底部 */
 @media (max-width: 767px) {
     #page-generator .input-container {
         position: fixed;
@@ -470,25 +469,22 @@ html body #page-generator.page.active {
         right: 20px;
         width: auto;
         z-index: 99;
-        margin-bottom: 0;
+        margin: 0;
     }
-    /* 给main-wrap留出固定输入框的空间 */
     #page-generator .main-wrap {
         padding-bottom: 100px;
     }
-    /* 问答区高度限定为3-5行文字（约72-120px） */
     #page-generator .qa-area {
         max-height: 120px;
         min-height: 72px;
     }
-    /* 按钮固定最小宽度 */
     #page-generator .dropdown-btn {
-        width: 90px;
-        flex: 0 0 90px;
+        min-width: 90px;
+        max-width: 90px;
     }
 }
 
-/* 桌面端：输入框在正常文档流中，不固定 */
+/* 桌面端：输入框在正常文档流中 */
 @media (min-width: 768px) {
     #page-generator .input-container {
         position: static;
@@ -497,15 +493,12 @@ html body #page-generator.page.active {
     #page-generator .voice-btn {
         display: none;
     }
-    /* 问答区自适应高度 */
     #page-generator .qa-area {
         max-height: 200px;
     }
-    /* 按钮自适应宽度 */
     #page-generator .dropdown-btn {
-        width: auto;
-        flex: 0 0 auto;
-        min-width: 80px;
+        min-width: auto;
+        max-width: none;
     }
 }
 
@@ -598,6 +591,34 @@ html body #page-generator.page.active {
     justify-content: center;
 }
 #page-generator .mode-btn.active { color: #fff; }
+
+/* 分类/菜系按钮：最小宽度，白色药丸风格 */
+#page-generator .dropdown-group {
+    display: flex;
+    gap: 12px;
+    position: relative;
+    z-index: 90;
+}
+#page-generator .dropdown-btn {
+    padding: 6px 10px;
+    border: 0.5px solid #cce4ff;
+    border-radius: 999px;
+    background: #f9fafb;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    white-space: nowrap;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+
+#page-generator .dropdown-btn.active {
+    border-color: #4a90e2;
+    background: #f0f7ff;
+    color: #4a90e2;
+}
 
 /* 气泡消息 */
 #page-generator .bubble-user {
