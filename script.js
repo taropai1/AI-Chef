@@ -1783,7 +1783,8 @@ function switchLang(lang) {
             items[2].textContent = t('optPregnancy');
         }
     }
-
+    var dishInput = document.getElementById('dishName');
+if (dishInput) dishInput.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';
     document.getElementById('langDropdown').style.display = 'none';
 }
 
