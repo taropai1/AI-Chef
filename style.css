@@ -296,53 +296,46 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
-/* ==================== 生成器页面最终整合版 ==================== */
+/* ==================== 生成器页面最终版（双层架构） ==================== */
 
-/* 1. 锁定页面，彻底禁止全局滚动（原设计“固定纸张”逻辑） */
+/* 1. 锁定整个生成器页面为全屏，禁止全局滚动 */
 html body #page-generator.page.active {
     height: 100vh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
     padding-top: 60px;
     box-sizing: border-box;
     margin: 0;
 }
 
-/* 2. 主容器：初始自动高度，发送后100%充满 */
+/* 2. 主容器：在按钮区和输入框之间填充，自己不可滚，内部区域可滚 */
 #page-generator .main-wrap {
     width: 100%;
     max-width: 900px;
+    flex: 1;                          /* 自动占满按钮区和输入框之间的空间 */
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden;                  /* 自己不滚，把滚动交给内部区域 */
     box-sizing: border-box;
 }
-#page-generator .main-wrap.top-fixed {
-    height: 100%;
-    justify-content: flex-start;
-    padding-bottom: 20px;
-}
 
-/* 3. 顶部按钮区：初始标题距导航栏35px，发送后sticky固定 */
+/* 3. 顶部按钮区：初始有标题，发送后固定在导航栏下方 */
 #page-generator .top-inner {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 35px;
+    padding-top: 35px;                 /* 初始状态：标题距导航栏35px */
     flex-shrink: 0;
-    position: relative;
-    z-index: 5;
-}
-#page-generator .main-wrap.top-fixed .top-inner {
     position: sticky;
-    top: 60px;
+    top: 60px;                         /* 导航栏高度 */
     z-index: 10;
     background: #f8f9fa;
-    margin-top: 20px;
+}
+#page-generator .main-wrap.top-fixed .top-inner {
+    padding-top: 20px;                 /* 发送后：按钮行距导航栏20px */
     padding-bottom: 8px;
 }
 
@@ -354,11 +347,11 @@ html body #page-generator.page.active {
     text-align: center;
     margin-bottom: 24px;
 }
-#page-generator .main-wrap.top-fixed .title {
-    display: none;
+#page-generator .top-fixed .title {
+    display: none;                     /* 发送后隐藏主标题 */
 }
 
-/* 副标题对齐：左对齐空2格 / 右对齐省略号留白 */
+/* 副标题 */
 #page-generator .mode-desc {
     font-size: 12px;
     color: #9ca3af;
@@ -376,7 +369,7 @@ html body #page-generator.page.active {
     text-align: right;
 }
 
-/* 4. 内容展示块：默认隐藏，发送后才显示 */
+/* 4. 内容展示块：默认隐藏，发送后显示，内部两个独立滚动窗口 */
 #page-generator .content-block {
     display: none;
     flex: 1;
@@ -449,14 +442,13 @@ html body #page-generator.page.active {
     cursor: pointer;
     white-space: nowrap;
     line-height: 1.3;
-    transition: all 0.15s ease;
 }
 #page-generator .dropdown-item:hover {
     background: #f0f7ff;
     color: #4a90e2;
 }
 
-/* 6. 输入框卡片区 */
+/* 6. 输入框卡片区：始终固定在视口底部 */
 #page-generator .input-container {
     width: 100%;
     max-width: 700px;
@@ -476,13 +468,6 @@ html body #page-generator.page.active {
 /* 桌面端 */
 @media (min-width: 768px) {
     #page-generator .input-container {
-        position: static;
-        margin-bottom: 20px;
-    }
-    #page-generator .voice-btn {
-        display: none;
-    }
-    #page-generator .main-wrap.top-fixed .input-container {
         position: fixed;
         bottom: 20px;
         left: 50%;
@@ -490,13 +475,16 @@ html body #page-generator.page.active {
         z-index: 99;
         margin-bottom: 0;
     }
+    #page-generator .voice-btn {
+        display: none;
+    }
 }
 
 /* 移动端 */
 @media (max-width: 767px) {
     #page-generator .input-container {
         position: fixed;
-        bottom: 30px;
+        bottom: 30px;                    /* 比原设计下移10px */
         left: 20px;
         right: 20px;
         width: auto;
@@ -594,7 +582,7 @@ html body #page-generator.page.active {
 }
 #page-generator .mode-btn.active { color: #fff; }
 
-/* 下拉按钮组：固定等宽，文案过长截断 */
+/* 下拉按钮组：移动端固定宽度，桌面端自适应 */
 #page-generator .dropdown-group {
     display: flex;
     gap: 12px;
@@ -602,8 +590,6 @@ html body #page-generator.page.active {
     z-index: 90;
 }
 #page-generator .dropdown-btn {
-    width: 90px;
-    flex: 0 0 90px;
     padding: 6px 10px;
     border: 0.5px solid #cce4ff;
     border-radius: 999px;
@@ -612,10 +598,23 @@ html body #page-generator.page.active {
     color: #6b7280;
     cursor: pointer;
     white-space: nowrap;
+    text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: center;
     box-sizing: border-box;
+}
+@media (max-width: 767px) {
+    #page-generator .dropdown-btn {
+        width: 90px;
+        flex: 0 0 90px;
+    }
+}
+@media (min-width: 768px) {
+    #page-generator .dropdown-btn {
+        width: auto;
+        flex: 0 0 auto;
+        min-width: 80px;
+    }
 }
 #page-generator .dropdown-btn.active {
     border-color: #4a90e2;
@@ -623,7 +622,7 @@ html body #page-generator.page.active {
     color: #4a90e2;
 }
 
-/* 气泡消息：用户右侧，AI左侧 */
+/* 气泡消息 */
 #page-generator .bubble-user {
     align-self: flex-end;
     background: #cce5ff;
@@ -633,7 +632,6 @@ html body #page-generator.page.active {
     max-width: 85%;
     line-height: 1.5;
     font-size: 14px;
-    word-break: break-word;
 }
 #page-generator .bubble-ai {
     align-self: flex-start;
@@ -644,7 +642,6 @@ html body #page-generator.page.active {
     max-width: 85%;
     line-height: 1.5;
     font-size: 14px;
-    word-break: break-word;
 }
 
 /* 加载动画 */
