@@ -623,18 +623,19 @@ html body #page-generator.page.active {
 @keyframes dots {
     0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; }
 }
-/* 为弹窗提供定位参考 */
 #page-generator .dropdown {
     position: relative;
 }
-
-/* 弹窗相对于触发按钮居中，外观沿用全局样式 */
 #page-generator .dropdown-menu {
     left: 50%;
     transform: translateX(-50%);
     max-height: 200px;
     overflow-y: auto;
-}
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 4px 0;
 }
 /* 隐藏废弃旧元素 */
 .card-generator, .card-content, .gen-header, .form, .help-trigger, .generate-btn, .recipe-banner, .content-nav, .recover {
