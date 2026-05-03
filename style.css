@@ -296,9 +296,10 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
-/* ==================== 生成器页面最终完整版 ==================== */
 
-/* 1. 锁定页面骨架，禁止全局滚动 */
+/* ==================== 生成器页面最终版 ==================== */
+
+/* 1. 锁定页面，禁止全局滚动 */
 html body #page-generator.page.active {
     height: 100vh !important;
     overflow: hidden !important;
@@ -310,15 +311,15 @@ html body #page-generator.page.active {
     margin: 0;
 }
 
-/* 2. 主容器：弹性填充，内部两个独立滚动窗口 */
+/* 2. 主容器：弹性填充，内部可滚动 */
 #page-generator .main-wrap {
     width: 100%;
     max-width: 900px;
     flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
     box-sizing: border-box;
+    padding-bottom: 20px;
 }
 
 /* 3. 顶部按钮区：固定在导航栏下方 */
@@ -367,12 +368,10 @@ html body #page-generator.page.active {
     text-align: right;
 }
 
-/* 4. 内容展示块：默认隐藏，内有两个独立滚动窗口 */
+/* 4. 内容展示块 */
 #page-generator .content-block {
     display: none;
     flex-direction: column;
-    flex: 1;
-    overflow: hidden;
     width: 100%;
     max-width: 700px;
     margin: 0 auto;
@@ -383,20 +382,19 @@ html body #page-generator.page.active {
     display: flex;
 }
 
-/* 4.1 食谱内容窗口 */
+/* 食谱窗口 */
 #page-generator .recipe-area {
     flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0;
     margin-top: 20px;
     margin-bottom: 10px;
     padding-bottom: 20px;
 }
 
-/* 4.2 问答内容窗口 */
+/* 问答窗口 */
 #page-generator .qa-area {
     overflow-y: auto;
     margin-bottom: 10px;
+    align-items: flex-start;
 }
 
 /* 虚线分割 */
@@ -407,7 +405,7 @@ html body #page-generator.page.active {
     margin: 8px 0;
 }
 
-/* 5. 分类/菜系弹窗 */
+/* 5. 弹窗 */
 #page-generator .dropdown {
     position: relative;
 }
@@ -442,8 +440,14 @@ html body #page-generator.page.active {
     background: #f0f7ff;
     color: #4a90e2;
 }
+#page-generator .dropdown-item:first-child {
+    padding-top: 12px;
+}
+#page-generator .dropdown-item:last-child {
+    padding-bottom: 12px;
+}
 
-/* 6. 输入框卡片区：默认右上间距50px */
+/* 6. 输入框卡片区 */
 #page-generator .input-container {
     width: 100%;
     max-width: 700px;
@@ -460,7 +464,7 @@ html body #page-generator.page.active {
     flex-shrink: 0;
 }
 
-/* 手机端：输入框固定在底部 */
+/* 移动端 */
 @media (max-width: 767px) {
     #page-generator .input-container {
         position: fixed;
@@ -484,7 +488,7 @@ html body #page-generator.page.active {
     }
 }
 
-/* 桌面端：输入框在正常文档流中 */
+/* 桌面端 */
 @media (min-width: 768px) {
     #page-generator .input-container {
         position: static;
@@ -592,7 +596,7 @@ html body #page-generator.page.active {
 }
 #page-generator .mode-btn.active { color: #fff; }
 
-/* 分类/菜系按钮：最小宽度，白色药丸风格 */
+/* 下拉按钮组 */
 #page-generator .dropdown-group {
     display: flex;
     gap: 12px;
@@ -613,33 +617,36 @@ html body #page-generator.page.active {
     text-overflow: ellipsis;
     box-sizing: border-box;
 }
-
 #page-generator .dropdown-btn.active {
     border-color: #4a90e2;
     background: #f0f7ff;
     color: #4a90e2;
 }
 
-/* 气泡消息 */
+/* 气泡消息：自然宽度，随内容缩放 */
 #page-generator .bubble-user {
     align-self: flex-end;
     background: #cce5ff;
     color: #1f2937;
-    padding: 12px 16px;
-    border-radius: 16px 16px 4px 16px;
-    max-width: 85%;
-    line-height: 1.5;
+    padding: 10px 14px;
+    border-radius: 18px 18px 4px 18px;
+    max-width: 75%;
+    line-height: 1.4;
     font-size: 14px;
+    display: inline-block;
+    width: fit-content;
 }
 #page-generator .bubble-ai {
     align-self: flex-start;
     background: #f3f4f6;
     color: #1f2937;
-    padding: 12px 16px;
-    border-radius: 16px 16px 16px 4px;
-    max-width: 85%;
-    line-height: 1.5;
+    padding: 10px 14px;
+    border-radius: 18px 18px 18px 4px;
+    max-width: 75%;
+    line-height: 1.4;
     font-size: 14px;
+    display: inline-block;
+    width: fit-content;
 }
 
 /* 加载动画 */
@@ -667,6 +674,7 @@ html body #page-generator.page.active {
 
 /* 导航栏置顶 */
 .nav { z-index: 9999 !important; }
+
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
