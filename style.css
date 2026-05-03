@@ -298,7 +298,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 }
 /* ==================== 生成器页面最终整合版 ==================== */
 
-/* 1. 页面骨架：初始居中，发送后锁定全屏 */
+/* 1. 锁定页面，彻底禁止全局滚动（原设计“固定纸张”逻辑） */
 html body #page-generator.page.active {
     height: 100vh !important;
     overflow: hidden !important;
@@ -311,7 +311,7 @@ html body #page-generator.page.active {
     margin: 0;
 }
 
-/* 2. 主容器：初始不设高度自然居中，发送后才充满 */
+/* 2. 主容器：初始自动高度，发送后100%充满 */
 #page-generator .main-wrap {
     width: 100%;
     max-width: 900px;
@@ -326,7 +326,7 @@ html body #page-generator.page.active {
     padding-bottom: 20px;
 }
 
-/* 3. 顶部按钮区：初始有标题距导航栏35px，发送后sticky固定距导航栏20px */
+/* 3. 顶部按钮区：初始标题距导航栏35px，发送后sticky固定 */
 #page-generator .top-inner {
     width: 100%;
     display: flex;
@@ -358,7 +358,7 @@ html body #page-generator.page.active {
     display: none;
 }
 
-/* 副标题：左对齐空2格 / 右对齐省略号自然留白 */
+/* 副标题对齐：左对齐空2格 / 右对齐省略号留白 */
 #page-generator .mode-desc {
     font-size: 12px;
     color: #9ca3af;
@@ -376,7 +376,7 @@ html body #page-generator.page.active {
     text-align: right;
 }
 
-/* 4. 内容展示块：默认隐藏，发送后才显示虚线分割 */
+/* 4. 内容展示块：默认隐藏，发送后才显示 */
 #page-generator .content-block {
     display: none;
     flex: 1;
@@ -393,7 +393,7 @@ html body #page-generator.page.active {
     display: flex;
 }
 
-/* 4.1 食谱窗口：与副标题间距20px，下边扩大20px */
+/* 4.1 食谱窗口 */
 #page-generator .recipe-area {
     flex: 1 1 auto;
     overflow-y: auto;
@@ -411,7 +411,7 @@ html body #page-generator.page.active {
     margin-bottom: 10px;
 }
 
-/* 4.3 虚线分割 */
+/* 虚线分割 */
 #page-generator .divider-dash {
     height: 1px;
     background: repeating-linear-gradient(to right, #e5e7eb 50%, transparent 50%);
@@ -419,7 +419,7 @@ html body #page-generator.page.active {
     margin: 8px 0;
 }
 
-/* 5. 分类/菜系弹窗：外观完全独立，不依赖全局 */
+/* 5. 分类/菜系弹窗 */
 #page-generator .dropdown {
     position: relative;
 }
@@ -473,7 +473,7 @@ html body #page-generator.page.active {
     flex-shrink: 0;
 }
 
-/* 桌面端：初始跟随流居中，发送后固定底部 */
+/* 桌面端 */
 @media (min-width: 768px) {
     #page-generator .input-container {
         position: static;
@@ -492,7 +492,7 @@ html body #page-generator.page.active {
     }
 }
 
-/* 移动端：在原设计基础上向下10px，按钮固定最小宽度不被文案撑开 */
+/* 移动端 */
 @media (max-width: 767px) {
     #page-generator .input-container {
         position: fixed;
@@ -501,12 +501,6 @@ html body #page-generator.page.active {
         right: 20px;
         width: auto;
         z-index: 99;
-    }
-    #page-generator .dropdown-btn {
-        min-width: 80px;
-        max-width: 90px;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 }
 
@@ -600,7 +594,7 @@ html body #page-generator.page.active {
 }
 #page-generator .mode-btn.active { color: #fff; }
 
-/* 下拉按钮组：固定宽度，文案过长截断不外溢 */
+/* 下拉按钮组：固定等宽，文案过长截断 */
 #page-generator .dropdown-group {
     display: flex;
     gap: 12px;
@@ -608,6 +602,8 @@ html body #page-generator.page.active {
     z-index: 90;
 }
 #page-generator .dropdown-btn {
+    width: 90px;
+    flex: 0 0 90px;
     padding: 6px 10px;
     border: 0.5px solid #cce4ff;
     border-radius: 999px;
@@ -616,10 +612,10 @@ html body #page-generator.page.active {
     color: #6b7280;
     cursor: pointer;
     white-space: nowrap;
-    flex: 0 0 90px;
-    text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: center;
+    box-sizing: border-box;
 }
 #page-generator .dropdown-btn.active {
     border-color: #4a90e2;
@@ -627,7 +623,7 @@ html body #page-generator.page.active {
     color: #4a90e2;
 }
 
-/* 气泡消息：用户右侧蓝色，AI左侧灰色 */
+/* 气泡消息：用户右侧，AI左侧 */
 #page-generator .bubble-user {
     align-self: flex-end;
     background: #cce5ff;
@@ -637,6 +633,7 @@ html body #page-generator.page.active {
     max-width: 85%;
     line-height: 1.5;
     font-size: 14px;
+    word-break: break-word;
 }
 #page-generator .bubble-ai {
     align-self: flex-start;
@@ -647,6 +644,7 @@ html body #page-generator.page.active {
     max-width: 85%;
     line-height: 1.5;
     font-size: 14px;
+    word-break: break-word;
 }
 
 /* 加载动画 */
@@ -672,7 +670,7 @@ html body #page-generator.page.active {
     display: none !important;
 }
 
-/* 导航栏始终置顶 */
+/* 导航栏置顶 */
 .nav { z-index: 9999 !important; }
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
