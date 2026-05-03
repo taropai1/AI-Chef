@@ -623,7 +623,10 @@ html body #page-generator.page.active {
 @keyframes dots {
     0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; }
 }
-
+#page-generator .dropdown-menu {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+}
 /* 隐藏废弃旧元素 */
 .card-generator, .card-content, .gen-header, .form, .help-trigger, .generate-btn, .recipe-banner, .content-nav, .recover {
     display: none !important;
