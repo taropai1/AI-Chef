@@ -296,22 +296,23 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
-/* ==================== 生成器页面最终稳定布局 ==================== */
 
-/* 1. 页面骨架：全屏高度，溢出隐藏，弹性列布局 */
+/* ==================== 生成器页面最终完整版 ==================== */
+
+/* 1. 页面骨架*/
 html body #page-generator.page.active {
     height: 100vh !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;   /* 初始状态垂直居中 */
-    padding-top: 60px;                   /* 为顶部导航栏留出空间 */
+    justify-content: center !important;
+    padding-top: 60px;
     box-sizing: border-box;
     margin: 0;
 }
 
-/* 2. 主容器：限制最大宽度，全高，内部弹性列，不溢出 */
+/* 2. 主容器 */
 #page-generator .main-wrap {
     width: 100%;
     max-width: 900px;
@@ -322,37 +323,37 @@ html body #page-generator.page.active {
     box-sizing: border-box;
 }
 
-/* 2.1 初始状态：垂直方向空间均匀分配，保证标题/按钮/输入框居中 */
+/* 2.1 初始状态：垂直居中 */
 #page-generator .main-wrap:not(.top-fixed) {
     justify-content: center;
 }
 
-/* 2.2 发送后状态：标题消失，内容区撑满剩余空间，输入框固定在底部 */
+/* 2.2 发送后状态：内容区撑满，输入框固定在底部 */
 #page-generator .main-wrap.top-fixed {
     justify-content: flex-start;
-    padding-bottom: 20px;   /* 与页面底部的间距 */
+    padding-bottom: 20px;
 }
 
-/* 3. 顶部区域：包含标题、模式按钮、副标题 */
+/* 3. 顶部区域：标题、模式按钮、副标题 */
 #page-generator .top-inner {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;                /* 水平居中按钮组 */
+    align-items: center;
     position: relative;
     z-index: 5;
     background: transparent;
-    padding-top: 35px;                  /* 初始状态：标题离导航栏 35px */
-    flex-shrink: 0;                    /* 不参与收缩 */
+    padding-top: 35px;
+    flex-shrink: 0;
 }
 
-/* 3.1 发送后状态：标题隐藏，按钮区吸附在导航栏下方 20px */
+/* 3.1 发送后状态：按钮区吸附在导航栏下方 */
 #page-generator .main-wrap.top-fixed .top-inner {
     position: sticky;
-    top: 60px;                         /* 导航栏高度 */
+    top: 60px;
     z-index: 15;
-    background-color: #f8f9fa;        /* 遮挡后面内容 */
-    padding-top: 20px;                /* 按钮行距导航栏 20px */
+    background-color: #f8f9fa;
+    padding-top: 20px;
     padding-bottom: 8px;
 }
 
@@ -382,14 +383,13 @@ html body #page-generator.page.active {
     text-align: center;
 }
 
-/* 发送后副标题下边距 */
 #page-generator .main-wrap.top-fixed .mode-desc {
-    margin-bottom: 0;    /* 与食谱区间距由 recipe-area 的 margin-top 控制 */
+    margin-bottom: 0;
 }
 
-/* 4. 内容展示块：发送后可见，占据剩余空间，内部两个窗口独立滚动 */
+/* 4. 内容展示块 */
 #page-generator .content-block {
-    flex: 1;              /* 撑满剩余高度 */
+    flex: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -404,23 +404,55 @@ html body #page-generator.page.active {
     display: flex;
 }
 
-/* 4.1 食谱窗口：最高优先级滚动，自动充满 */
+/* 4.1 食谱窗口 */
 #page-generator .recipe-area {
     flex: 1 1 auto;
     overflow-y: auto;
     min-height: 0;
-    margin-top: 20px;         /* 离副标题 20px */
+    margin-top: 20px;
     margin-bottom: 10px;
-    padding-bottom: 20px;     /* 下边扩大 20px */
+    padding-bottom: 20px;
     scroll-behavior: smooth;
 }
 
-/* 4.2 问答窗口：固定高度，独立滚动 */
+/* 4.2 问答窗口 */
 #page-generator .qa-area {
     flex: 0 0 180px;
     overflow-y: auto;
     min-height: 0;
     margin-bottom: 10px;
+}
+
+/* 4.3 分类/菜系弹窗 */
+#page-generator .dropdown-menu {
+    position: absolute;
+    max-height: 220px;
+    max-width: 240px;
+    overflow-y: auto;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(6px);
+    border: 0.5px solid #d4e8fb;
+    border-radius: 12px;
+    box-shadow: 0 -2px 12px rgba(74, 144, 226, 0.08);
+    padding: 4px 0;
+    z-index: 101;
+    display: none;
+}
+#page-generator .dropdown-menu.show {
+    display: block;
+}
+#page-generator .dropdown-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+#page-generator .dropdown-item:hover {
+    background: #f0f7ff;
+    color: #4a90e2;
 }
 
 /* 5. 虚线分割 */
@@ -442,16 +474,15 @@ html body #page-generator.page.active {
     flex-direction: column;
     gap: 12px;
     box-sizing: border-box;
-    flex-shrink: 0;          /* 输入框高度不参与缩放 */
+    flex-shrink: 0;
 }
 
-/* 6.1 桌面端 (≥768px)：输入框位于正常文档流底部 */
+/* 6.1 桌面端 */
 @media (min-width: 768px) {
     #page-generator .input-container {
         position: static;
-        margin-bottom: 20px;   /* 距离页面底部 20px */
+        margin-bottom: 20px;
     }
-    /* 发送后，输入框吸附在屏幕底部 */
     #page-generator .main-wrap.top-fixed .input-container {
         position: fixed;
         bottom: 20px;
@@ -460,13 +491,12 @@ html body #page-generator.page.active {
         margin-bottom: 0;
         z-index: 99;
     }
-    /* 桌面端隐藏语音按钮（原设计要求） */
     #page-generator .voice-btn {
         display: none !important;
     }
 }
 
-/* 6.2 移动端 (≤767px)：输入框始终固定在底部，并下移 10px */
+/* 6.2 移动端 */
 @media (max-width: 767px) {
     #page-generator .input-container {
         position: fixed;
@@ -477,11 +507,11 @@ html body #page-generator.page.active {
         z-index: 99;
     }
     #page-generator .main-wrap.top-fixed .input-container {
-        bottom: 30px;   /* 发送后依然保持相同位置 */
+        bottom: 30px;
     }
 }
 
-/* 7. 输入框、按钮、下拉等交互组件样式保持原有设计，仅调整必要的细节 */
+/* 7. 输入框与交互组件 */
 #page-generator .input-area {
     width: 100%;
     border: none;
@@ -539,9 +569,128 @@ html body #page-generator.page.active {
     fill: none;
 }
 
-/* 模式按钮、下拉等保持原设计，不再赘述 */
+/* 模式切换按钮组 */
+#page-generator .mode-group {
+    position: relative;
+    display: flex;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    width: 100%;
+    max-width: 280px;
+    height: 44px;
+    overflow: hidden;
+    background: #ffffff;
+}
 
-/* 18. 隐藏废弃的旧版生成器卡片结构（保留原代码但不可见） */
+#page-generator .mode-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: #4a90e2;
+    border-radius: 999px;
+    transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1;
+}
+
+#page-generator .mode-slider.right {
+    left: 50%;
+}
+
+#page-generator .mode-btn {
+    flex: 1;
+    height: 100%;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+#page-generator .mode-btn.active {
+    color: #ffffff;
+}
+
+/* 下拉按钮与菜单 */
+#page-generator .dropdown {
+    position: relative;
+}
+#page-generator .dropdown-group {
+    display: flex;
+    gap: 12px;
+    position: relative;
+    z-index: 100;
+}
+#page-generator .dropdown-btn {
+    padding: 6px 10px;
+    border: 0.5px solid #cce4ff;
+    border-radius: 999px;
+    background: #f9fafb;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 0 90px;
+    text-align: center;
+    position: relative;
+}
+#page-generator .dropdown-btn.active {
+    border-color: #4a90e2;
+    background: #f0f7ff;
+    color: #4a90e2;
+}
+
+/* 气泡消息 */
+#page-generator .bubble-user {
+    align-self: flex-end;
+    background: #cce5ff;
+    color: #1f2937;
+    padding: 12px 16px;
+    border-radius: 16px 16px 4px 16px;
+    max-width: 85%;
+    line-height: 1.5;
+    font-size: 14px;
+}
+#page-generator .bubble-ai {
+    align-self: flex-start;
+    background: #f3f4f6;
+    color: #1f2937;
+    padding: 12px 16px;
+    border-radius: 16px 16px 16px 4px;
+    max-width: 85%;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+/* 加载动画 */
+.generating-tip {
+    text-align: center;
+    padding: 40px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+.dot-anim::after {
+    content: '';
+    animation: dots 1.5s steps(3, end) infinite;
+}
+@keyframes dots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+}
+
+/* 隐藏废弃的旧版结构 */
 .card-generator,
 .card-content,
 .gen-header,
