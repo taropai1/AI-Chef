@@ -1835,6 +1835,43 @@ if (catMenu) {
         items[2].textContent = t('optPregnancy');
     }
 }
+    // 同步生成器分类/菜系按钮文字
+var genCatBtn = document.getElementById('categoryBtn');
+var genCuiBtn = document.getElementById('cuisineBtn');
+if (genCatBtn) {
+    var mt = document.getElementById('mealType');
+    if (mt && mt.value !== 'standard') {
+        var cmap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
+        genCatBtn.textContent = cmap[mt.value] || mt.value;
+    } else {
+        genCatBtn.textContent = t('category') || 'Category';
+    }
+}
+if (genCuiBtn) {
+    var cs = document.getElementById('cuisine');
+    if (cs && cs.value) {
+        var cmap2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+        genCuiBtn.textContent = cmap2[cs.value] || cs.value;
+    } else {
+        genCuiBtn.textContent = t('cuisine') || 'Cuisine';
+    }
+}
+// 更新菜系弹窗
+var genCuiMenu = document.getElementById('cuisineMenu');
+if (genCuiMenu) {
+    var cmap3 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+    genCuiMenu.innerHTML = CUISINES.map(function(c) { return '<div class="dropdown-item" data-value="' + c + '">' + (cmap3[c] || c) + '</div>'; }).join('');
+}
+// 更新分类弹窗
+var genCatMenu = document.getElementById('categoryMenu');
+if (genCatMenu) {
+    var items = genCatMenu.querySelectorAll('.dropdown-item');
+    if (items.length >= 3) {
+        items[0].textContent = t('optStandard');
+        items[1].textContent = t('optBaby');
+        items[2].textContent = t('optPregnancy');
+    }
+}
     document.getElementById('langDropdown').style.display = 'none';
 }
 function addToHome() { if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) { alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。'); } else if (navigator.share) { navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{}); } else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); } }
