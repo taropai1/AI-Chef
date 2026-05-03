@@ -1737,143 +1737,56 @@ function switchLang(lang) {
     currentLang = lang;
     localStorage.setItem('aiChefLang', lang);
     document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼';
-    document.documentElement.lang = lang;   // ← 新增这一行
-    renderLanguage(); 
+    document.documentElement.lang = lang;
+    renderLanguage();
     updateLimitInfo();
     if (userData) renderProfile();
-    // 同步生成器页面的分类/菜系按钮文字
-if (categoryBtn) {
-    const mealType = document.getElementById('mealType');
-    const catVal = mealType ? mealType.value : 'standard';
-    const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
-    categoryBtn.textContent = catMap[catVal] || catVal;
-}
-if (cuisineBtn) {
-    const cuisineSelect = document.getElementById('cuisine');
-    const curCui = cuisineSelect ? cuisineSelect.value : CUISINES[0];
-    const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-    cuisineBtn.textContent = map[curCui] || curCui;
-}
-const cuisineMenu = document.getElementById('cuisineMenu');
-if (cuisineMenu) {
-    const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-    cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
-}
-    // 同步生成器页面的分类/菜系按钮文字
-const categoryBtn = document.getElementById('categoryBtn');
-const cuisineBtn = document.getElementById('cuisineBtn');
-if (categoryBtn) {
-    const mealType = document.getElementById('mealType');
-    if (mealType && mealType.value !== 'standard') {
-        // 用户已手动选过，保持具体选项名
-        const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
-        categoryBtn.textContent = catMap[mealType.value] || mealType.value;
-    } else {
-        // 未选过，显示“分类”
-        categoryBtn.textContent = t('category') || t('genMealType') || 'Category';
+
+    // 同步分类按钮文字
+    const catBtn = document.getElementById('categoryBtn');
+    if (catBtn) {
+        const mealType = document.getElementById('mealType');
+        if (mealType && mealType.value !== 'standard') {
+            const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
+            catBtn.textContent = catMap[mealType.value] || mealType.value;
+        } else {
+            catBtn.textContent = t('category') || '分类';
+        }
     }
-}
-if (cuisineBtn) {
-    const cuisineSelect = document.getElementById('cuisine');
-    if (cuisineSelect && cuisineSelect.value) {
-        const curCui = cuisineSelect.value;
-        const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-        cuisineBtn.textContent = map[curCui] || curCui;
-    } else {
-        cuisineBtn.textContent = t('cuisine') || t('genCuisine') || 'Cuisine';
+
+    // 同步菜系按钮文字
+    const cuiBtn = document.getElementById('cuisineBtn');
+    if (cuiBtn) {
+        const cuisineSelect = document.getElementById('cuisine');
+        if (cuisineSelect && cuisineSelect.value) {
+            const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+            cuiBtn.textContent = map[cuisineSelect.value] || cuisineSelect.value;
+        } else {
+            cuiBtn.textContent = t('cuisine') || '菜系';
+        }
     }
-}
-// 更新菜系弹窗内容
-if (cuisineMenu) {
-    const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-    cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
-}
-// 更新分类弹窗内容
-const categoryMenu = document.getElementById('categoryMenu');
-if (categoryMenu) {
-    const items = categoryMenu.querySelectorAll('.dropdown-item');
-    if (items.length >= 3) {
-        items[0].textContent = t('optStandard');
-        items[1].textContent = t('optBaby');
-        items[2].textContent = t('optPregnancy');
+
+    // 更新菜系弹窗
+    const cuiMenu = document.getElementById('cuisineMenu');
+    if (cuiMenu) {
+        const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+        cuiMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
     }
-}
-    // 在 switchLang 末尾，document.getElementById('langDropdown').style.display = 'none'; 之前添加
-const catBtn = document.getElementById('categoryBtn');
-const cuiBtn = document.getElementById('cuisineBtn');
-if (catBtn) {
-    const mealType = document.getElementById('mealType');
-    if (mealType && mealType.value !== 'standard') {
-        const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
-        catBtn.textContent = catMap[mealType.value] || mealType.value;
-    } else {
-        catBtn.textContent = t('category') || '分类';
+
+    // 更新分类弹窗
+    const catMenu = document.getElementById('categoryMenu');
+    if (catMenu) {
+        const items = catMenu.querySelectorAll('.dropdown-item');
+        if (items.length >= 3) {
+            items[0].textContent = t('optStandard');
+            items[1].textContent = t('optBaby');
+            items[2].textContent = t('optPregnancy');
+        }
     }
-}
-if (cuiBtn) {
-    const cuiSelect = document.getElementById('cuisine');
-    if (cuiSelect && cuiSelect.value) {
-        const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-        cuiBtn.textContent = map[cuiSelect.value] || cuiSelect.value;
-    } else {
-        cuiBtn.textContent = t('cuisine') || '菜系';
-    }
-}
-// 更新菜系弹窗
-const cuiMenu = document.getElementById('cuisineMenu');
-if (cuiMenu) {
-    const map2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-    cuiMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map2[c] || c}</div>`).join('');
-}
-// 更新分类弹窗
-const catMenu = document.getElementById('categoryMenu');
-if (catMenu) {
-    const items = catMenu.querySelectorAll('.dropdown-item');
-    if (items.length >= 3) {
-        items[0].textContent = t('optStandard');
-        items[1].textContent = t('optBaby');
-        items[2].textContent = t('optPregnancy');
-    }
-}
-    // 同步生成器分类/菜系按钮文字
-var genCatBtn = document.getElementById('categoryBtn');
-var genCuiBtn = document.getElementById('cuisineBtn');
-if (genCatBtn) {
-    var mt = document.getElementById('mealType');
-    if (mt && mt.value !== 'standard') {
-        var cmap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
-        genCatBtn.textContent = cmap[mt.value] || mt.value;
-    } else {
-        genCatBtn.textContent = t('category') || 'Category';
-    }
-}
-if (genCuiBtn) {
-    var cs = document.getElementById('cuisine');
-    if (cs && cs.value) {
-        var cmap2 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-        genCuiBtn.textContent = cmap2[cs.value] || cs.value;
-    } else {
-        genCuiBtn.textContent = t('cuisine') || 'Cuisine';
-    }
-}
-// 更新菜系弹窗
-var genCuiMenu = document.getElementById('cuisineMenu');
-if (genCuiMenu) {
-    var cmap3 = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-    genCuiMenu.innerHTML = CUISINES.map(function(c) { return '<div class="dropdown-item" data-value="' + c + '">' + (cmap3[c] || c) + '</div>'; }).join('');
-}
-// 更新分类弹窗
-var genCatMenu = document.getElementById('categoryMenu');
-if (genCatMenu) {
-    var items = genCatMenu.querySelectorAll('.dropdown-item');
-    if (items.length >= 3) {
-        items[0].textContent = t('optStandard');
-        items[1].textContent = t('optBaby');
-        items[2].textContent = t('optPregnancy');
-    }
-}
+
     document.getElementById('langDropdown').style.display = 'none';
 }
+
 function addToHome() { if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) { alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。'); } else if (navigator.share) { navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{}); } else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); } }
 function showToast(msg) { alert(msg); } // 简化为alert，无successModal
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
