@@ -403,15 +403,37 @@ html body #page-generator.page.active {
     min-height: 0;
     margin-bottom: 10px;
 }
-
-/* 4.3 弹窗定位（沿用旧版外观，仅限制位置、间距、居中） */
+/* 4.3 分类/菜系弹窗：完全独立，不依赖全局样式 */
 #page-generator .dropdown-menu {
     position: absolute;
-    bottom: calc(100% + 10px);
+    bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
-    max-height: 200px;
+    max-height: 220px;
+    max-width: 220px;
+    min-width: 120px;
     overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    z-index: 100;
+    display: none;
+}
+#page-generator .dropdown-menu.show {
+    display: block;
+}
+#page-generator .dropdown-item {
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #1f2937;
+    cursor: pointer;
+    white-space: nowrap;
+}
+#page-generator .dropdown-item:hover {
+    background: #f0f7ff;
+    color: #4a90e2;
 }
 
 /* 5. 虚线分割 */
@@ -630,11 +652,6 @@ html body #page-generator.page.active {
 }
 
 /* 13. 保证导航栏始终在最顶层 */
-.nav {
-    z-index: 9999 !important;
-}
-
-/* 19. 强制导航栏始终在顶层 */
 .nav {
     z-index: 9999 !important;
 }
