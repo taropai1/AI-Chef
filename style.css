@@ -296,9 +296,9 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
-/* ==================== 生成器页面最终完整版 ==================== */
+/* ==================== 生成器页面最终版 ==================== */
 
-/* 1. 页面骨架：初始居中，发送后锁定全屏 */
+/* 1. 页面骨架 */
 html body #page-generator.page.active {
     height: 100vh !important;
     overflow: hidden !important;
@@ -311,7 +311,7 @@ html body #page-generator.page.active {
     margin: 0;
 }
 
-/* 2. 主容器 */
+/* 2. 主容器：初始不设高度，发送后才充满 */
 #page-generator .main-wrap {
     width: 100%;
     max-width: 900px;
@@ -323,7 +323,7 @@ html body #page-generator.page.active {
 #page-generator .main-wrap.top-fixed {
     height: 100%;
     justify-content: flex-start;
-    padding-bottom: 20px;
+    padding-bottom: 90px; /* 给底部固定输入框留足空间，防止问答区被遮挡 */
 }
 
 /* 3. 顶部按钮区 */
@@ -342,10 +342,12 @@ html body #page-generator.page.active {
     top: 60px;
     z-index: 10;
     background: #f8f9fa;
-    margin-top: 20px;
+    padding-top: 0;
+    margin-top: 0;
     padding-bottom: 8px;
 }
 
+/* 标题 */
 #page-generator .title {
     font-size: 18px;
     font-weight: 600;
@@ -357,6 +359,7 @@ html body #page-generator.page.active {
     display: none;
 }
 
+/* 副标题 */
 #page-generator .mode-desc {
     font-size: 12px;
     color: #9ca3af;
@@ -383,7 +386,7 @@ html body #page-generator.page.active {
     display: flex;
 }
 
-/* 4.1 食谱窗口 */
+/* 食谱窗口 */
 #page-generator .recipe-area {
     flex: 1 1 auto;
     overflow-y: auto;
@@ -393,7 +396,7 @@ html body #page-generator.page.active {
     padding-bottom: 20px;
 }
 
-/* 4.2 问答窗口 */
+/* 问答窗口 */
 #page-generator .qa-area {
     flex: 0 0 160px;
     overflow-y: auto;
@@ -401,7 +404,7 @@ html body #page-generator.page.active {
     margin-bottom: 10px;
 }
 
-/* 4.3 弹窗：覆盖全局位置，限制高度，默认隐藏 */
+/* 5. 弹窗：沿用旧版外观，仅控制位置、居中、高度、默认隐藏 */
 #page-generator .dropdown-menu {
     position: absolute;
     bottom: calc(100% + 8px);
@@ -415,7 +418,7 @@ html body #page-generator.page.active {
     display: block;
 }
 
-/* 5. 虚线分割 */
+/* 虚线分割 */
 #page-generator .divider-dash {
     height: 1px;
     background: repeating-linear-gradient(to right, #e5e7eb 0 4px, transparent 4px 8px);
@@ -439,7 +442,7 @@ html body #page-generator.page.active {
     flex-shrink: 0;
 }
 
-/* 桌面端 */
+/* 桌面端：初始跟随流居中，发送后固定底部 */
 @media (min-width: 768px) {
     #page-generator .input-container {
         position: static;
@@ -458,11 +461,11 @@ html body #page-generator.page.active {
     }
 }
 
-/* 移动端 */
+/* 移动端：在原有位置上下调10px缩小间距，并保持按钮最小宽度 */
 @media (max-width: 767px) {
     #page-generator .input-container {
         position: fixed;
-        bottom: 40px;
+        bottom: 30px;
         left: 20px;
         right: 20px;
         width: auto;
@@ -473,7 +476,7 @@ html body #page-generator.page.active {
     }
 }
 
-/* 7. 输入框与交互控件 */
+/* 7. 输入框与控件 */
 #page-generator .input-area {
     width: 100%;
     border: none;
@@ -524,7 +527,7 @@ html body #page-generator.page.active {
     fill: none;
 }
 
-/* 8. 模式切换按钮组 */
+/* 模式按钮 */
 #page-generator .mode-group {
     position: relative;
     display: flex;
@@ -546,9 +549,7 @@ html body #page-generator.page.active {
     transition: left 0.3s ease;
     z-index: 1;
 }
-#page-generator .mode-slider.right {
-    left: 50%;
-}
+#page-generator .mode-slider.right { left: 50%; }
 #page-generator .mode-btn {
     flex: 1;
     height: 100%;
@@ -563,11 +564,9 @@ html body #page-generator.page.active {
     align-items: center;
     justify-content: center;
 }
-#page-generator .mode-btn.active {
-    color: #fff;
-}
+#page-generator .mode-btn.active { color: #fff; }
 
-/* 9. 下拉按钮组 */
+/* 下拉按钮 */
 #page-generator .dropdown-group {
     display: flex;
     gap: 12px;
@@ -592,7 +591,7 @@ html body #page-generator.page.active {
     color: #4a90e2;
 }
 
-/* 10. 气泡消息 */
+/* 气泡 */
 #page-generator .bubble-user {
     align-self: flex-end;
     background: #cce5ff;
@@ -610,7 +609,7 @@ html body #page-generator.page.active {
     font-size: 14px;
 }
 
-/* 11. 加载动画 */
+/* 加载动画 */
 .generating-tip {
     text-align: center;
     padding: 40px;
@@ -622,21 +621,16 @@ html body #page-generator.page.active {
     animation: dots 1.5s steps(3, end) infinite;
 }
 @keyframes dots {
-    0% { content: ''; }
-    33% { content: '.'; }
-    66% { content: '..'; }
-    100% { content: '...'; }
+    0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; }
 }
 
-/* 12. 隐藏废弃旧元素 */
+/* 隐藏废弃旧元素 */
 .card-generator, .card-content, .gen-header, .form, .help-trigger, .generate-btn, .recipe-banner, .content-nav, .recover {
     display: none !important;
 }
 
-/* 13. 保证导航栏始终在最顶层 */
-.nav {
-    z-index: 9999 !important;
-}
+/* 导航栏置顶 */
+.nav { z-index: 9999 !important; }
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
