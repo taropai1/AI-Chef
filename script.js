@@ -1242,7 +1242,18 @@ function initNewGenerator() {
             }
         });
     }
-
+    const catBtn = document.getElementById('categoryBtn');
+if (catBtn) {
+    const mealType = document.getElementById('mealType');
+    if (mealType && mealType.value !== 'standard') {
+        // 已选择具体分类，显示对应翻译
+        const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
+        catBtn.textContent = catMap[mealType.value] || mealType.value;
+    } else {
+        // 未选择，显示“分类”
+        catBtn.textContent = t('category') || 'Category';
+    }
+}
     switchMode('recipe');
 
 const mainWrap = document.getElementById('mainWrap');
