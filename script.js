@@ -1754,7 +1754,7 @@ function switchLang(lang) {
             const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
             catBtn.textContent = catMap[mealType.value] || mealType.value;
         } else {
-            catBtn.textContent = t('category') || '分类';
+            catBtn.textContent = t('category') || 'Category';
         }
     }
 
