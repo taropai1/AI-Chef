@@ -296,236 +296,131 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     margin-left: 16px;   /* 向右移动 16px，可根据需要调整 */
     /* 保留原有其他样式 */
 }
-/* ==================== 生成器页面最终稳定版（层级清晰） ==================== */
+/* ==================== 生成器页面（基于开发文档） ==================== */
 
-/* 1. 锁定整个生成器页面为全屏固定画布 */
+/* 页面骨架：锁定全屏，弹性居中 */
 html body #page-generator.page.active {
-    height: 100vh !important;           /* 强制全屏高度 */
-    overflow: hidden !important;        /* 页面整体不可滚 */
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important; /* 初始状态垂直居中 */
-    padding-top: 60px;                  /* 给导航栏让位 */
-    box-sizing: border-box;
-    margin: 0;
+    height: 100vh !important; overflow: hidden !important;
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important;
+    padding-top: 60px; box-sizing: border-box; margin: 0;
 }
 
-/* 2. 主容器：弹性占满剩余空间，但不裁剪 sticky 元素 */
+/* 主容器：弹性填充，自身不滚 */
 #page-generator .main-wrap {
-    width: 100%;
-    max-width: 900px;
-    flex: 1;                            /* 自动获取按钮区和输入框之间的高度 */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: visible;                  /* 不裁剪，保证 sticky 生效 */
-    box-sizing: border-box;
+    width: 100%; max-width: 900px; flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    overflow: visible; box-sizing: border-box;
 }
 
-/* 3. 顶部按钮区：初始在弹性流中由居中控制，发送后粘滞固定 */
+/* 顶部按钮区：初始透明，发送后粘滞固定 */
 #page-generator .top-inner {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-    padding-top: 35px;                  /* 初始状态：标题离导航栏 35px */
-    padding-bottom: 8px;
-    z-index: 10;
-    background: transparent;            /* 初始透明，发送后加背景 */
-    transition: background 0.2s;
+    width: 100%; display: flex; flex-direction: column;
+    align-items: center; flex-shrink: 0;
+    padding-top: 35px; padding-bottom: 8px;
+    z-index: 10; background: transparent;
 }
-/* 发送后按钮区粘在导航栏下方，并保证背景不透明 */
 #page-generator .main-wrap.top-fixed .top-inner {
-    position: sticky;
-    top: 60px;                          /* 导航栏高度 */
-    background: #f8f9fa;               /* 挡住后面滚动的内容 */
-    padding-top: 20px;                 /* 发送后按钮行离导航栏实际间距 20px (sticky top 已经包含导航栏高度，这里再补 20px 视觉间距) */
-    padding-bottom: 8px;
+    position: sticky; top: 60px; background: #f8f9fa;
+    padding-top: 20px; padding-bottom: 8px;
 }
 
-/* 标题与副标题样式 */
+/* 标题与副标题 */
 #page-generator .title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
-    text-align: center;
-    margin-bottom: 24px;
+    font-size: 18px; font-weight: 600; color: #1f2937;
+    text-align: center; margin-bottom: 24px;
 }
 #page-generator .mode-desc {
-    font-size: 12px;
-    color: #9ca3af;
-    margin: 4px 0 0;
-    width: 280px;
-    line-height: 1.1;
-    transition: all 0.3s ease;
+    font-size: 12px; color: #9ca3af; margin: 4px 0 0;
+    width: 280px; line-height: 1.1; transition: all 0.3s ease;
 }
-#page-generator .mode-desc.left-indent {
-    padding-left: 16px;
-    text-align: left;
-}
-#page-generator .mode-desc.right-normal {
-    padding-left: 0;
-    text-align: right;
-}
+#page-generator .mode-desc.left-indent { padding-left: 16px; text-align: left; }
+#page-generator .mode-desc.right-normal { padding-left: 0; text-align: right; }
 
-/* 4. 内容展示容器（发送后显示，内部两个切换界面） */
+/* 内容展示容器 */
 #page-generator .content-block {
-    display: none;
-    flex: 1;                            /* 占据剩余空间 */
-    width: 100%;
-    max-width: 700px;
-    padding: 0 20px;
-    box-sizing: border-box;
-    overflow: hidden;                  /* 自己不可滚，由内部子元素滚动 */
+    display: none; flex: 1; width: 100%; max-width: 700px;
+    padding: 0 20px; box-sizing: border-box; overflow: hidden;
     flex-direction: column;
 }
-#page-generator .content-block.show {
-    display: flex;
-}
+#page-generator .content-block.show { display: flex; }
 
-/* 食谱界面：独立滚动区域 */
+/* 食谱区 */
 #page-generator .recipe-area {
-    display: none;
-    flex: 1;
-    overflow-y: auto;                  /* 核心滚动区 */
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    position: relative;                /* 为加载动画提供定位父级 */
+    display: none; flex: 1; overflow-y: auto;
+    margin-top: 20px; margin-bottom: 20px; padding-bottom: 20px;
 }
-#page-generator .recipe-area.show {
-    display: block;
-}
+#page-generator .recipe-area.show { display: block; }
 
-/* 问答界面：独立滚动区域 */
+/* 问答区 */
 #page-generator .qa-area {
-    display: none;
-    flex: 1;
-    overflow-y: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;           /* 默认左对齐，气泡自己控制左右 */
+    display: none; flex: 1; overflow-y: auto;
+    margin-top: 20px; margin-bottom: 20px; padding-bottom: 20px;
+    flex-direction: column; align-items: stretch;
 }
-#page-generator .qa-area.show {
-    display: flex;                     /* 覆盖 display: none */
-}
+#page-generator .qa-area.show { display: flex; }
 
-/* 虚线分割不再使用 */
-#page-generator .divider-dash {
-    display: none;
-}
+/* 虚线分割（不再使用） */
+#page-generator .divider-dash { display: none; }
 
-/* 5. 下拉弹窗（沿用旧版视觉） */
-#page-generator .dropdown {
-    position: relative;
-}
+/* 弹窗 */
+#page-generator .dropdown { position: relative; }
 #page-generator .dropdown-menu {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    max-height: 220px;
-    overflow-y: auto;
-    display: none;
-    background: rgba(255,255,255,0.92);
-    border: 0.5px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    padding: 4px 0;
-    z-index: 100;
-    min-width: 110px;
+    position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%); max-height: 220px; overflow-y: auto;
+    display: none; background: rgba(255,255,255,0.92);
+    border: 0.5px solid #e5e7eb; border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06); padding: 4px 0;
+    z-index: 100; min-width: 110px;
 }
 #page-generator .dropdown-menu.show { display: block; }
 #page-generator .dropdown-item {
-    padding: 6px 14px;
-    font-size: 13px;
-    color: #374151;
-    cursor: pointer;
-    white-space: nowrap;
-    line-height: 1.3;
+    padding: 6px 14px; font-size: 13px; color: #374151;
+    cursor: pointer; white-space: nowrap; line-height: 1.3;
 }
-#page-generator .dropdown-item:hover {
-    background: #f0f7ff;
-    color: #4a90e2;
-}
+#page-generator .dropdown-item:hover { background: #f0f7ff; color: #4a90e2; }
 #page-generator .dropdown-item:first-child { padding-top: 12px; }
 #page-generator .dropdown-item:last-child { padding-bottom: 12px; }
 
-/* 6. 输入框卡片区 */
+/* 输入框卡片区 */
 #page-generator .input-container {
-    width: 100%;
-    max-width: 700px;
-    border: 1px solid #e5e7eb;
-    border-radius: 24px;
-    padding: 12px 18px;
-    background: #fff;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    box-sizing: border-box;
-    flex-shrink: 0;
+    width: 100%; max-width: 700px; border: 1px solid #e5e7eb;
+    border-radius: 24px; padding: 12px 18px; background: #fff;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06); display: flex;
+    flex-direction: column; gap: 12px; box-sizing: border-box; flex-shrink: 0;
 }
 
-/* 移动端固定在底部下方20px */
+/* 移动端 */
 @media (max-width: 767px) {
     #page-generator .input-container {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        right: 20px;
-        width: auto;
-        z-index: 99;
-        margin: 0;
+        position: fixed; bottom: 20px; left: 20px; right: 20px;
+        width: auto; z-index: 99; margin: 0;
     }
-    #page-generator .main-wrap {
-        padding-bottom: 100px;         /* 为固定输入框留出空间 */
-    }
-    #page-generator .dropdown-btn {
-        width: 90px;
-        flex: 0 0 90px;
-    }
+    #page-generator .main-wrap { padding-bottom: 100px; }
+    #page-generator .dropdown-btn { min-width: 90px; max-width: 90px; }
 }
 
-/* 桌面/平板端：输入框自然居中，与按钮区间距50px */
+/* 桌面端 */
 @media (min-width: 768px) {
     #page-generator .input-container {
-        position: static;
-        margin-top: 50px;
-        margin-bottom: 20px;
+        position: static; margin-top: 50px; margin-bottom: 20px;
     }
     #page-generator .voice-btn { display: none; }
-    #page-generator .dropdown-btn {
-        width: auto;
-        flex: 0 0 auto;
-        min-width: 80px;
-    }
+    #page-generator .dropdown-btn { min-width: auto; max-width: none; }
 }
 
-/* 7. 输入框与图标按钮 */
+/* 输入框与控件 */
 #page-generator .input-area {
-    width: 100%;
-    border: none;
-    outline: none;
-    font-size: 15px;
-    padding: 4px 0 0;
-    resize: none;
-    min-height: 36px;
-    max-height: 44px;
-    color: #1f2937;
-    background: transparent;
+    width: 100%; border: none; outline: none; font-size: 15px;
+    padding: 4px 0 0; resize: none; min-height: 36px; max-height: 44px;
+    color: #1f2937; background: transparent;
 }
 #page-generator .func-row { display: flex; align-items: flex-end; justify-content: space-between; }
 #page-generator .action-group { display: flex; gap: 6px; align-items: center; flex-shrink: 0; margin-left: auto; }
 #page-generator .icon-btn {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: transparent; display: flex; align-items: center;
-    justify-content: center; cursor: pointer; color: #6b7280; border: none;
+    width: 36px; height: 36px; border-radius: 50%; background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #6b7280; border: none;
 }
 #page-generator .icon-btn:active { background: #eeeef0; transform: scale(0.96); }
 #page-generator .icon-btn svg {
@@ -533,7 +428,7 @@ html body #page-generator.page.active {
     stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none;
 }
 
-/* 8. 模式切换按钮组 */
+/* 模式按钮组 */
 #page-generator .mode-group {
     position: relative; display: flex; border: 1px solid #e5e7eb;
     border-radius: 999px; width: 280px; height: 44px;
@@ -548,67 +443,47 @@ html body #page-generator.page.active {
 #page-generator .mode-btn {
     flex: 1; height: 100%; border: none; background: transparent;
     font-size: 15px; cursor: pointer; position: relative;
-    z-index: 2; color: #111827; display: flex;
-    align-items: center; justify-content: center;
+    z-index: 2; color: #111827; display: flex; align-items: center; justify-content: center;
 }
 #page-generator .mode-btn.active { color: #fff; }
 
-/* 9. 分类/菜系下拉按钮 */
+/* 下拉按钮组 */
 #page-generator .dropdown-group { display: flex; gap: 12px; position: relative; z-index: 90; }
 #page-generator .dropdown-btn {
-    padding: 6px 10px; border: 0.5px solid #cce4ff;
-    border-radius: 999px; background: #f9fafb; font-size: 13px;
-    color: #6b7280; cursor: pointer; white-space: nowrap;
-    text-align: center; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;
+    padding: 6px 10px; border: 0.5px solid #cce4ff; border-radius: 999px;
+    background: #f9fafb; font-size: 13px; color: #6b7280; cursor: pointer;
+    white-space: nowrap; text-align: center; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;
 }
 #page-generator .dropdown-btn.active { border-color: #4a90e2; background: #f0f7ff; color: #4a90e2; }
 
-/* 10. 气泡（用户右蓝，AI左灰），宽度自适应 */
+/* 气泡消息 */
 #page-generator .bubble-user {
-    align-self: flex-end;
-    background: #cce5ff; color: #1f2937;
+    align-self: flex-end; background: #cce5ff; color: #1f2937;
     padding: 10px 14px; border-radius: 18px 18px 4px 18px;
     max-width: 75%; line-height: 1.4; font-size: 14px;
-    width: fit-content; word-break: break-word;
-    margin-left: auto; /* 辅助右对齐 */
+    width: fit-content; word-break: break-word; margin-left: auto;
 }
 #page-generator .bubble-ai {
-    align-self: flex-start;
-    background: #f3f4f6; color: #1f2937;
+    align-self: flex-start; background: #f3f4f6; color: #1f2937;
     padding: 10px 14px; border-radius: 18px 18px 18px 4px;
     max-width: 75%; line-height: 1.4; font-size: 14px;
-    width: fit-content; word-break: break-word;
-    margin-right: auto; /* 辅助左对齐 */
+    width: fit-content; word-break: break-word; margin-right: auto;
 }
 
-/* 11. 加载动画（绝对定位浮于内容之上，不占据空间，不遮挡内容） */
+/* 加载动画 */
 .generating-tip {
-    position: absolute;           /* 脱离文档流 */
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.7);  /* 半透明遮罩，底下内容仍可见 */
-    color: #9ca3af;
-    font-size: 14px;
-    z-index: 5;
-    pointer-events: none;         /* 不阻挡用户操作 */
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.7); color: #9ca3af;
+    font-size: 14px; z-index: 5; pointer-events: none;
 }
-.dot-anim::after {
-    content: '';
-    animation: dots 1.5s steps(3, end) infinite;
-}
+.dot-anim::after { content: ''; animation: dots 1.5s steps(3,end) infinite; }
 @keyframes dots {
     0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; }
 }
 
-/* 12. 隐藏废弃旧元素 */
-.card-generator, .card-content, .gen-header, .form, .help-trigger, .generate-btn,
-.recipe-banner, .content-nav, .recover { display: none !important; }
-
-/* 13. 导航栏始终在最顶层 */
+/* 导航栏置顶 */
 .nav { z-index: 9999 !important; }
-
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
