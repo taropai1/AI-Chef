@@ -1030,266 +1030,6 @@ async function askQuestion() {
     }
 }
 
-// ==================== 生成器新布局（最终修正版） ====================
-let currentMode = 'recipe';
-
-function getModeBtnText(key) {
-    const text = t(key);
-    return text && text.length <= 8 ? text : key;
-}
-
-function switchMode(mode) {
-    currentMode = mode;
-    const slider = document.getElementById('modeSlider');
-    const desc = document.getElementById('modeDesc');
-    const btns = document.querySelectorAll('#page-generator .mode-btn');
-    btns.forEach(b => b.classList.remove('active'));
-
-    if (mode === 'recipe') {
-        if (slider) slider.classList.remove('right');
-        if (btns[0]) btns[0].classList.add('active');
-        if (desc) {
-            desc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
-            desc.classList.add('left-indent');
-            desc.classList.remove('right-normal');
-        }
-    } else {
-        if (slider) slider.classList.add('right');
-        if (btns[1]) btns[1].classList.add('active');
-        if (desc) {
-            desc.textContent = t('enterQuestion') || 'Ask about this recipe...';
-            desc.classList.add('right-normal');
-            desc.classList.remove('left-indent');
-        }
-    }
-    const sendBtn = document.getElementById('btnGenerate');
-if (sendBtn) sendBtn.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
-
-    // 新增：根据模式切换内容区显示
-    const recipeArea = document.getElementById('recipeArea');
-    const qaArea = document.getElementById('qaArea');
-    if (mode === 'recipe') {
-        if (recipeArea) recipeArea.classList.add('show');
-        if (qaArea) qaArea.classList.remove('show');
-    } else {
-        if (recipeArea) recipeArea.classList.remove('show');
-        if (qaArea) qaArea.classList.add('show');
-    }
-}
-
-function toggleDropdown(type) {
-    const menu = document.getElementById(`${type}Menu`);
-    if (!menu) return;
-    const isShow = menu.classList.contains('show');
-    document.querySelectorAll('#page-generator .dropdown-menu').forEach(m => m.classList.remove('show'));
-    if (!isShow) menu.classList.add('show');
-}
-
-function selectItem(type, el) {
-    const btn = document.querySelector(`#page-generator .dropdown:has(#${type}Menu) .dropdown-btn`);
-    if (btn) {
-        btn.textContent = el.textContent;
-        btn.classList.add('active');
-    }
-    document.getElementById(`${type}Menu`)?.classList.remove('show');
-
-    if (type === 'category') {
-        const mealType = document.getElementById('mealType');
-        if (mealType) {
-            const val = el.getAttribute('data-value') || el.textContent.toLowerCase();
-            if (val === 'standard' || val === 'baby' || val === 'pregnancy') {
-                mealType.value = val;
-            }
-        }
-    } else if (type === 'cuisine') {
-        const cuisineSelect = document.getElementById('cuisine');
-        if (cuisineSelect) {
-            const val = el.getAttribute('data-value') || el.textContent;
-            const match = Array.from(cuisineSelect.options).find(o => o.value === val || o.text === val);
-            if (match) cuisineSelect.value = match.value;
-        }
-    }
-}
-
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('#page-generator .dropdown')) {
-        document.querySelectorAll('#page-generator .dropdown-menu').forEach(m => m.classList.remove('show'));
-    }
-});
-
-function addBubble(text, isUser) {
-    const qaArea = document.getElementById('qaArea');
-    if (!qaArea) return;
-    const div = document.createElement('div');
-    div.className = isUser ? 'bubble-user' : 'bubble-ai';
-    div.innerText = text;
-    qaArea.appendChild(div);
-    requestAnimationFrame(function() { qaArea.scrollTop = qaArea.scrollHeight; });
-}
-
-function renderLastAnswerToQa() {
-    const oldQaHistory = document.getElementById('qaHistory');
-    const qaArea = document.getElementById('qaArea');
-    if (!oldQaHistory || !qaArea) return;
-    const lastQA = oldQaHistory.lastElementChild;
-    if (lastQA) {
-        const answer = lastQA.querySelector('a')?.innerText || lastQA.innerText || '';
-        if (answer) addBubble(answer, false);
-    }
-    oldQaHistory.innerHTML = '';
-}
-
-function renderRecipeToArea() {
-    const recipeArea = document.getElementById('recipeArea');
-    const recipeName = document.getElementById('recipeNameDisplay')?.innerText || '';
-    const recipeContent = document.getElementById('recipeContent')?.innerHTML || '';
-    if (recipeArea) {
-        // 移除所有生成中提示（如果有）
-        const tips = recipeArea.querySelectorAll('.generating-tip');
-        tips.forEach(t => t.remove());
-        // 追加新食谱
-        recipeArea.innerHTML += `<div class="recipe-entry" style="margin-bottom:20px; border-bottom:1px solid #e5e7eb; padding-bottom:16px;">
-            <div style="text-align:center; color:#6b7280; font-size:20px; font-weight:400; margin-bottom:12px;">${recipeName}</div>
-            <div>${recipeContent}</div>
-        </div>`;
-        recipeArea.scrollTop = recipeArea.scrollHeight;
-    }
-}
-
-async function handleSend() {
-    const input = document.getElementById('dishName');
-    if (!input) return;
-    const val = input.value.trim();
-
-    if (!userData) {
-        alert(t('pleaseLogin'));
-        showPage('page-login-register');
-        return;
-    }
-    if (!val) return;
-
-    // 先切换到内容展示区
-    const mainWrap = document.getElementById('mainWrap');
-    const contentBlock = document.getElementById('contentBlock');
-    if (mainWrap) mainWrap.classList.add('top-fixed');
-    if (contentBlock) contentBlock.classList.add('show');
-
-        if (currentMode === 'recipe') {
-        const mealType = document.getElementById('mealType');
-        const cuisine = document.getElementById('cuisine');
-        if (mealType && !mealType.value) mealType.value = 'standard';
-        if (cuisine && !cuisine.value && CUISINES.length > 0) cuisine.value = CUISINES[0];
-
-        const recipeArea = document.getElementById('recipeArea');
-        if (recipeArea) recipeArea.innerHTML = '<div class="generating-tip" style="text-align:center;padding:40px;color:#9ca3af;">' + t('generating') + '<span class="dot-anim"></span></div>';
-        const qaArea = document.getElementById('qaArea');
-        if (qaArea) qaArea.innerHTML = '';
-
-        try {
-            await generateRecipe();
-            renderRecipeToArea();
-        } catch (err) {
-            if (recipeArea) {
-                recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ ' + t('generateFailed') + '</div>';
-            }
-        }
-    } else {
-        if (!userData.lastRecipeText) {
-            alert(t('alertNoRecipe') || 'Please generate a recipe first.');
-            return;
-        }
-        addBubble(val, true);
-        await askQuestion();
-        renderLastAnswerToQa();
-    }
-    input.value = '';
-}
-
-function initNewGenerator() {
-    document.getElementById('modeBtnRecipe')?.addEventListener('click', () => switchMode('recipe'));
-    document.getElementById('modeBtnQA')?.addEventListener('click', () => switchMode('qa'));
-    document.getElementById('modeBtnRecipe').innerText = getModeBtnText('Generate Recipe');
-    document.getElementById('modeBtnQA').innerText = getModeBtnText('AI Assistant');
-    
-    const recipeBtn = document.getElementById('modeBtnRecipe');
-    const qaBtn = document.getElementById('modeBtnQA');
-    if (recipeBtn) recipeBtn.innerText = getModeBtnText('Generate Recipe');
-    if (qaBtn) qaBtn.innerText = getModeBtnText('AI Assistant');
-
-    const cuisineMenu = document.getElementById('cuisineMenu');
-    if (cuisineMenu) {
-        const lang = getCurrentLang();
-        const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
-        cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map[c] || c}</div>`).join('');
-    }
-
-    document.querySelectorAll('#page-generator #categoryMenu .dropdown-item').forEach(item => {
-        item.addEventListener('click', function() { selectItem('category', this); });
-    });
-    cuisineMenu?.addEventListener('click', function(e) {
-        const item = e.target.closest('.dropdown-item');
-        if (!item) return;
-        selectItem('cuisine', item);
-    });
-
-    document.getElementById('categoryBtn')?.addEventListener('click', () => toggleDropdown('category'));
-    document.getElementById('cuisineBtn')?.addEventListener('click', () => toggleDropdown('cuisine'));
-
-    const categoryBtn = document.getElementById('categoryBtn');
-    const cuisineBtn = document.getElementById('cuisineBtn');
-    if (categoryBtn) categoryBtn.textContent = t('category') || t('genMealType') || 'Category';
-    if (cuisineBtn) cuisineBtn.textContent = t('cuisine') || t('genCuisine') || 'Cuisine';
-
-    const mealTypeSelect = document.getElementById('mealType');
-    if (mealTypeSelect) mealTypeSelect.value = 'standard';
-    const cuisineSelect = document.getElementById('cuisine');
-    if (cuisineSelect && CUISINES.length > 0) cuisineSelect.value = CUISINES[0];
-
-    document.getElementById('btnGenerate')?.addEventListener('click', handleSend);
-    const input = document.getElementById('dishName');
-    if (input) {
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-            }
-        });
-    }
-    const catBtn = document.getElementById('categoryBtn');
-if (catBtn) {
-    const mealType = document.getElementById('mealType');
-    if (mealType && mealType.value !== 'standard') {
-        // 已选择具体分类，显示对应翻译
-        const catMap = { standard: t('optStandard'), baby: t('optBaby'), pregnancy: t('optPregnancy') };
-        catBtn.textContent = catMap[mealType.value] || mealType.value;
-    } else {
-        // 未选择，显示“分类”
-        catBtn.textContent = t('category') || 'Category';
-    }
-}
-    switchMode('recipe');
-
-const mainWrap = document.getElementById('mainWrap');
-const contentBlock = document.getElementById('contentBlock');
-if (mainWrap) mainWrap.classList.remove('top-fixed');
-if (contentBlock) contentBlock.classList.remove('show');
-document.getElementById('recipeArea').innerHTML = '';
-document.getElementById('qaArea').innerHTML = '';
-
-const sendBtn = document.getElementById('btnGenerate');
-if (sendBtn) {
-    sendBtn.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
-}
-// 设置输入框提示文案
-var dishInput = document.getElementById('dishName');
-if (dishInput) dishInput.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initNewGenerator);
-} else {
-    initNewGenerator();
-}
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
 
@@ -2049,3 +1789,212 @@ if (autoCode && action === 'changeEmail') {
         console.warn('语音模块初始化失败，已自动禁用', globalError);
     }
 })();
+
+// ==================== 生成器新布局交互逻辑 ====================
+let currentMode = 'recipe';
+
+function getModeBtnText(key) {
+    const text = t(key);
+    return text && text.length <= 8 ? text : key;
+}
+
+function switchMode(mode) {
+    currentMode = mode;
+    const slider = document.getElementById('modeSlider');
+    const desc = document.getElementById('modeDesc');
+    const btns = document.querySelectorAll('#page-generator .mode-btn');
+    btns.forEach(b => b.classList.remove('active'));
+
+    if (mode === 'recipe') {
+        if (slider) slider.classList.remove('right');
+        if (btns[0]) btns[0].classList.add('active');
+        if (desc) {
+            desc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
+            desc.classList.add('left-indent'); desc.classList.remove('right-normal');
+        }
+    } else {
+        if (slider) slider.classList.add('right');
+        if (btns[1]) btns[1].classList.add('active');
+        if (desc) {
+            desc.textContent = t('enterQuestion') || 'Ask about this recipe...';
+            desc.classList.add('right-normal'); desc.classList.remove('left-indent');
+        }
+    }
+
+    // 切换内容区显示
+    const recipeArea = document.getElementById('recipeArea');
+    const qaArea = document.getElementById('qaArea');
+    if (mode === 'recipe') {
+        if (recipeArea) { recipeArea.classList.add('show'); recipeArea.style.display = 'block'; }
+        if (qaArea) { qaArea.classList.remove('show'); qaArea.style.display = 'none'; }
+    } else {
+        if (recipeArea) { recipeArea.classList.remove('show'); recipeArea.style.display = 'none'; }
+        if (qaArea) { qaArea.classList.add('show'); qaArea.style.display = 'flex'; }
+    }
+}
+
+function toggleDropdown(type) {
+    const menu = document.getElementById(`${type}Menu`);
+    if (!menu) return;
+    const isShow = menu.classList.contains('show');
+    document.querySelectorAll('#page-generator .dropdown-menu').forEach(m => m.classList.remove('show'));
+    if (!isShow) menu.classList.add('show');
+}
+
+function selectItem(type, el) {
+    const btn = document.querySelector(`#page-generator .dropdown:has(#${type}Menu) .dropdown-btn`);
+    if (btn) { btn.textContent = el.textContent; btn.classList.add('active'); }
+    document.getElementById(`${type}Menu`)?.classList.remove('show');
+
+    if (type === 'category') {
+        const mealType = document.getElementById('mealType');
+        if (mealType) {
+            const val = el.getAttribute('data-value') || el.textContent.toLowerCase();
+            if (val === 'standard' || val === 'baby' || val === 'pregnancy') mealType.value = val;
+        }
+    } else if (type === 'cuisine') {
+        const cuisineSelect = document.getElementById('cuisine');
+        if (cuisineSelect) {
+            const val = el.getAttribute('data-value') || el.textContent;
+            const match = Array.from(cuisineSelect.options).find(o => o.value === val || o.text === val);
+            if (match) cuisineSelect.value = match.value;
+        }
+    }
+}
+
+document.addEventListener('click', e => {
+    if (!e.target.closest('#page-generator .dropdown')) {
+        document.querySelectorAll('#page-generator .dropdown-menu').forEach(m => m.classList.remove('show'));
+    }
+});
+
+function addBubble(text, isUser) {
+    const qaArea = document.getElementById('qaArea');
+    if (!qaArea) return;
+    const div = document.createElement('div');
+    div.className = isUser ? 'bubble-user' : 'bubble-ai';
+    div.innerText = text;
+    qaArea.appendChild(div);
+    requestAnimationFrame(() => { qaArea.scrollTop = qaArea.scrollHeight; });
+}
+
+function renderRecipeToArea() {
+    const recipeArea = document.getElementById('recipeArea');
+    const recipeName = document.getElementById('recipeNameDisplay')?.innerText || '';
+    const recipeContent = document.getElementById('recipeContent')?.innerHTML || '';
+    if (recipeArea) {
+        recipeArea.innerHTML = `<div class="recipe-entry" style="margin-bottom:20px;border-bottom:1px solid #e5e7eb;padding-bottom:16px;">
+            <div style="text-align:center;color:#6b7280;font-size:20px;font-weight:400;margin-bottom:12px;">${recipeName}</div>
+            <div>${recipeContent}</div>
+        </div>`;
+        recipeArea.scrollTop = recipeArea.scrollHeight;
+    }
+}
+
+function renderLastAnswerToQa() {
+    const qaHistory = document.getElementById('qaHistory');
+    const qaArea = document.getElementById('qaArea');
+    if (!qaHistory || !qaArea) return;
+    const lastQA = qaHistory.lastElementChild;
+    if (lastQA && lastQA.classList.contains('qa')) {
+        const answer = lastQA.querySelector('a')?.innerText || lastQA.innerText || '';
+        if (answer) addBubble(answer, false);
+    }
+    qaHistory.innerHTML = '';
+}
+
+async function handleSend() {
+    const input = document.getElementById('dishName');
+    if (!input) return;
+    const val = input.value.trim();
+    if (!val) return;
+    if (!userData) { alert(t('pleaseLogin')); showPage('page-login-register'); return; }
+
+    if (currentMode === 'recipe') {
+        const mealType = document.getElementById('mealType');
+        const cuisine = document.getElementById('cuisine');
+        if (mealType && !mealType.value) mealType.value = 'standard';
+        if (cuisine && !cuisine.value && CUISINES.length > 0) cuisine.value = CUISINES[0];
+
+        const recipeArea = document.getElementById('recipeArea');
+        if (recipeArea) recipeArea.innerHTML = '<div class="generating-tip">' + t('generating') + '<span class="dot-anim"></span></div>';
+
+        try {
+            await generateRecipe();
+            renderRecipeToArea();
+        } catch (err) {
+            if (recipeArea) recipeArea.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ ' + t('generateFailed') + '</div>';
+        }
+    } else {
+        if (!userData.lastRecipeText) { alert(t('alertNoRecipe') || 'Please generate a recipe first.'); return; }
+        addBubble(val, true);
+        await askQuestion();
+        renderLastAnswerToQa();
+    }
+
+    input.value = '';
+    const mainWrap = document.getElementById('mainWrap');
+    const contentBlock = document.getElementById('contentBlock');
+    if (mainWrap) mainWrap.classList.add('top-fixed');
+    if (contentBlock) contentBlock.classList.add('show');
+    switchMode(currentMode);
+}
+
+function initNewGenerator() {
+    document.getElementById('modeBtnRecipe')?.addEventListener('click', () => switchMode('recipe'));
+    document.getElementById('modeBtnQA')?.addEventListener('click', () => switchMode('qa'));
+
+    const recipeBtn = document.getElementById('modeBtnRecipe');
+    const qaBtn = document.getElementById('modeBtnQA');
+    if (recipeBtn) recipeBtn.innerText = getModeBtnText('Generate Recipe');
+    if (qaBtn) qaBtn.innerText = getModeBtnText('AI Assistant');
+
+    const cuisineMenu = document.getElementById('cuisineMenu');
+    if (cuisineMenu) {
+        const lang = getCurrentLang();
+        const map = CUISINE_MAP[lang] || CUISINE_MAP['en'] || {};
+        cuisineMenu.innerHTML = CUISINES.map(c => `<div class="dropdown-item" data-value="${c}">${map[c] || c}</div>`).join('');
+    }
+
+    document.querySelectorAll('#page-generator #categoryMenu .dropdown-item').forEach(item => {
+        item.addEventListener('click', function() { selectItem('category', this); });
+    });
+    cuisineMenu?.addEventListener('click', function(e) {
+        const item = e.target.closest('.dropdown-item');
+        if (!item) return;
+        selectItem('cuisine', item);
+    });
+
+    document.getElementById('categoryBtn')?.addEventListener('click', () => toggleDropdown('category'));
+    document.getElementById('cuisineBtn')?.addEventListener('click', () => toggleDropdown('cuisine'));
+
+    const categoryBtn = document.getElementById('categoryBtn');
+    const cuisineBtn = document.getElementById('cuisineBtn');
+    if (categoryBtn) categoryBtn.textContent = t('category') || 'Category';
+    if (cuisineBtn) cuisineBtn.textContent = t('cuisine') || 'Cuisine';
+
+    const mealTypeSelect = document.getElementById('mealType');
+    if (mealTypeSelect) mealTypeSelect.value = 'standard';
+    const cuisineSelect = document.getElementById('cuisine');
+    if (cuisineSelect && CUISINES.length > 0) cuisineSelect.value = CUISINES[0];
+
+    document.getElementById('btnGenerate')?.addEventListener('click', handleSend);
+    const input = document.getElementById('dishName');
+    if (input) {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+        });
+    }
+
+    document.getElementById('mainWrap')?.classList.remove('top-fixed');
+    document.getElementById('contentBlock')?.classList.remove('show');
+    document.getElementById('recipeArea').innerHTML = '';
+    document.getElementById('qaArea').innerHTML = '';
+    switchMode('recipe');
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNewGenerator);
+} else {
+    initNewGenerator();
+}
