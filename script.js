@@ -1197,7 +1197,9 @@ async function handleSend() {
 function initNewGenerator() {
     document.getElementById('modeBtnRecipe')?.addEventListener('click', () => switchMode('recipe'));
     document.getElementById('modeBtnQA')?.addEventListener('click', () => switchMode('qa'));
-
+    document.getElementById('modeBtnRecipe').innerText = getModeBtnText('Generate Recipe');
+    document.getElementById('modeBtnQA').innerText = getModeBtnText('AI Assistant');
+    
     const recipeBtn = document.getElementById('modeBtnRecipe');
     const qaBtn = document.getElementById('modeBtnQA');
     if (recipeBtn) recipeBtn.innerText = getModeBtnText('Generate Recipe');
