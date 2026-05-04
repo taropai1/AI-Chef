@@ -320,6 +320,7 @@ html body #page-generator.page.active {
     overflow-x: hidden;
     box-sizing: border-box;
     padding-bottom: 20px;
+    overflow: hidden;
 }
 
 /* 3. 顶部按钮区：固定在导航栏下方 */
@@ -371,6 +372,9 @@ html body #page-generator.page.active {
 /* 4. 内容展示块 */
 #page-generator .content-block {
     display: none;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 700px;
@@ -385,6 +389,7 @@ html body #page-generator.page.active {
 /* 食谱窗口 */
 #page-generator .recipe-area {
     flex: 1 1 auto;
+    overflow-y: auto;
     margin-top: 20px;
     margin-bottom: 10px;
     padding-bottom: 20px;
@@ -392,11 +397,18 @@ html body #page-generator.page.active {
 
 /* 问答窗口 */
 #page-generator .qa-area {
+    flex: 0 0 auto;
+    max-height: 200px;        /* 桌面端 */
+    min-height: 72px;
     overflow-y: auto;
     margin-bottom: 10px;
-    align-items: flex-start;
 }
-
+@media (max-width: 767px) {
+    #page-generator .qa-area {
+        max-height: 120px;
+        min-height: 72px;
+    }
+}
 /* 虚线分割 */
 #page-generator .divider-dash {
     height: 1px;
@@ -479,8 +491,9 @@ html body #page-generator.page.active {
         padding-bottom: 100px;
     }
     #page-generator .qa-area {
-        max-height: 120px;
-        min-height: 72px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch; /* 重要：让子元素可以独立对齐 */
     }
     #page-generator .dropdown-btn {
         min-width: 90px;
