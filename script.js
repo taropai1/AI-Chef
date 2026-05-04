@@ -1064,6 +1064,17 @@ function switchMode(mode) {
     }
     const sendBtn = document.getElementById('btnGenerate');
 if (sendBtn) sendBtn.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+
+    // 新增：根据模式切换内容区显示
+    const recipeArea = document.getElementById('recipeArea');
+    const qaArea = document.getElementById('qaArea');
+    if (mode === 'recipe') {
+        if (recipeArea) recipeArea.classList.add('show');
+        if (qaArea) qaArea.classList.remove('show');
+    } else {
+        if (recipeArea) recipeArea.classList.remove('show');
+        if (qaArea) qaArea.classList.add('show');
+    }
 }
 
 function toggleDropdown(type) {
