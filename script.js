@@ -1759,6 +1759,9 @@ function switchLang(lang) {
     updateLimitInfo();
     if (userData) renderProfile();
 
+    document.getElementById('modeBtnRecipe').innerText = getModeBtnText('Generate Recipe');
+    document.getElementById('modeBtnQA').innerText = getModeBtnText('AI Assistant');
+    
     // 同步分类按钮文字
     const catBtn = document.getElementById('categoryBtn');
     if (catBtn) {
