@@ -1608,49 +1608,12 @@ function updateModeBtns() {
   const btnAi = document.getElementById('btnAiMode');
   if (!btnRecipe || !btnAi) return;
 
-  // 直接复用旧版已有的翻译键值（旧版 translations 里已有多语言版本）
-  let recipeText = t('generate') || 'Generate Recipe';
-  let aiText = t('aiAssistTitle') || 'AI Assistant';
+  const recipeText = t('generate');
+  const aiText = t('aiAssistTitle');
 
-  // 长度限制：超过8字符用英文原文
-  if (recipeText.length > 8) recipeText = 'Generate';
-  if (aiText.length > 8) aiText = 'AI Asst';
-
-  btnRecipe.textContent = recipeText;
-  btnAi.textContent = aiText;
+  btnRecipe.textContent = recipeText.length > 8 ? (translations.en.generate || 'Generate Recipe') : recipeText;
+  btnAi.textContent = aiText.length > 8 ? (translations.en.aiAssistTitle || 'AI Assistant') : aiText;
 }
-
-// ==================== 下拉菜单操作 ====================
-function toggleDropdown(type) {
-  const menu = document.getElementById(`${type}Menu`);
-  if (!menu) return;
-  const isShow = menu.classList.contains('show');
-  document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-  if (!isShow) menu.classList.add('show');
-}
-
-function selectCategoryItem(value, label) {
-  const btn = document.getElementById('categoryBtn');
-  if (btn) btn.textContent = label;
-  document.getElementById('categoryMenu').classList.remove('show');
-  const mealTypeSelect = document.getElementById('mealType');
-  if (mealTypeSelect) mealTypeSelect.value = value;
-}
-
-function selectCuisineItem(value, label) {
-  const btn = document.getElementById('cuisineBtn');
-  if (btn) btn.textContent = label;
-  document.getElementById('cuisineMenu').classList.remove('show');
-  const cuisineSelect = document.getElementById('cuisine');
-  if (cuisineSelect) cuisineSelect.value = value;
-}
-
-// 点击外部关闭下拉
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.dropdown')) {
-    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-  }
-});
 
 // ==================== 合并发送逻辑 ====================
 function handleSend() {
@@ -1682,7 +1645,7 @@ function handleSend() {
     
     const dishNameInput = document.getElementById('dishName');
     if (dishNameInput) dishNameInput.value = val;
-    syncDropdownToSelect();
+    
     switchToContentView();
     showGeneratingTip();
     generateRecipe();
@@ -1862,23 +1825,6 @@ function addQABubble(text, isUser) {
   qaHistory.scrollTop = qaHistory.scrollHeight;
 }
 
-// ==================== 填充菜系下拉弹窗 ====================
-function populateCuisineDropdown() {
-  const menu = document.getElementById('cuisineMenu');
-  if (!menu) return;
-  const map = CUISINE_MAP[currentLang] || CUISINE_MAP['en'] || {};
-  menu.innerHTML = CUISINES.map(c => 
-    `<div class="dropdown-item" onclick="selectCuisineItem('${c}','${(map[c] || c).replace(/'/g, "\\'")}')">${map[c] || c}</div>`
-  ).join('');
-}
-
-// 扩展 populateCuisines
-const originalPopulateCuisines = populateCuisines;
-populateCuisines = function() {
-  originalPopulateCuisines();
-  populateCuisineDropdown();
-};
-
 // ==================== 重置内容 ====================
 function clearContentOnReset() {
   const recipeList = document.getElementById('recipeList');
@@ -1913,17 +1859,19 @@ logout = function() {
 
 // ==================== 初始化新版生成器 ====================
 (function initNewGenerator() {
-  // 发送按钮：解绑旧事件，绑定新事件
   const qaSendBtn = document.getElementById('qaSendBtn');
   if (qaSendBtn) {
     qaSendBtn.removeEventListener('click', askQuestion);
+    qaSendBtn.removeEventListener('click', handleSend);
     qaSendBtn.onclick = null;
     qaSendBtn.addEventListener('click', handleSend);
   }
-  
-  // 输入框回车发送
+
   const qaInput = document.getElementById('qaInput');
   if (qaInput) {
+    qaInput.removeEventListener('keydown', askQuestion);
+    qaInput.removeEventListener('keydown', handleSend);
+    qaInput.onkeydown = null;
     qaInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -1931,50 +1879,28 @@ logout = function() {
       }
     });
   }
-  
-  // 扩展 renderLanguage，同步分类/菜系按钮多语言
+
   const originalRenderLanguage = renderLanguage;
   renderLanguage = function() {
     originalRenderLanguage();
     updateModeBtns();
-    populateCuisineDropdown();
-    
-    const catBtn = document.getElementById('categoryBtn');
-    if (catBtn) catBtn.textContent = t('genMealType');
-    const cuiBtn = document.getElementById('cuisineBtn');
-    if (cuiBtn) cuiBtn.textContent = t('genCuisine');
-    
-    const catMenu = document.getElementById('categoryMenu');
-    if (catMenu) {
-      catMenu.innerHTML = `
-        <div class="dropdown-item" onclick="selectCategoryItem('standard','${t('optStandard')}')">${t('optStandard')}</div>
-        <div class="dropdown-item" onclick="selectCategoryItem('baby','${t('optBaby')}')">${t('optBaby')}</div>
-        <div class="dropdown-item" onclick="selectCategoryItem('pregnancy','${t('optPregnancy')}')">${t('optPregnancy')}</div>
-      `;
-    }
-    
+    populateCuisines();
     const inputPl = document.getElementById('qaInput');
     if (inputPl) inputPl.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';
   };
-  
-  // 弹窗自动收回（鼠标离开）
-  document.querySelectorAll('.dropdown').forEach(drop => {
-    drop.addEventListener('mouseleave', () => {
-      const menu = drop.querySelector('.dropdown-menu');
-      if (menu) menu.classList.remove('show');
-    });
-  });
-  
-  // 设置默认值
+
   const mealTypeSelect = document.getElementById('mealType');
   if (mealTypeSelect) mealTypeSelect.value = 'standard';
-  const cuisineSelect = document.getElementById('cuisine');
-  if (cuisineSelect) {
-    const americanOption = Array.from(cuisineSelect.options).find(opt => opt.value === 'American');
-    if (americanOption) cuisineSelect.value = 'American';
-    else if (cuisineSelect.options.length > 0) cuisineSelect.selectedIndex = 0;
-  }
   
+  setTimeout(() => {
+    const cuisineSelect = document.getElementById('cuisine');
+    if (cuisineSelect) {
+      const americanOption = Array.from(cuisineSelect.options).find(opt => opt.value === 'American');
+      if (americanOption) cuisineSelect.value = 'American';
+      else if (cuisineSelect.options.length > 0) cuisineSelect.selectedIndex = 0;
+    }
+  }, 100);
+
   switchGeneratorMode('recipe');
 })();
 
