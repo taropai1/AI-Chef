@@ -389,14 +389,14 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .select-group {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .action-group {
   display: flex;
   gap: 10px;
   align-items: center;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 /* 隐藏的原生 select */
