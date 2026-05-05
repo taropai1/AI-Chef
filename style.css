@@ -376,7 +376,8 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .btn-video::before{content:"▶";font-size:10px}
 .btn-video:hover{background:#f0f4ff;border-color:#4a90e2;color:#2563eb;bottom:-4px}
 .mic-btn.unsupported{display:none!important}
-/* ==================== 原生 select 布局修正 ==================== */
+
+/* ==================== 生成器布局修正 ==================== */
 .func-row {
   display: flex;
   align-items: center;
@@ -389,47 +390,59 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   display: flex;
   gap: 8px;
   flex-shrink: 0;
-  margin-right: auto;
-}
-
-.native-select {
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 14px;
-  outline: none;
-  background: #eef1f5;
-  color: #1f2937;
-  appearance: auto;
-  -webkit-appearance: auto;
-  cursor: pointer;
-}
-
-@media (max-width: 767px) {
-  .native-select {
-    min-width: 90px;
-    max-width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-@media (min-width: 768px) {
-  .native-select {
-    min-width: auto;
-    max-width: none;
-    width: auto;
-  }
 }
 
 .action-group {
   display: flex;
-  gap: 6px;
+  gap: 10px;
   align-items: center;
   flex-shrink: 0;
-  margin-left: auto;
+}
+
+/* 隐藏的原生 select */
+.hidden-select {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+/* 自定义选择按钮 */
+.select-btn {
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  font-size: 14px;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.select-btn:hover {
+  background: #f3f4f6;
+  border-color: #d4e8fb;
+}
+
+@media (max-width: 767px) {
+  .select-btn {
+    min-width: 90px;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (min-width: 768px) {
+  .select-btn {
+    min-width: auto;
+    max-width: none;
+    width: auto;
+  }
 }
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
