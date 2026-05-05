@@ -65,133 +65,117 @@
       <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
     </div>
   </div>
-  
-  <!-- ==================== 生成器页（新版设计） ==================== -->
   <div class="page" id="page-generator">
-    <div class="generator-wrap-new">
-      <div class="main-wrap" id="mainWrap">
-        <!-- 顶部区域 -->
-        <div class="top-inner">
-          <div class="gen-title-new" id="genTitle">AI Recipe Generator</div>
-          <div class="mode-group">
-            <div class="mode-slider" id="modeSlider"></div>
-            <button class="mode-btn active" id="btnRecipeMode" onclick="switchGeneratorMode('recipe')">Generate</button>
-            <button class="mode-btn" id="btnAiMode" onclick="switchGeneratorMode('qa')">AI Asst</button>
-          </div>
-          <p class="mode-desc left-indent" id="modeDesc">Enter ingredients, dish names or food items.</p>
+  <div class="generator-wrap-new">
+    <div class="main-wrap" id="mainWrap">
+      <!-- 顶部区域 -->
+      <div class="top-inner">
+        <div class="gen-title-new" id="genTitle">AI Recipe Generator</div>
+        <div class="mode-group">
+          <div class="mode-slider" id="modeSlider"></div>
+          <button class="mode-btn active" id="btnRecipeMode" onclick="switchGeneratorMode('recipe')">Generate Recipe</button>
+          <button class="mode-btn" id="btnAiMode" onclick="switchGeneratorMode('qa')">AI Assistant</button>
         </div>
+        <p class="mode-desc left-indent" id="modeDesc">Enter ingredients, dish names or food items.</p>
+      </div>
 
-        <!-- 内容展示区 -->
-        <div class="content-block" id="contentBlock">
-          <div class="recipe-content" id="recipeContentWrapper">
-            <div class="recipe-list" id="recipeList"></div>
-          </div>
-          <div class="qa-content" id="qaContent">
-            <div class="qa-list-new" id="qaHistory">
-              <div class="qa-bubble ai-bubble">Hello, I'm your AI food assistant. How can I help?</div>
-            </div>
-          </div>
+      <!-- 内容展示区 -->
+      <div class="content-block" id="contentBlock">
+        <div class="recipe-content" id="recipeContentWrapper">
+          <div class="recipe-list" id="recipeList"></div>
         </div>
-
-        <!-- 生成提示动效 -->
-        <div class="generating-tip" id="generatingTip">Generating recipe...</div>
-
-        <!-- 输入卡片 -->
-        <div class="input-container" id="inputContainer">
-          <select id="mealType" style="display:none;">
-            <option value="standard" id="optStandard">Standard</option>
-            <option value="baby" id="optBaby">Baby</option>
-            <option value="pregnancy" id="optPregnancy">Pregnancy</option>
-          </select>
-          <select id="cuisine" style="display:none;"></select>
-          <input type="text" id="dishName" style="display:none;">
-
-          <textarea class="input-area" id="qaInput" placeholder="Tap the category and cuisine buttons, choose what you want to eat!"></textarea>
-          <div class="func-row">
-
-            <div class="select-group">
-  <select id="mealType" class="native-select">
-    <option value="standard" id="optStandard">Standard</option>
-    <option value="baby" id="optBaby">Baby</option>
-    <option value="pregnancy" id="optPregnancy">Pregnancy</option>
-  </select>
-  <select id="cuisine" class="native-select"></select>
-</div>
-            
-            <div class="action-group">
-              <button class="icon-btn voice-btn" id="voiceBtn">
-                <svg viewBox="0 0 24 24">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                  <line x1="12" y1="19" x2="12" y2="23"></line>
-                  <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-              </button>
-              <button class="icon-btn send-btn" id="qaSendBtn">
-                <svg viewBox="0 0 24 24">
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-              </button>
-            </div>
+        <div class="qa-content" id="qaContent">
+          <div class="qa-list-new" id="qaHistory">
+            <div class="qa-bubble ai-bubble">Hello, I'm your AI food assistant. How can I help?</div>
           </div>
         </div>
       </div>
 
-      <div class="tip-modal-new" id="tipModal">Please generate a new recipe</div>
+      <!-- 生成提示动效 -->
+      <div class="generating-tip" id="generatingTip">Generating recipe...</div>
 
-      <!-- ===== 以下旧版元素，隐藏但保留 ===== -->
-      <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()" style="display:none;">Generate Recipe</button>
-      <div class="recipe-banner" id="personalizedGreeting" style="display:none;">Dear Gourmet! Enjoy your meal!</div>
-      <div class="recipe-title" id="recipeNameDisplay" style="display:none;"></div>
-      <div class="recipe-body" id="recipeContent" style="display:none;"></div>
-      <div class="content-nav" style="display:none;">
-        <button class="nav-icon" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>←</button>
-        <button class="nav-icon" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>→</button>
-      </div>
-      <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()" style="display:none;">↻ Recover last 3</button>
-      <div class="gen-sub" id="limitInfo" style="display:none;">Please log in to continue</div>
-      <div class="limit" id="qaLimitNote" style="display:none;"></div>
-      <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" title="Add to Home" style="display:none;">+</button>
-      <div class="modal-overlay" id="howToModal" style="display:none;">
-        <div class="modal">
-          <h4 id="howToTitle">How to use</h4>
-          <ul id="howToList"></ul>
-          <p class="modal-highlight-text" id="howToHighlight"></p>
-          <button class="close-btn" onclick="closeHowToModal()">Got it</button>
-        </div>
-      </div>
-      <button class="help-btn" id="howToUseBtn" style="display:none;">How to use</button>
-      <button class="btn-video" id="openVideoBtn" style="display:none;">Watch Video Guides</button>
-      <div class="video-modal" id="videoModal" style="display:none;">
-        <div class="video-modal-card">
-          <div class="video-modal-head">
-            <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
-            <button class="video-modal-close" id="closeVideoModal">×</button>
+      <!-- 输入卡片 -->
+      <div class="input-container" id="inputContainer">
+        <select id="mealType" class="hidden-select">
+          <option value="standard" id="optStandard">Standard</option>
+          <option value="baby" id="optBaby">Baby</option>
+          <option value="pregnancy" id="optPregnancy">Pregnancy</option>
+        </select>
+        <select id="cuisine" class="hidden-select"></select>
+        <input type="text" id="dishName" style="display:none;">
+
+        <textarea class="input-area" id="qaInput" placeholder="Tap the category and cuisine buttons, choose what you want to eat!"></textarea>
+        <div class="func-row">
+          <div class="select-group">
+            <button class="select-btn" id="categoryBtn" onclick="openNativeSelect('mealType')">Category</button>
+            <button class="select-btn" id="cuisineBtn" onclick="openNativeSelect('cuisine')">Cuisine</button>
           </div>
-          <div class="video-grid" id="videoGrid"></div>
-        </div>
-      </div>
-      <div class="video-player" id="videoPlayer" style="display:none;">
-        <div class="video-player-container">
-          <div class="video-frame" id="videoFrameContainer"></div>
-          <div class="video-row">
-            <div class="video-thumb" id="videoThumb">Video</div>
-            <div class="video-info">
-              <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
-              <div class="video-info-desc">Step-by-step cooking</div>
-            </div>
-            <div class="video-controls">
-              <button class="video-control-btn" id="togglePlayer">⤢</button>
-              <button class="video-control-btn" id="closePlayer">×</button>
-            </div>
+          <div class="action-group">
+            <button class="icon-btn voice-btn" id="voiceBtn">
+              <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <button class="icon-btn send-btn" id="qaSendBtn">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
           </div>
         </div>
       </div>
-      <button class="btn-ask" id="qaAskBtn" style="display:none;">Ask</button>
     </div>
-  </div>
 
+    <div class="tip-modal-new" id="tipModal">Please generate a new recipe</div>
+
+    <!-- ===== 以下旧版元素，隐藏但保留 ===== -->
+    <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()" style="display:none;">Generate Recipe</button>
+    <div class="recipe-banner" id="personalizedGreeting" style="display:none;">Dear Gourmet! Enjoy your meal!</div>
+    <div class="recipe-title" id="recipeNameDisplay" style="display:none;"></div>
+    <div class="recipe-body" id="recipeContent" style="display:none;"></div>
+    <div class="content-nav" style="display:none;">
+      <button class="nav-icon" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>←</button>
+      <button class="nav-icon" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>→</button>
+    </div>
+    <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()" style="display:none;">↻ Recover last 3</button>
+    <div class="gen-sub" id="limitInfo" style="display:none;">Please log in to continue</div>
+    <div class="limit" id="qaLimitNote" style="display:none;"></div>
+    <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" title="Add to Home" style="display:none;">+</button>
+    <div class="modal-overlay" id="howToModal" style="display:none;">
+      <div class="modal">
+        <h4 id="howToTitle">How to use</h4>
+        <ul id="howToList"></ul>
+        <p class="modal-highlight-text" id="howToHighlight"></p>
+        <button class="close-btn" onclick="closeHowToModal()">Got it</button>
+      </div>
+    </div>
+    <button class="help-btn" id="howToUseBtn" style="display:none;">How to use</button>
+    <button class="btn-video" id="openVideoBtn" style="display:none;">Watch Video Guides</button>
+    <div class="video-modal" id="videoModal" style="display:none;">
+      <div class="video-modal-card">
+        <div class="video-modal-head">
+          <div class="video-modal-title" id="videoModalTitle">Popular Cooking Videos</div>
+          <button class="video-modal-close" id="closeVideoModal">×</button>
+        </div>
+        <div class="video-grid" id="videoGrid"></div>
+      </div>
+    </div>
+    <div class="video-player" id="videoPlayer" style="display:none;">
+      <div class="video-player-container">
+        <div class="video-frame" id="videoFrameContainer"></div>
+        <div class="video-row">
+          <div class="video-thumb" id="videoThumb">Video</div>
+          <div class="video-info">
+            <div class="video-info-title" id="bottomVideoTitle">Recipe Video Guide</div>
+            <div class="video-info-desc">Step-by-step cooking</div>
+          </div>
+          <div class="video-controls">
+            <button class="video-control-btn" id="togglePlayer">⤢</button>
+            <button class="video-control-btn" id="closePlayer">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-ask" id="qaAskBtn" style="display:none;">Ask</button>
+  </div>
+</div>
+  
   <!-- 登录/注册页 -->
   <div class="page" id="page-login-register">
     <div class="auth-container">
