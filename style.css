@@ -1465,6 +1465,47 @@ input:focus, select:focus { border-color: transparent; box-shadow: 0 0 0 1px rgb
 .tip-modal-new.show {
   display: block;
 }
+/* 修正下拉按钮样式 */
+.dropdown-btn {
+  background-image: none !important;
+  padding-right: 10px !important;
+}
+
+/* 输入卡片相对定位，用于生成提示 */
+.input-container {
+  position: relative;
+}
+
+/* 生成提示动效（绝对定位在输入卡片右上角） */
+.generating-tip {
+  position: absolute;
+  top: -28px;
+  right: 10px;
+  background: rgba(255,255,255,0.95);
+  padding: 4px 12px;
+  border-radius: 12px;
+  color: #4a90e2;
+  font-size: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  white-space: nowrap;
+  z-index: 102;
+  display: none;
+}
+
+/* 弱化输入框引导语 */
+.input-area::placeholder {
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+/* 防止功能行溢出 */
+.func-row {
+  flex-wrap: nowrap;
+}
+.dropdown-group {
+  flex-shrink: 1;
+  min-width: 0;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
