@@ -108,20 +108,16 @@
 
           <textarea class="input-area" id="qaInput" placeholder="Tap the category and cuisine buttons, choose what you want to eat!"></textarea>
           <div class="func-row">
-            <div class="dropdown-group">
-              <div class="dropdown">
-                <button class="dropdown-btn" id="categoryBtn" onclick="toggleDropdown('category')">Category</button>
-                <div class="dropdown-menu" id="categoryMenu">
-                  <div class="dropdown-item" onclick="selectCategoryItem('standard','Standard')">Standard</div>
-                  <div class="dropdown-item" onclick="selectCategoryItem('baby','Baby')">Baby</div>
-                  <div class="dropdown-item" onclick="selectCategoryItem('pregnancy','Pregnancy')">Pregnancy</div>
-                </div>
-              </div>
-              <div class="dropdown">
-                <button class="dropdown-btn" id="cuisineBtn" onclick="toggleDropdown('cuisine')">Cuisine</button>
-                <div class="dropdown-menu" id="cuisineMenu"></div>
-              </div>
-            </div>
+
+            <div class="select-group">
+  <select id="mealType" class="native-select">
+    <option value="standard" id="optStandard">Standard</option>
+    <option value="baby" id="optBaby">Baby</option>
+    <option value="pregnancy" id="optPregnancy">Pregnancy</option>
+  </select>
+  <select id="cuisine" class="native-select"></select>
+</div>
+            
             <div class="action-group">
               <button class="icon-btn voice-btn" id="voiceBtn">
                 <svg viewBox="0 0 24 24">
