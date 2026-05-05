@@ -65,7 +65,7 @@
       <a id="linkLegal" onclick="showPage('page-legal')">Privacy/Terms</a>
     </div>
   </div>
-
+  
   <!-- ==================== 生成器页（新版设计） ==================== -->
   <div class="page" id="page-generator">
     <div class="generator-wrap-new">
@@ -75,8 +75,8 @@
           <div class="gen-title-new" id="genTitle">AI Recipe Generator</div>
           <div class="mode-group">
             <div class="mode-slider" id="modeSlider"></div>
-            <button class="mode-btn active" id="btnRecipeMode" onclick="switchGeneratorMode('recipe')">Generate Recipe</button>
-            <button class="mode-btn" id="btnAiMode" onclick="switchGeneratorMode('qa')">AI Assistant</button>
+            <button class="mode-btn active" id="btnRecipeMode" onclick="switchGeneratorMode('recipe')">Generate</button>
+            <button class="mode-btn" id="btnAiMode" onclick="switchGeneratorMode('qa')">AI Asst</button>
           </div>
           <p class="mode-desc left-indent" id="modeDesc">Enter ingredients, dish names or food items.</p>
         </div>
@@ -88,10 +88,13 @@
           </div>
           <div class="qa-content" id="qaContent">
             <div class="qa-list-new" id="qaHistory">
-              <div class="qa-bubble ai-bubble"><span class="qa-label qa-label-a">A:</span>Hello, I'm your AI food assistant. How can I help?</div>
+              <div class="qa-bubble ai-bubble">Hello, I'm your AI food assistant. How can I help?</div>
             </div>
           </div>
         </div>
+
+        <!-- 生成提示动效 -->
+        <div class="generating-tip" id="generatingTip">Generating recipe...</div>
 
         <!-- 输入卡片 -->
         <div class="input-container" id="inputContainer">
@@ -107,7 +110,7 @@
           <div class="func-row">
             <div class="dropdown-group">
               <div class="dropdown">
-                <button class="dropdown-btn" id="categoryBtn" onclick="toggleDropdown('category')">Standard</button>
+                <button class="dropdown-btn" id="categoryBtn" onclick="toggleDropdown('category')">Category</button>
                 <div class="dropdown-menu" id="categoryMenu">
                   <div class="dropdown-item" onclick="selectCategoryItem('standard','Standard')">Standard</div>
                   <div class="dropdown-item" onclick="selectCategoryItem('baby','Baby')">Baby</div>
@@ -115,7 +118,7 @@
                 </div>
               </div>
               <div class="dropdown">
-                <button class="dropdown-btn" id="cuisineBtn" onclick="toggleDropdown('cuisine')">American</button>
+                <button class="dropdown-btn" id="cuisineBtn" onclick="toggleDropdown('cuisine')">Cuisine</button>
                 <div class="dropdown-menu" id="cuisineMenu"></div>
               </div>
             </div>
