@@ -376,7 +376,61 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .btn-video::before{content:"▶";font-size:10px}
 .btn-video:hover{background:#f0f4ff;border-color:#4a90e2;color:#2563eb;bottom:-4px}
 .mic-btn.unsupported{display:none!important}
+/* ==================== 原生 select 布局修正 ==================== */
+.func-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0;
+}
 
+.select-group {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-right: auto;
+}
+
+.native-select {
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  outline: none;
+  background: #eef1f5;
+  color: #1f2937;
+  appearance: auto;
+  -webkit-appearance: auto;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .native-select {
+    min-width: 90px;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 768px) {
+  .native-select {
+    min-width: auto;
+    max-width: none;
+    width: auto;
+  }
+}
+
+.action-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
