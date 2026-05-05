@@ -378,6 +378,7 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .mic-btn.unsupported{display:none!important}
 
 /* ==================== 生成器布局修正 ==================== */
+/* ==================== 生成器布局修正（替换同名选择器） ==================== */
 .func-row {
   display: flex;
   align-items: center;
@@ -389,14 +390,14 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .select-group {
   display: flex;
   gap: 8px;
-  flex: 0 0 auto;
+  flex: 0 0 auto;          /* 绝对不压缩 */
 }
 
 .action-group {
   display: flex;
   gap: 10px;
   align-items: center;
-  flex: 0 0 auto;
+  flex: 0 0 auto;          /* 绝对不压缩，图标永不重叠 */
 }
 
 /* 隐藏的原生 select */
@@ -408,10 +409,10 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   height: 0;
 }
 
-/* 自定义选择按钮 */
+/* 分类/菜系按钮样式（圆角、高度、对齐） */
 .select-btn {
   height: 46px;
-  padding: 0 12px;
+  padding: 0 14px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   background: #f9fafb;
@@ -421,6 +422,9 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   white-space: nowrap;
   text-align: center;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .select-btn:hover {
@@ -428,6 +432,7 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   border-color: #d4e8fb;
 }
 
+/* 手机端：固定最小宽度，文字超出显示省略号 */
 @media (max-width: 767px) {
   .select-btn {
     min-width: 90px;
@@ -437,6 +442,7 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   }
 }
 
+/* 平板/电脑端：宽度自适应 */
 @media (min-width: 768px) {
   .select-btn {
     min-width: auto;
@@ -444,6 +450,7 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
     width: auto;
   }
 }
+
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
