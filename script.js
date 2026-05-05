@@ -1885,13 +1885,19 @@ logout = function() {
     originalRenderLanguage();
     updateModeBtns();
     populateCuisines();
+
+    const catBtn = document.getElementById('categoryBtn');
+    if (catBtn) catBtn.textContent = t('genMealType');
+    const cuiBtn = document.getElementById('cuisineBtn');
+    if (cuiBtn) cuiBtn.textContent = t('genCuisine');
+
     const inputPl = document.getElementById('qaInput');
     if (inputPl) inputPl.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';
   };
 
   const mealTypeSelect = document.getElementById('mealType');
   if (mealTypeSelect) mealTypeSelect.value = 'standard';
-  
+
   setTimeout(() => {
     const cuisineSelect = document.getElementById('cuisine');
     if (cuisineSelect) {
@@ -1903,7 +1909,6 @@ logout = function() {
 
   switchGeneratorMode('recipe');
 })();
-
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
     // 将所有逻辑完全隔离，任何错误都不会影响主程序
