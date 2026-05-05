@@ -53,12 +53,6 @@ const PLANS = {
   premium: { dailyLimit: 80, qPerRecipe: 5 },
   business: { dailyLimit: 300, qPerRecipe: 5 }
 };
-
-function getCurrentLang() {
-  const stored = localStorage.getItem('aiChefLang');
-  return stored && LANGS.includes(stored) ? stored : 'en';
-}
-
 let currentLang = localStorage.getItem('aiChefLang');
 if (!currentLang) {
   const browserLang = navigator.language.split('-')[0];
@@ -159,7 +153,8 @@ const translations = {
     homeFeature6Title: 'Unlimited Ideas', homeFeature6Desc: 'Tap Generate again for fresh, new cooking ideas anytime you want.',
     homeBottomTitle: 'Simple. Fast. Delicious.',
     homeBottomDesc: 'Type any food-related keywords to explore endless recipes. Get popular, authentic dishes from worldwide cuisines with AI.',
-    homeSubscriptionLink: 'Subscription'
+    homeSubscriptionLink: 'Subscription', 
+    inputPlaceholder: 'Tap the category and cuisine buttons, choose what you want to eat!', generating: 'Generating your recipe...', generateFailed: 'Load failed, please try again!',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -231,7 +226,8 @@ const translations = {
     homeFeature6Title: '无限灵感', homeFeature6Desc: '随时点击生成，获取全新烹饪灵感。',
     homeBottomTitle: '简单、快捷、美味',
     homeBottomDesc: '输入任意美食关键词，探索无限食谱。AI 带你解锁全球热门地道菜品。',
-    homeSubscriptionLink: '订阅'
+    homeSubscriptionLink: '订阅',
+    inputPlaceholder: '点开分类和菜系按钮，选择你想吃的美味!', generating: '正在生成食谱...', generateFailed: '加载失败，请重试！',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
@@ -311,7 +307,8 @@ const translations = {
     homeFeature5Title: 'Cocinas del mundo', homeFeature5Desc: 'Descubre cocinas del mundo y prepara platos auténticos de cualquier cultura.',
     homeFeature6Title: 'Ideas ilimitadas', homeFeature6Desc: 'Pulsa Generar de nuevo para nuevas ideas culinarias cuando quieras.',
     homeBottomTitle: 'Sencillo. Rápido. Delicioso.', homeBottomDesc: 'Escribe cualquier palabra clave relacionada con comida para explorar recetas infinitas. Obtén platos populares y auténticos de cocinas del mundo con IA.',
-    homeSubscriptionLink: 'Suscripción'
+    homeSubscriptionLink: 'Suscripción',
+    inputPlaceholder: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!', generating: 'Generando tu receta...', generateFailed: 'Error de carga, inténtalo de nuevo!',
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -392,7 +389,8 @@ const translations = {
     homeFeature5Title: 'Cuisines du monde', homeFeature5Desc: 'Découvrez des cuisines du monde et préparez des plats authentiques de toutes cultures.',
     homeFeature6Title: 'Idées illimitées', homeFeature6Desc: 'Appuyez sur Générer à nouveau pour de nouvelles idées de cuisine quand vous voulez.',
     homeBottomTitle: 'Simple. Rapide. Délicieux.', homeBottomDesc: 'Tapez n\'importe quel mot-clé culinaire pour explorer des recettes infinies. Obtenez des plats populaires et authentiques de cuisines du monde avec l\'IA.',
-    homeSubscriptionLink: 'Abonnement'
+    homeSubscriptionLink: 'Abonnement',
+    inputPlaceholder: 'Cliquez sur les boutons des catégories et cuisines, choisissez ce que vous voulez déguster!', generating: 'Génération de votre recette...', generateFailed: 'Échec du chargement, réessayez!',
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -474,7 +472,8 @@ const translations = {
     homeFeature5Title: 'Weltküchen', homeFeature5Desc: 'Entdecke Weltküchen und koche authentische Gerichte aus jeder Kultur.',
     homeFeature6Title: 'Unbegrenzte Ideen', homeFeature6Desc: 'Tippe auf Generieren, wann immer du neue Kochideen brauchst.',
     homeBottomTitle: 'Einfach. Schnell. Lecker.', homeBottomDesc: 'Gib einfach Lebensmittel-Schlüsselwörter ein, um endlose Rezepte zu entdecken. Hol dir beliebte, authentische Gerichte aus aller Welt mit KI.',
-    homeSubscriptionLink: 'Abonnement'
+    homeSubscriptionLink: 'Abonnement',
+    inputPlaceholder: 'Tippe auf Kategorie- und Küchenbuttons, wähle was du essen möchtest!', generating: 'Ihr Rezept wird erstellt...', generateFailed: 'Laden fehlgeschlagen, bitte erneut versuchen!',
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -555,7 +554,8 @@ const translations = {
     homeFeature5Title: 'Cucine del mondo', homeFeature5Desc: 'Scopri cucine del mondo e prepara piatti autentici di ogni cultura.',
     homeFeature6Title: 'Idee illimitate', homeFeature6Desc: 'Tocca Genera di nuovo per nuove idee culinarie quando vuoi.',
     homeBottomTitle: 'Semplice. Veloce. Delizioso.', homeBottomDesc: 'Inserisci qualsiasi parola chiave culinaria per esplorare ricette infinite. Ottieni piatti popolari e autentici da cucine di tutto il mondo con l\'IA.',
-    homeSubscriptionLink: 'Abbonamento'
+    homeSubscriptionLink: 'Abbonamento',
+    inputPlaceholder: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!', generating: 'Generando la tua ricetta...', generateFailed: 'Caricamento fallito, riprova!',
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -637,21 +637,10 @@ const translations = {
     homeFeature5Title: 'Culinárias do mundo', homeFeature5Desc: 'Descubra culinárias do mundo e prepare pratos autênticos de qualquer cultura.',
     homeFeature6Title: 'Ideias ilimitadas', homeFeature6Desc: 'Toque Gerar novamente para novas ideias culinárias quando quiser.',
     homeBottomTitle: 'Simples. Rápido. Delicioso.', homeBottomDesc: 'Digite qualquer palavra-chave relacionada a comida para explorar receitas infinitas. Obtenha pratos populares e autênticos de culinárias do mundo com IA.',
-    homeSubscriptionLink: 'Assinatura'
+    homeSubscriptionLink: 'Assinatura',
+    inputPlaceholder: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!', generating: 'Gerando sua receita...', generateFailed: 'Falha no carregamento, tente novamente!',
   },
-  inputPlaceholder: {
-    en: 'Tap the category and cuisine buttons, choose what you want to eat!',
-    es: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!',
-    fr: 'Cliquez sur les boutons des catégories et cuisines, choisissez ce que vous voulez déguster!',
-    de: 'Tippe auf Kategorie- und Küchenbuttons, wähle was du essen möchtest!',
-    it: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!',
-    pt: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!',
-    'zh-CN': '点开分类和菜系按钮，选择你想吃的美味！'
-},
-  generating: { en: 'Generating your recipe...', es: 'Generando tu receta...', fr: 'Génération de votre recette...', de: 'Ihr Rezept wird erstellt...', it: 'Generando la tua ricetta...', pt: 'Gerando sua receita...', 'zh-CN': '正在生成食谱...' },
-  generateFailed: { en: 'Generation failed, please try again.', es: 'Falló la generación, inténtelo de nuevo.', fr: 'Échec de la génération, veuillez réessayer.', de: 'Erstellung fehlgeschlagen, bitte versuchen Sie es erneut.', it: 'Generazione fallita, riprova.', pt: 'Falha na geração, tente novamente.', 'zh-CN': '食谱生成失败，请重新生成' },
-};
-
+}
 function t(key, params) {
   let text = translations[currentLang]?.[key] || translations.en[key] || key;
   if (params) for (let k in params) text = text.replace(new RegExp(`{{${k}}}`, 'g'), params[k]);
@@ -1608,22 +1597,16 @@ function updateModeBtns() {
   const btnAi = document.getElementById('btnAiMode');
   if (!btnRecipe || !btnAi) return;
 
-  const texts = {
-    recipe: t('genModeRecipe') || 'Generate Recipe',
-    ai: t('genModeAi') || 'AI Assistant'
-  };
+  // 直接复用旧版已有的翻译键值（旧版 translations 里已有多语言版本）
+  let recipeText = t('generate') || 'Generate Recipe';
+  let aiText = t('aiAssistTitle') || 'AI Assistant';
 
   // 长度限制：超过8字符用英文原文
-  const apply = (btn, key, fallback) => {
-    let txt = t(key) || fallback;
-    if (txt.length > 8) txt = fallback;
-    btn.textContent = txt;
-    if (txt.length > 10) btn.style.fontSize = '13px';
-    else btn.style.fontSize = '15px';
-  };
+  if (recipeText.length > 8) recipeText = 'Generate';
+  if (aiText.length > 8) aiText = 'AI Asst';
 
-  apply(btnRecipe, 'genModeRecipe', 'Generate');
-  apply(btnAi, 'genModeAi', 'AI Asst');
+  btnRecipe.textContent = recipeText;
+  btnAi.textContent = aiText;
 }
 
 // ==================== 下拉菜单操作 ====================
