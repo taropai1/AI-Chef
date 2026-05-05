@@ -1909,6 +1909,13 @@ logout = function() {
 
   switchGeneratorMode('recipe');
 })();
+
+function openNativeSelect(selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.focus();
+  select.click();
+}
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
     // 将所有逻辑完全隔离，任何错误都不会影响主程序
