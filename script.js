@@ -1647,10 +1647,11 @@ function handleSend(e) {
   const qaInput = document.getElementById('qaInput');
   const val = qaInput ? qaInput.value.trim() : '';
   
+  // 【精准修复点】：未登录时，提示并立刻终止，不再执行后续任何逻辑
   if (!userData) {
     alert(t('pleaseLogin'));
     showPage('page-login-register');
-    return;
+    return; // 这是最关键的一行，必须在提示后加上
   }
   
   if (generatorMode === 'recipe') {
@@ -1680,6 +1681,7 @@ function handleSend(e) {
       showTipModal('Please enter a question.');
       return;
     }
+    // 这里会正确校验食谱是否存在，未登录状态已被上面拦截，所以不会误报
     if (!userData.lastRecipeText) {
       alert(t('alertNoRecipe'));
       return;
