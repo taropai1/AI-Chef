@@ -916,6 +916,76 @@ function renderRecipeContent(text) {
   document.getElementById('recipeContent').innerHTML = html;
 }
 
+function renderRecipeContentAppend(text) {
+  const blocks = text.split(/\n\s*\n/);
+  const name = blocks[0]?.trim() || '';
+  
+  const nameDisplay = document.getElementById('recipeNameDisplay');
+  if (nameDisplay) nameDisplay.innerText = name;
+  
+  let html = '';
+  for (let i = 1; i < blocks.length; i++) {
+    const block = blocks[i].trim();
+    if (!block) continue;
+    const lines = block.split('\n');
+    
+    let titleLine = '';
+    const contentLines = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      if (!titleLine) { titleLine = trimmed; }
+      else { contentLines.push(trimmed); }
+    }
+    
+    const hasDashItems = contentLines.some(l => l.startsWith('-'));
+    const hasNumberedItems = contentLines.some(l => /^\d+\./.test(l));
+    
+    if (titleLine) { html += `<h4>${titleLine}</h4>`; }
+    
+    if (hasDashItems) {
+      const items = contentLines.filter(l => l.startsWith('-')).map(l => l.substring(1).trim());
+      html += '<ul class="dash-list">';
+      items.forEach(item => { html += `<li>${item}</li>`; });
+      html += '</ul>';
+    } else if (hasNumberedItems) {
+      const isWarnings = titleLine.toLowerCase().includes('allergen') || titleLine.toLowerCase().includes('safety') || titleLine.includes('风险') || titleLine.includes('建议');
+      const items = contentLines.filter(l => /^\d+\./.test(l)).map(l => l.trim());
+      if (isWarnings) {
+        html += '<ul class="warnings-list">';
+        items.forEach(item => { html += `<li>${item}</li>`; });
+        html += '</ul>';
+      } else {
+        html += '<ul class="instructions-list">';
+        items.forEach(item => { html += `<li>${item}</li>`; });
+        html += '</ul>';
+      }
+    } else {
+      html += `<p>${contentLines.join('<br>')}</p>`;
+    }
+  }
+  
+  const recipeList = document.getElementById('recipeList');
+  if (recipeList) {
+    const card = document.createElement('div');
+    card.className = 'recipe-card';
+    card.innerHTML = `<div class="recipe-card-name">${name}</div><div class="recipe-card-body">${html}</div>`;
+    recipeList.appendChild(card);
+    
+    while (recipeList.children.length > 12) {
+      recipeList.removeChild(recipeList.firstChild);
+    }
+  }
+  
+  const oldRecipeContent = document.getElementById('recipeContent');
+  if (oldRecipeContent) oldRecipeContent.innerHTML = html;
+  
+  setTimeout(() => {
+    if (recipeList && recipeList.lastElementChild) {
+      recipeList.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 100);
+}
 function updateLimitInfo() {
   const el = document.getElementById('limitInfo');
   if (!el) return;
