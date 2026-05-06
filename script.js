@@ -1570,7 +1570,51 @@ if (autoCode && action === 'changeEmail') {
 }
 })();
 
-// ==================== 新版生成器模式切换 ====================
+// ==================== 生成器完整交互（状态 + 模式切换 + 发送 + 弹窗 + 初始化） ====================
+let generatorMode = 'recipe';
+let sendLocked = false;
+
+function unlockSend() {
+    sendLocked = false;
+    const btn = document.getElementById('qaSendBtn');
+    if (btn) btn.disabled = false;
+}
+
+function updateModeBtns() {
+  const btnRecipe = document.getElementById('btnRecipeMode');
+  const btnAi = document.getElementById('btnAiMode');
+  if (!btnRecipe || !btnAi) return;
+
+  const recipeText = t('generate');
+  const aiText = t('aiAssistTitle');
+
+  btnRecipe.textContent = recipeText.length > 8 ? (translations.en.generate || 'Generate Recipe') : recipeText;
+  btnAi.textContent = aiText.length > 8 ? (translations.en.aiAssistTitle || 'AI Assistant') : aiText;
+}
+
+function openNativeSelect(selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.focus();
+  select.click();
+}
+
+// 监听原生 select 变化，同步按钮文案
+document.addEventListener('change', function(e) {
+  const target = e.target;
+  if (target.id === 'mealType') {
+    const btn = document.getElementById('categoryBtn');
+    if (btn && target.selectedIndex >= 0) {
+      btn.textContent = target.options[target.selectedIndex].textContent;
+    }
+  } else if (target.id === 'cuisine') {
+    const btn = document.getElementById('cuisineBtn');
+    if (btn && target.selectedIndex >= 0) {
+      btn.textContent = target.options[target.selectedIndex].textContent;
+    }
+  }
+});
+
 function switchGeneratorMode(mode) {
   generatorMode = mode;
   const slider = document.getElementById('modeSlider');
@@ -1604,19 +1648,6 @@ function switchGeneratorMode(mode) {
   }
 }
 
-// ==================== 更新模态按钮文字（多语言+长度限制） ====================
-function updateModeBtns() {
-  const btnRecipe = document.getElementById('btnRecipeMode');
-  const btnAi = document.getElementById('btnAiMode');
-  if (!btnRecipe || !btnAi) return;
-
-  const recipeText = t('generate');
-  const aiText = t('aiAssistTitle');
-
-  btnRecipe.textContent = recipeText.length > 8 ? (translations.en.generate || 'Generate Recipe') : recipeText;
-  btnAi.textContent = aiText.length > 8 ? (translations.en.aiAssistTitle || 'AI Assistant') : aiText;
-}
-// ==================== 合并发送逻辑 ====================
 function handleSend(e) {
   if (e) e.preventDefault();
   if (sendLocked) return;
@@ -1624,7 +1655,6 @@ function handleSend(e) {
   const qaInput = document.getElementById('qaInput');
   const val = qaInput ? qaInput.value.trim() : '';
   
-  // 未登录检查
   if (!userData) {
     alert(t('pleaseLogin'));
     showPage('page-login-register');
@@ -1642,12 +1672,10 @@ function handleSend(e) {
       return;
     }
     
-    // 锁定发送
     sendLocked = true;
     const btn = document.getElementById('qaSendBtn');
     if (btn) btn.disabled = true;
     
-    // 同步输入到隐藏的 dishName
     const dishNameInput = document.getElementById('dishName');
     if (dishNameInput) dishNameInput.value = val;
     
@@ -1660,7 +1688,7 @@ function handleSend(e) {
       showTipModal('Please enter a question.');
       return;
     }
-    if (!userData || !userData.lastRecipeText) {
+    if (!userData.lastRecipeText) {
       alert(t('alertNoRecipe'));
       return;
     }
@@ -1678,98 +1706,6 @@ function handleSend(e) {
   }
 }
 
-function showTipModal(msg) {
-  const modal = document.getElementById('tipModal');
-  if (modal) {
-    modal.textContent = msg;
-    modal.classList.add('show');
-    setTimeout(() => modal.classList.remove('show'), 2000);
-  }
-}
-
-function showGeneratingTip() {
-  const tip = document.getElementById('generatingTip');
-  if (tip) tip.classList.add('show');
-}
-
-function hideGeneratingTip() {
-  const tip = document.getElementById('generatingTip');
-  if (tip) tip.classList.remove('show');
-}
-
-// ==================== 食谱内容追加渲染 ====================
-function renderRecipeContentAppend(text) {
-  const blocks = text.split(/\n\s*\n/);
-  const name = blocks[0]?.trim() || '';
-  
-  const nameDisplay = document.getElementById('recipeNameDisplay');
-  if (nameDisplay) nameDisplay.innerText = name;
-  
-  let html = '';
-  for (let i = 1; i < blocks.length; i++) {
-    const block = blocks[i].trim();
-    if (!block) continue;
-    const lines = block.split('\n');
-    
-    let titleLine = '';
-    const contentLines = [];
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      if (!titleLine) { titleLine = trimmed; }
-      else { contentLines.push(trimmed); }
-    }
-    
-    const hasDashItems = contentLines.some(l => l.startsWith('-'));
-    const hasNumberedItems = contentLines.some(l => /^\d+\./.test(l));
-    
-    if (titleLine) { html += `<h4>${titleLine}</h4>`; }
-    
-    if (hasDashItems) {
-      const items = contentLines.filter(l => l.startsWith('-')).map(l => l.substring(1).trim());
-      html += '<ul class="dash-list">';
-      items.forEach(item => { html += `<li>${item}</li>`; });
-      html += '</ul>';
-    } else if (hasNumberedItems) {
-      const isWarnings = titleLine.toLowerCase().includes('allergen') || titleLine.toLowerCase().includes('safety') || titleLine.includes('风险') || titleLine.includes('建议');
-      const items = contentLines.filter(l => /^\d+\./.test(l)).map(l => l.trim());
-      if (isWarnings) {
-        html += '<ul class="warnings-list">';
-        items.forEach(item => { html += `<li>${item}</li>`; });
-        html += '</ul>';
-      } else {
-        html += '<ul class="instructions-list">';
-        items.forEach(item => { html += `<li>${item}</li>`; });
-        html += '</ul>';
-      }
-    } else {
-      html += `<p>${contentLines.join('<br>')}</p>`;
-    }
-  }
-  
-  const recipeList = document.getElementById('recipeList');
-  if (recipeList) {
-    const card = document.createElement('div');
-    card.className = 'recipe-card';
-    card.innerHTML = `<div class="recipe-card-name">${name}</div><div class="recipe-card-body">${html}</div>`;
-    recipeList.appendChild(card);
-    
-    while (recipeList.children.length > 12) {
-      recipeList.removeChild(recipeList.firstChild);
-    }
-  }
-  
-  const oldRecipeContent = document.getElementById('recipeContent');
-  if (oldRecipeContent) oldRecipeContent.innerHTML = html;
-  
-  setTimeout(() => {
-    if (recipeList && recipeList.lastElementChild) {
-      recipeList.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, 100);
-}
-
-// ==================== 食谱生成页面默认界面切换 ====================        
 function switchToContentView() {
   const mainWrap = document.getElementById('mainWrap');
   const contentBlock = document.getElementById('contentBlock');
@@ -1788,20 +1724,28 @@ function switchToContentView() {
   }
 }
 
-// ==================== AI 问答气泡追加 ====================
-function addQABubble(text, isUser) {
-  const qaHistory = document.getElementById('qaHistory');
-  if (!qaHistory) return;
-  
-  const bubble = document.createElement('div');
-  bubble.className = isUser ? 'qa-bubble user-bubble' : 'qa-bubble ai-bubble';
-  bubble.textContent = text;
-  
-  qaHistory.appendChild(bubble);
-  qaHistory.scrollTop = qaHistory.scrollHeight;
+function showTipModal(msg) {
+  const modal = document.getElementById('tipModal');
+  if (modal) {
+    modal.textContent = msg;
+    modal.classList.add('show');
+    setTimeout(() => modal.classList.remove('show'), 2000);
+  }
 }
 
-// ==================== 重置内容 ====================
+function showGeneratingTip() { document.getElementById('generatingTip').classList.add('show'); }
+function hideGeneratingTip() { document.getElementById('generatingTip').classList.remove('show'); }
+
+function addQABubble(text, isUser) {
+  const h = document.getElementById('qaHistory');
+  const b = document.createElement('div');
+  b.className = isUser ? 'qa-bubble user-bubble' : 'qa-bubble ai-bubble';
+  b.textContent = text;
+  h.appendChild(b);
+  h.scrollTop = h.scrollHeight;
+}
+
+// 重置内容（退出登录时调用）
 function clearContentOnReset() {
   const recipeList = document.getElementById('recipeList');
   if (recipeList) recipeList.innerHTML = '';
@@ -1826,39 +1770,69 @@ function clearContentOnReset() {
   switchGeneratorMode('recipe');
 }
 
-// 扩展 logout
+// 扩展 logout，退出时清空生成器
 const originalLogout = logout;
 logout = function() {
   originalLogout();
   clearContentOnReset();
 };
-   
-// ==================== 打开原生 select ====================
-function openNativeSelect(selectId) {
-  const select = document.getElementById(selectId);
-  if (!select) return;
-  select.focus();
-  select.click();
-}
 
-// ==================== 监听原生 select 变化，同步按钮文案 ====================
-(function syncSelectLabels() {
-  document.addEventListener('change', function(e) {
-    const target = e.target;
-    if (target.id === 'mealType') {
-      const btn = document.getElementById('categoryBtn');
-      if (btn) {
-        const selectedOption = target.options[target.selectedIndex];
-        btn.textContent = selectedOption ? selectedOption.textContent : t('genMealType');
+// ==================== 初始化 ====================
+(function initNewGenerator() {
+  const qaSendBtn = document.getElementById('qaSendBtn');
+  if (qaSendBtn) {
+    qaSendBtn.removeEventListener('click', handleSend);
+    qaSendBtn.addEventListener('click', handleSend);
+  }
+
+  const qaInput = document.getElementById('qaInput');
+  if (qaInput) {
+    qaInput.removeEventListener('keydown', handleSend);
+    qaInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend(e);
       }
-    } else if (target.id === 'cuisine') {
-      const btn = document.getElementById('cuisineBtn');
-      if (btn) {
-        const selectedOption = target.options[target.selectedIndex];
-        btn.textContent = selectedOption ? selectedOption.textContent : t('genCuisine');
-      }
+    });
+  }
+
+  // 扩展 renderLanguage 以同步生成器内多语言元素
+  const originalRenderLanguage = renderLanguage;
+  renderLanguage = function() {
+    originalRenderLanguage();
+    updateModeBtns();
+    populateCuisines();
+
+    const mealTypeSelect = document.getElementById('mealType');
+    const categoryBtn = document.getElementById('categoryBtn');
+    if (mealTypeSelect && categoryBtn && mealTypeSelect.selectedIndex <= 0) {
+      categoryBtn.textContent = t('genMealType');
     }
-  });
+
+    const cuisineSelect = document.getElementById('cuisine');
+    const cuisineBtn = document.getElementById('cuisineBtn');
+    if (cuisineSelect && cuisineBtn && cuisineSelect.selectedIndex <= 0) {
+      cuisineBtn.textContent = t('genCuisine');
+    }
+
+    const inputPl = document.getElementById('qaInput');
+    if (inputPl) inputPl.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';
+  };
+
+  // 设置默认分类/菜系
+  const mealTypeSelect = document.getElementById('mealType');
+  if (mealTypeSelect) mealTypeSelect.value = 'standard';
+
+  setTimeout(() => {
+    const cuisineSelect = document.getElementById('cuisine');
+    if (cuisineSelect) {
+      const americanOption = Array.from(cuisineSelect.options).find(opt => opt.value === 'American');
+      if (americanOption) cuisineSelect.value = 'American';
+      else if (cuisineSelect.options.length > 0) cuisineSelect.selectedIndex = 0;
+    }
+  }, 100);
+
+  switchGeneratorMode('recipe');
 })();
 
 // ==================== 语音识别模块（绝对隔离版） ====================
