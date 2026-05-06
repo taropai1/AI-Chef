@@ -1571,15 +1571,6 @@ if (autoCode && action === 'changeEmail') {
 })();
 
 // ==================== 生成器完整交互（状态 + 模式切换 + 发送 + 弹窗 + 初始化） ====================
-let generatorMode = 'recipe';
-let sendLocked = false;
-
-function unlockSend() {
-    sendLocked = false;
-    const btn = document.getElementById('qaSendBtn');
-    if (btn) btn.disabled = false;
-}
-
 function updateModeBtns() {
   const btnRecipe = document.getElementById('btnRecipeMode');
   const btnAi = document.getElementById('btnAiMode');
