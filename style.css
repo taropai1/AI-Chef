@@ -411,11 +411,11 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 /* 分类/菜系按钮样式（圆角、高度、对齐） */
 .select-btn {
   height: 46px;
-  padding: 0 14px;
+  padding: 0 12px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   background: #f9fafb;
-  font-size: 14px;
+  font-size: 12px;
   color: #6b7280;
   cursor: pointer;
   white-space: nowrap;
@@ -449,10 +449,6 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
     width: auto;
   }
 }
-/* 输入卡片作为定位基准 */
-.input-container {
-  position: relative;
-}
 
 /* 功能行布局：左侧按钮组正常流，右侧图标绝对定位 */
 .func-row {
@@ -460,12 +456,6 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   align-items: center;
   width: 100%;
   margin-top: 12px;
-}
-
-.select-group {
-  display: flex;
-  gap: 8px;
-  flex: 0 0 auto;
 }
 
 /* 右侧图标组绝对固定在卡片右边内侧 */
@@ -477,7 +467,21 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   gap: 10px;
   align-items: center;
 }
-
+/* 生成提示动效 */
+.generating-tip {
+  position: absolute;
+  top: -28px;
+  right: 10px;
+  background: rgba(255,255,255,0.95);
+  padding: 4px 12px;
+  border-radius: 12px;
+  color: #4a90e2;
+  font-size: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  white-space: nowrap;
+  z-index: 102;
+  display: none;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
