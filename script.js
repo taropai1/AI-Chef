@@ -2003,24 +2003,6 @@ logout = function() {
                     });
                 }
 
-                // 发送箭头
-                const qaSendBtn = document.getElementById('qaSendBtn');
-                if (qaSendBtn && typeof askQuestion === 'function') {
-                    qaSendBtn.addEventListener('click', () => {
-                        if (qaInput && qaInput.value.trim()) askQuestion();
-                    });
-                }
-
-                // 回车发送
-                if (qaInput && typeof askQuestion === 'function') {
-                    qaInput.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' && qaInput.value.trim()) {
-                            e.preventDefault();
-                            askQuestion();
-                        }
-                    });
-                }
-
                 // 安全重写 switchLang
                 if (typeof window.switchLang === 'function') {
     const originalSwitchLang = window.switchLang;
