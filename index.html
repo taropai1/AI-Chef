@@ -66,8 +66,8 @@
     </div>
   </div>
 
-  <!-- 生成器页（新版） -->
-<div class="page" id="page-generator">
+  <!-- 生成器页（新版A） -->
+  <div class="page" id="page-generator">
   <div class="generator-wrap-new">
     <div class="main-wrap" id="mainWrap">
       <!-- 顶部区域 -->
@@ -98,26 +98,20 @@
         <!-- 生成提示动效 -->
         <div class="generating-tip" id="generatingTip">Generating recipe...</div>
 
-        <!-- 业务依赖的隐藏字段 -->
+        <!-- 隐藏的原生选择器（方案A：隐藏式+JS触发） -->
+        <select id="mealType" class="hidden-select">
+          <option value="standard" id="optStandard">Standard</option>
+          <option value="baby" id="optBaby">Baby</option>
+          <option value="pregnancy" id="optPregnancy">Pregnancy</option>
+        </select>
+        <select id="cuisine" class="hidden-select"></select>
         <input type="text" id="dishName" style="display:none;">
 
         <textarea class="input-area" id="qaInput" placeholder="Tap the category and cuisine buttons, choose what you want to eat!"></textarea>
         <div class="func-row">
           <div class="select-group">
-            <!-- 分类：按钮+透明select覆盖 -->
-            <div class="select-wrapper">
-              <button class="select-btn" id="categoryBtn">Category</button>
-              <select id="mealType" class="transparent-select">
-                <option value="standard" id="optStandard">Standard</option>
-                <option value="baby" id="optBaby">Baby</option>
-                <option value="pregnancy" id="optPregnancy">Pregnancy</option>
-              </select>
-            </div>
-            <!-- 菜系：按钮+透明select覆盖 -->
-            <div class="select-wrapper">
-              <button class="select-btn" id="cuisineBtn">Cuisine</button>
-              <select id="cuisine" class="transparent-select"></select>
-            </div>
+            <button class="select-btn" id="categoryBtn" onclick="openNativeSelect('mealType')">Category</button>
+            <button class="select-btn" id="cuisineBtn" onclick="openNativeSelect('cuisine')">Cuisine</button>
           </div>
           <div class="action-group">
             <button class="icon-btn voice-btn" id="voiceBtn">
@@ -150,7 +144,7 @@
     <button class="btn-ask" id="qaAskBtn" style="display:none;">Ask</button>
   </div>
 </div>
-
+    
     <button class="help-btn" id="howToUseBtn" style="display:none;">How to use</button>
     <button class="btn-video" id="openVideoBtn" style="display:none;">Watch Video Guides</button>
     <div class="video-modal" id="videoModal" style="display:none;">
