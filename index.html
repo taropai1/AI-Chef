@@ -66,7 +66,7 @@
     </div>
   </div>
 
-  <!-- ==================== 生成器页（完整替换 #page-generator） ==================== -->
+  <!-- 生成器页（新版设计） -->
 <div class="page" id="page-generator">
   <div class="generator-wrap-new">
     <div class="main-wrap" id="mainWrap">
@@ -93,17 +93,19 @@
         </div>
       </div>
 
-      <!-- 生成提示动效 -->
-      <div class="generating-tip" id="generatingTip">Generating recipe...</div>
-
       <!-- 输入卡片 -->
       <div class="input-container" id="inputContainer">
+        <!-- 生成提示动效（位于输入卡片右上角） -->
+        <div class="generating-tip" id="generatingTip">Generating recipe...</div>
+
+        <!-- 隐藏的原生 select，用于弹窗效果 + 后台默认值 -->
         <select id="mealType" class="hidden-select">
           <option value="standard" id="optStandard">Standard</option>
           <option value="baby" id="optBaby">Baby</option>
           <option value="pregnancy" id="optPregnancy">Pregnancy</option>
         </select>
         <select id="cuisine" class="hidden-select"></select>
+        <!-- 隐藏的 dishName 输入，业务逻辑依赖 -->
         <input type="text" id="dishName" style="display:none;">
 
         <textarea class="input-area" id="qaInput" placeholder="Tap the category and cuisine buttons, choose what you want to eat!"></textarea>
@@ -126,19 +128,14 @@
 
     <div class="tip-modal-new" id="tipModal">Please generate a new recipe</div>
 
-    <!-- ===== 以下旧版元素，隐藏但保留 ===== -->
+    <!-- ===== 以下旧版元素，业务逻辑依赖，隐藏但必须保留 ===== -->
     <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()" style="display:none;">Generate Recipe</button>
-    <div class="recipe-banner" id="personalizedGreeting" style="display:none;">Dear Gourmet! Enjoy your meal!</div>
     <div class="recipe-title" id="recipeNameDisplay" style="display:none;"></div>
     <div class="recipe-body" id="recipeContent" style="display:none;"></div>
-    <div class="content-nav" style="display:none;">
-      <button class="nav-icon" id="prevRecipeBtn" onclick="showPrevRecipe()" disabled>←</button>
-      <button class="nav-icon" id="nextRecipeBtn" onclick="showNextRecipe()" disabled>→</button>
-    </div>
-    <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()" style="display:none;">↻ Recover last 3</button>
     <div class="gen-sub" id="limitInfo" style="display:none;">Please log in to continue</div>
     <div class="limit" id="qaLimitNote" style="display:none;"></div>
-    <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" title="Add to Home" style="display:none;">+</button>
+    <!-- 后续迁移到导航栏的功能模块 -->
+    <button class="share-btn" id="addToHomeBtn" onclick="addToHome()" style="display:none;">+</button>
     <div class="modal-overlay" id="howToModal" style="display:none;">
       <div class="modal">
         <h4 id="howToTitle">How to use</h4>
@@ -177,7 +174,6 @@
     <button class="btn-ask" id="qaAskBtn" style="display:none;">Ask</button>
   </div>
 </div>
-  
   <!-- 登录/注册页 -->
   <div class="page" id="page-login-register">
     <div class="auth-container">
