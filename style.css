@@ -377,7 +377,6 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
 .btn-video:hover{background:#f0f4ff;border-color:#4a90e2;color:#2563eb;bottom:-4px}
 .mic-btn.unsupported{display:none!important}
 
-/* ==================== 生成器布局修正 ==================== */
 /* ==================== 生成器布局修正（替换同名选择器） ==================== */
 .func-row {
   display: flex;
