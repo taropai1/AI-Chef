@@ -127,7 +127,16 @@
 
     <!-- 提示弹窗 -->
     <div class="tip-modal-new" id="tipModal">Please generate a new recipe</div>
-
+    <div class="modal-overlay" id="howToModal" style="display:none;">
+  <div class="modal">
+    <h4 id="howToTitle">How to use</h4>
+    <ul id="howToList"></ul>
+    <p class="modal-highlight-text" id="howToHighlight"></p>
+    <button class="close-btn" onclick="closeHowToModal()">Got it</button>
+  </div>
+</div>
+<button class="help-btn" id="howToUseBtn" style="display:none;">How to use</button>
+    <button class="recover" id="restoreRecentLink" onclick="restoreRecentRecipes()" style="display:none;">↻ Recover last 3</button>
     <!-- ====== 业务依赖的隐藏元素，保留不动 ====== -->
     <button class="generate-btn" id="btnGenerate" onclick="generateRecipe()" style="display:none;">Generate Recipe</button>
     <div class="recipe-title" id="recipeNameDisplay" style="display:none;"></div>
