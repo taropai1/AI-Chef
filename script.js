@@ -1587,7 +1587,8 @@ function openNativeSelect(selectId) {
   const select = document.getElementById(selectId);
   if (!select) return;
   select.focus();
-  select.click();
+  select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+  select.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
 }
 
 // 监听原生 select 变化，同步按钮文案
