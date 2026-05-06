@@ -450,23 +450,6 @@ input:focus,select:focus{border-color:transparent;box-shadow:0 0 0 1px rgba(100,
   }
 }
 
-/* 功能行布局：左侧按钮组正常流，右侧图标绝对定位 */
-.func-row {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin-top: 12px;
-}
-
-/* 右侧图标组绝对固定在卡片右边内侧 */
-.action-group {
-  position: absolute;
-  right: 16px;
-  bottom: 12px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
 /* 生成提示动效 */
 .generating-tip {
   position: absolute;
