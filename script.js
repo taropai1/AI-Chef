@@ -1582,8 +1582,12 @@ function restoreRecentRecipes() {
 } // 仅保留这一个函数闭合括号
 function showPrevRecipe() { if (historyIndex > 0) { historyIndex--; renderRecipeContent(recipeHistory[historyIndex]); } updateHistoryButtons(); }
 function showNextRecipe() { if (historyIndex < recipeHistory.length - 1) { historyIndex++; renderRecipeContent(recipeHistory[historyIndex]); } updateHistoryButtons(); }
-function updateHistoryButtons() { document.getElementById('prevRecipeBtn').disabled = historyIndex <= 0; document.getElementById('nextRecipeBtn').disabled = historyIndex >= recipeHistory.length - 1; }
-
+function updateHistoryButtons() {
+    const prevBtn = document.getElementById('prevRecipeBtn');
+    const nextBtn = document.getElementById('nextRecipeBtn');
+    if (prevBtn) prevBtn.disabled = historyIndex <= 0;
+    if (nextBtn) nextBtn.disabled = historyIndex >= recipeHistory.length - 1;
+}
 // ==================== URL 参数处理 ====================
 function handleUrlParams() { const urlParams = new URLSearchParams(window.location.search); const action = urlParams.get('action'), email = urlParams.get('email'); if (action && email) { if (action === 'register') { showPage('page-login-register'); switchAuthTab('register'); document.getElementById('registerEmail').value = decodeURIComponent(email); document.getElementById('registerPassword').focus(); } else if (action === 'reset') { showPage('page-login-register'); switchAuthTab('login'); document.getElementById('loginEmail').value = decodeURIComponent(email); showForgotModal(); document.getElementById('forgotEmail').value = decodeURIComponent(email); } window.history.replaceState({}, document.title, window.location.pathname); } }
 function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card-generator'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
