@@ -162,7 +162,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 /* ==================== 语音输入与发送图标（旧版兼容） ==================== */
 .input-with-icon{position:relative;display:flex;align-items:center;width:100%}
 .input-with-icon input{flex:1;padding-right:40px}
-.mic-btn,.send-btn{position:absolute;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:transparent;cursor:pointer;border-radius:50%;transition:background 0.15s ease;color:#9ca3af}
+.mic-btn,.send-btn{position:static;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:transparent;cursor:pointer;border-radius:50%;transition:background 0.15s ease;color:#9ca3af}
 .mic-btn:hover,.send-btn:hover{background:#f3f4f6;color:#6b7280}
 .mic-btn:active,.send-btn:active{transform:scale(0.95)}
 .mic-btn.recording{color:#ef4444;animation:pulse 1.5s ease-in-out infinite}
@@ -179,7 +179,6 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 .mic-btn.unsupported{display:none!important}
 /* ==================== 生成器页（新版设计） ==================== */
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-body{background:#fff;}
 .generator-wrap-new{width:100%;min-height:100vh;display:flex;flex-direction:column}
 .main-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding-bottom:140px;gap:38px;transition:all 0.3s ease}
 .main-wrap.top-fixed{justify-content:flex-start;padding-top:30px;padding-bottom:120px;gap:24px}
