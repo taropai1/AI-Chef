@@ -1582,21 +1582,23 @@ function switchGeneratorMode(mode) {
   btns.forEach(b => b.classList.remove('active'));
   
   if (mode === 'recipe') {
-    slider.classList.remove('right');
-    btns[0].classList.add('active');
-    modeDesc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
-    modeDesc.classList.add('left-indent');
-    modeDesc.classList.remove('right-normal');
-    
+    if (slider) slider.classList.remove('right');
+    if (btns[0]) btns[0].classList.add('active');
+    if (modeDesc) {
+      modeDesc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
+      modeDesc.classList.add('left-indent');
+      modeDesc.classList.remove('right-normal');
+    }
     if (recipeContent) recipeContent.classList.add('show');
     if (qaContent) qaContent.classList.remove('show');
   } else {
-    slider.classList.add('right');
-    btns[1].classList.add('active');
-    modeDesc.textContent = t('enterQuestion') || 'Ask about this recipe...';
-    modeDesc.classList.add('right-normal');
-    modeDesc.classList.remove('left-indent');
-    
+    if (slider) slider.classList.add('right');
+    if (btns[1]) btns[1].classList.add('active');
+    if (modeDesc) {
+      modeDesc.textContent = t('enterQuestion') || 'Ask about this recipe...';
+      modeDesc.classList.add('right-normal');
+      modeDesc.classList.remove('left-indent');
+    }
     if (qaContent) qaContent.classList.add('show');
     if (recipeContent) recipeContent.classList.remove('show');
   }
@@ -1614,14 +1616,15 @@ function updateModeBtns() {
   btnRecipe.textContent = recipeText.length > 8 ? (translations.en.generate || 'Generate Recipe') : recipeText;
   btnAi.textContent = aiText.length > 8 ? (translations.en.aiAssistTitle || 'AI Assistant') : aiText;
 }
-
 // ==================== 合并发送逻辑 ====================
-function handleSend() {
+function handleSend(e) {
+  if (e) e.preventDefault();
   if (sendLocked) return;
   
   const qaInput = document.getElementById('qaInput');
   const val = qaInput ? qaInput.value.trim() : '';
   
+  // 未登录检查
   if (!userData) {
     alert(t('pleaseLogin'));
     showPage('page-login-register');
@@ -1639,10 +1642,12 @@ function handleSend() {
       return;
     }
     
+    // 锁定发送
     sendLocked = true;
     const btn = document.getElementById('qaSendBtn');
     if (btn) btn.disabled = true;
     
+    // 同步输入到隐藏的 dishName
     const dishNameInput = document.getElementById('dishName');
     if (dishNameInput) dishNameInput.value = val;
     
@@ -1655,7 +1660,7 @@ function handleSend() {
       showTipModal('Please enter a question.');
       return;
     }
-    if (!userData.lastRecipeText) {
+    if (!userData || !userData.lastRecipeText) {
       alert(t('alertNoRecipe'));
       return;
     }
@@ -1670,35 +1675,6 @@ function handleSend() {
     if (btn) btn.disabled = true;
     
     askQuestion();
-  }
-}
-
-function syncDropdownToSelect() {
-  const categoryBtn = document.getElementById('categoryBtn');
-  const cuisineBtn = document.getElementById('cuisineBtn');
-  const mealTypeSelect = document.getElementById('mealType');
-  const cuisineSelect = document.getElementById('cuisine');
-  
-  if (mealTypeSelect && categoryBtn) {
-    const catText = categoryBtn.textContent.trim().toLowerCase();
-    const options = mealTypeSelect.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].text.toLowerCase() === catText || options[i].value === catText) {
-        mealTypeSelect.value = options[i].value;
-        break;
-      }
-    }
-  }
-  
-  if (cuisineSelect && cuisineBtn) {
-    const cuiText = cuisineBtn.textContent.trim();
-    const options = cuisineSelect.options;
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].text === cuiText || options[i].value === cuiText) {
-        cuisineSelect.value = options[i].value;
-        break;
-      }
-    }
   }
 }
 
@@ -1786,7 +1762,6 @@ function renderRecipeContentAppend(text) {
   const oldRecipeContent = document.getElementById('recipeContent');
   if (oldRecipeContent) oldRecipeContent.innerHTML = html;
   
-  // 滚动到最新
   setTimeout(() => {
     if (recipeList && recipeList.lastElementChild) {
       recipeList.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1794,6 +1769,7 @@ function renderRecipeContentAppend(text) {
   }, 100);
 }
 
+// ==================== 食谱生成页面默认界面切换 ====================        
 function switchToContentView() {
   const mainWrap = document.getElementById('mainWrap');
   const contentBlock = document.getElementById('contentBlock');
@@ -1887,35 +1863,32 @@ function openNativeSelect(selectId) {
 
 // ==================== 初始化新生成器（替换原有的 IIFE） ====================
 (function initNewGenerator() {
-  // 发送按钮：彻底清除旧事件后重绑
   const qaSendBtn = document.getElementById('qaSendBtn');
   if (qaSendBtn) {
-    const newSendBtn = qaSendBtn.cloneNode(true);
-    qaSendBtn.parentNode.replaceChild(newSendBtn, qaSendBtn);
-    newSendBtn.addEventListener('click', handleSend);
+    // 不依赖 cloneNode，直接移除所有旧事件后重绑
+    qaSendBtn.removeEventListener('click', handleSend);
+    qaSendBtn.addEventListener('click', handleSend);
   }
 
-  // 输入框回车：彻底清除旧事件后重绑
   const qaInput = document.getElementById('qaInput');
   if (qaInput) {
-    const newInput = qaInput.cloneNode(true);
-    qaInput.parentNode.replaceChild(newInput, qaInput);
-    newInput.addEventListener('keydown', function(e) {
+    qaInput.removeEventListener('keydown', handleSend);
+    qaInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        handleSend();
+        handleSend(e);
       }
     });
   }
 
-  // 扩展 renderLanguage，同步分类/菜系按钮默认文案
+  // 扩展 renderLanguage，同步按钮默认文案和 placeholder
   const originalRenderLanguage = renderLanguage;
   renderLanguage = function() {
     originalRenderLanguage();
     updateModeBtns();
     populateCuisines();
 
-    // 如果用户还未选择，按钮保持默认的 Category/Cuisine 文案
+    // 如果用户未选择，按钮保持默认“分类/菜系”文案
     const mealTypeSelect = document.getElementById('mealType');
     const categoryBtn = document.getElementById('categoryBtn');
     if (mealTypeSelect && categoryBtn && mealTypeSelect.selectedIndex <= 0) {
@@ -1932,10 +1905,10 @@ function openNativeSelect(selectId) {
     if (inputPl) inputPl.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';
   };
 
-  // 设置隐藏 select 的默认值
+  // 设置隐藏 select 默认值
   const mealTypeSelect = document.getElementById('mealType');
   if (mealTypeSelect) mealTypeSelect.value = 'standard';
-
+  
   setTimeout(() => {
     const cuisineSelect = document.getElementById('cuisine');
     if (cuisineSelect) {
@@ -1947,6 +1920,22 @@ function openNativeSelect(selectId) {
 
   switchGeneratorMode('recipe');
 })();
+  
+// 监听原生 select 变化，更新按钮文案（选择后显示选中项名称）
+document.addEventListener('change', function(e) {
+  const target = e.target;
+  if (target.id === 'mealType') {
+    const btn = document.getElementById('categoryBtn');
+    if (btn && target.selectedIndex >= 0) {
+      btn.textContent = target.options[target.selectedIndex].textContent;
+    }
+  } else if (target.id === 'cuisine') {
+    const btn = document.getElementById('cuisineBtn');
+    if (btn && target.selectedIndex >= 0) {
+      btn.textContent = target.options[target.selectedIndex].textContent;
+    }
+  }
+});
 
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
