@@ -793,7 +793,7 @@ CRITICAL: You MUST translate ALL section headings (e.g. "Ingredients", "Instruct
     const response = await fetch(DEEPSEEK_API, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'deepseek-v4-flash', temperature: 0.9, max_tokens: 1200,
+        model: 'deepseek-v4-flash', temperature: 0.9, max_tokens: 1000,
         messages: [
           { role: 'system', content: systemPrompt },
         { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法。随机种子：${Date.now()}_${Math.random().toString(36)}` }
