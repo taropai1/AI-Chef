@@ -1881,7 +1881,6 @@ logout = function() {
       modeDesc.textContent = t('enterQuestion') || 'Ask about this recipe...';
     }
   }
-};
     const mealTypeSelect = document.getElementById('mealType');
     const categoryBtn = document.getElementById('categoryBtn');
     if (mealTypeSelect && categoryBtn && mealTypeSelect.selectedIndex <= 0) {
