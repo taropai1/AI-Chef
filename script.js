@@ -1650,13 +1650,9 @@ function updateModeBtns() {
   const btnAi = document.getElementById('btnAiMode');
   if (!btnRecipe || !btnAi) return;
 
-  const recipeText = t('generate');
-  const aiText = t('aiAssistTitle');
-
-  btnRecipe.textContent = recipeText.length > 8 ? (translations.en.generate || 'Generate Recipe') : recipeText;
-  btnAi.textContent = aiText.length > 8 ? (translations.en.aiAssistTitle || 'AI Assistant') : aiText;
+  btnRecipe.textContent = t('generate');
+  btnAi.textContent = t('aiAssistTitle');
 }
-
 function openNativeSelect(selectId) {
   const select = document.getElementById(selectId);
   if (!select) return;
