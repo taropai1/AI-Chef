@@ -982,9 +982,12 @@ function renderRecipeContentAppend(text) {
   
   setTimeout(() => {
     if (recipeList && recipeList.lastElementChild) {
-      recipeList.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const nameEl = recipeList.lastElementChild.querySelector('.recipe-card-name');
+        if (nameEl) {
+            nameEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
-  }, 100);
+}, 100);
 }
 function updateLimitInfo() {
   const el = document.getElementById('limitInfo');
