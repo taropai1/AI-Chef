@@ -1594,7 +1594,47 @@ function updateHistoryButtons() {
     if (nextBtn) nextBtn.disabled = historyIndex >= recipeHistory.length - 1;
 }
 // ==================== URL 参数处理 ====================
-function handleUrlParams() { const urlParams = new URLSearchParams(window.location.search); const action = urlParams.get('action'), email = urlParams.get('email'); if (action && email) { if (action === 'register') { showPage('page-login-register'); switchAuthTab('register'); document.getElementById('registerEmail').value = decodeURIComponent(email); document.getElementById('registerPassword').focus(); } else if (action === 'reset') { showPage('page-login-register'); switchAuthTab('login'); document.getElementById('loginEmail').value = decodeURIComponent(email); showForgotModal(); document.getElementById('forgotEmail').value = decodeURIComponent(email); } window.history.replaceState({}, document.title, window.location.pathname); } }
+function handleUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action'),
+        email = urlParams.get('email'),
+        code = urlParams.get('code');
+    if (action && email) {
+        if (action === 'register') {
+            showPage('page-login-register');
+            switchAuthTab('register');
+            document.getElementById('registerEmail').value = decodeURIComponent(email);
+            if (code) {
+                setTimeout(() => {
+                    const codeInput = document.getElementById('registerCode');
+                    if (codeInput) codeInput.value = code;
+                }, 300);
+            }
+            document.getElementById('registerPassword').focus();
+        } else if (action === 'reset') {
+            showPage('page-login-register');
+            switchAuthTab('login');
+            document.getElementById('loginEmail').value = decodeURIComponent(email);
+            showForgotModal();
+            document.getElementById('forgotEmail').value = decodeURIComponent(email);
+            if (code) {
+                setTimeout(() => {
+                    const codeInput = document.getElementById('forgotCode');
+                    if (codeInput) codeInput.value = code;
+                }, 300);
+            }
+        } else if (action === 'changeEmail') {
+            showPage('page-profile');
+            const codeInput = document.getElementById('emailChangeCode');
+            if (codeInput && code) {
+                setTimeout(() => {
+                    codeInput.value = code;
+                }, 300);
+            }
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
 function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card-generator'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
 
 // ==================== 头像裁剪 ====================
