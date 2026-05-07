@@ -789,7 +789,7 @@ CRITICAL: You MUST translate ALL section headings (e.g. "Ingredients", "Instruct
     }
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
     const response = await fetch(DEEPSEEK_API, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -838,10 +838,13 @@ if (sendBtn) sendBtn.disabled = false;
     updateLimitInfo();
   } catch (error) {
     console.error(error);
-    if (error.message.includes('Free trial expired') || error.message.includes('limit reached')) {
-      alert(t('alertNoPermission')); showPage('page-subscribe');
+    if (error.name === 'AbortError') {
+        document.getElementById('recipeNameDisplay').innerText = t('generateFailed') || 'Load failed, please try again!';
+        showTipModal(t('generateFailed') || 'Load failed, please try again!');
+    } else if (error.message.includes('Free trial expired') || error.message.includes('limit reached')) {
+        alert(t('alertNoPermission')); showPage('page-subscribe');
     } else {
-      document.getElementById('recipeNameDisplay').innerText = '生成失败：' + error.message;
+        document.getElementById('recipeNameDisplay').innerText = t('generateFailed') || 'Load failed, please try again!';
     }
   } finally { 
     genBtn.disabled = false; 
@@ -1868,7 +1871,17 @@ logout = function() {
     originalRenderLanguage();
     updateModeBtns();
     populateCuisines();
-
+    
+  // 追加这一行：更新模态按钮下的描述文字
+  const modeDesc = document.getElementById('modeDesc');
+  if (modeDesc) {
+    if (generatorMode === 'recipe') {
+      modeDesc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
+    } else {
+      modeDesc.textContent = t('enterQuestion') || 'Ask about this recipe...';
+    }
+  }
+};
     const mealTypeSelect = document.getElementById('mealType');
     const categoryBtn = document.getElementById('categoryBtn');
     if (mealTypeSelect && categoryBtn && mealTypeSelect.selectedIndex <= 0) {
