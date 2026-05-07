@@ -1213,16 +1213,6 @@ if (qaLimitNote) qaLimitNote.innerText = '';
   showPage('page-home'); updateNavButton(); renderProfile(); updateLimitInfo();
 }
 
-// 自动填充注册验证码（从邮件链接跳转过来时）
-const urlParams = new URLSearchParams(window.location.search);
-const autoCode = urlParams.get('code');
-if (autoCode) {
-  const codeInput = document.getElementById('registerCode');
-  if (codeInput) {
-    codeInput.value = autoCode;
-  }
-}
-
 // ==================== 验证码发送 ====================
 let countdowns = {};
 function startCountdown(btnId, seconds) {
@@ -1593,48 +1583,53 @@ function updateHistoryButtons() {
     if (prevBtn) prevBtn.disabled = historyIndex <= 0;
     if (nextBtn) nextBtn.disabled = historyIndex >= recipeHistory.length - 1;
 }
-// ==================== URL 参数处理 ====================
+
+// ==================== 验证码自动填充 ====================
 function handleUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action'),
-        email = urlParams.get('email'),
-        code = urlParams.get('code');
-    if (action && email) {
-        if (action === 'register') {
-            showPage('page-login-register');
-            switchAuthTab('register');
-            document.getElementById('registerEmail').value = decodeURIComponent(email);
-            if (code) {
-                setTimeout(() => {
-                    const codeInput = document.getElementById('registerCode');
-                    if (codeInput) codeInput.value = code;
-                }, 300);
-            }
-            document.getElementById('registerPassword').focus();
-        } else if (action === 'reset') {
-            showPage('page-login-register');
-            switchAuthTab('login');
-            document.getElementById('loginEmail').value = decodeURIComponent(email);
-            showForgotModal();
-            document.getElementById('forgotEmail').value = decodeURIComponent(email);
-            if (code) {
-                setTimeout(() => {
-                    const codeInput = document.getElementById('forgotCode');
-                    if (codeInput) codeInput.value = code;
-                }, 300);
-            }
-        } else if (action === 'changeEmail') {
-            showPage('page-profile');
-            const codeInput = document.getElementById('emailChangeCode');
-            if (codeInput && code) {
-                setTimeout(() => {
-                    codeInput.value = code;
-                }, 300);
-            }
+    const action = urlParams.get('action');
+    const email = urlParams.get('email');
+    const code = urlParams.get('code');
+
+    if (!action || !email) return;
+
+    if (action === 'register') {
+        showPage('page-login-register');
+        switchAuthTab('register');
+        document.getElementById('registerEmail').value = decodeURIComponent(email);
+        if (code) {
+            setTimeout(() => {
+                const codeInput = document.getElementById('registerCode');
+                if (codeInput) codeInput.value = code;
+            }, 500);
         }
-        window.history.replaceState({}, document.title, window.location.pathname);
+        document.getElementById('registerPassword').focus();
+    } else if (action === 'reset') {
+        showPage('page-login-register');
+        switchAuthTab('login');
+        document.getElementById('loginEmail').value = decodeURIComponent(email);
+        showForgotModal();
+        document.getElementById('forgotEmail').value = decodeURIComponent(email);
+        if (code) {
+            setTimeout(() => {
+                const codeInput = document.getElementById('forgotCode');
+                if (codeInput) codeInput.value = code;
+            }, 500);
+        }
+    } else if (action === 'changeEmail') {
+        showPage('page-profile');
+        if (code) {
+            setTimeout(() => {
+                const codeInput = document.getElementById('emailChangeCode');
+                if (codeInput) codeInput.value = code;
+            }, 500);
+        }
     }
+
+    window.history.replaceState({}, document.title, window.location.pathname);
 }
+
+// ==================== URL 参数处理 ====================
 function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card-generator'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
 
 // ==================== 头像裁剪 ====================
@@ -1677,16 +1672,6 @@ if (videoBtn) videoBtn.onclick = showVideo;
   document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
-  // 自动填充修改邮箱验证码（从邮件链接跳转过来时）
-const urlParams = new URLSearchParams(window.location.search);
-const autoCode = urlParams.get('code');
-const action = urlParams.get('action');
-if (autoCode && action === 'changeEmail') {
-  const codeInput = document.getElementById('emailChangeCode');
-  if (codeInput) {
-    codeInput.value = autoCode;
-  }
-}
 })();
 
 // ==================== 生成器完整交互（状态 + 模式切换 + 发送 + 弹窗 + 初始化） ====================
