@@ -833,7 +833,6 @@ CRITICAL: You MUST translate ALL section headings (e.g. "Ingredients", "Instruct
 const sendBtn = document.getElementById('qaSendBtn');
 if (qaInputEl) qaInputEl.disabled = false;
 if (sendBtn) sendBtn.disabled = false;
-      document.getElementById('qaHistory').innerHTML = '';
       document.getElementById('qaLimitNote').innerText = `${t('qLeft')}: ${userData.qLeft}`;
     }
     updateLimitInfo();
