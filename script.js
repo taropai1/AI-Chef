@@ -1056,7 +1056,7 @@ if (sendBtn) sendBtn.disabled = true;
     const historyEl = document.getElementById('qaHistory');  // 注意 ID 是 qaHistory
     addQABubble(question, true);
     historyEl.scrollTop = historyEl.scrollHeight;  //  自动滚动到底部
-
+    document.getElementById('qaInput').value = '';  // 立即清空
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -1108,7 +1108,6 @@ const targetLang = langMap[lang] || 'English';
     addQABubble('Error, please try again.', false);
     } finally {
     unlockSend();
-    document.getElementById('qaInput').value = '';
 }
 }
 // ==================== 视频模块 ====================
