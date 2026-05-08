@@ -724,10 +724,43 @@ function updateNavButton() {
 async function generateRecipe() {
   if (!userData) { alert(t('pleaseLogin')); showPage('page-login-register'); return; }
   const plan = userData.plan;
-  if (plan === 'free' && userData.freeUsed >= 3) { alert(t('alertNoPermission')); showPage('page-subscribe'); return; }
   const limit = PLANS[plan]?.dailyLimit || 0;
-  if (plan !== 'free' && userData.dailyUsed >= limit) { alert(t('alertDailyLimit')); showPage('page-subscribe'); return; }
 
+  // ========== 第一类：权益用完（免费到期 / 订阅到期） ==========
+  if (plan === 'free' && userData.freeUsed >= 3) {
+    alert(t('alertNoPermission'));
+    clearContentOnReset();
+    sendLocked = false;
+    const sendBtn = document.getElementById('qaSendBtn');
+    if (sendBtn) sendBtn.disabled = false;
+    hideGeneratingTip();
+    showPage('page-subscribe');
+    return;
+  }
+
+  // ========== 第二类：权益超限（订阅有效但当日额满） ==========
+  if (plan !== 'free' && limit > 0 && userData.dailyUsed >= limit) {
+    // 区分：订阅是否已到期
+    if (userData.expireAt && new Date(userData.expireAt).getTime() < Date.now()) {
+      // 订阅已到期 → 权益用完，跳转支付页
+      alert(t('alertNoPermission'));
+      clearContentOnReset();
+      sendLocked = false;
+      const sendBtn = document.getElementById('qaSendBtn');
+      if (sendBtn) sendBtn.disabled = false;
+      hideGeneratingTip();
+      showPage('page-subscribe');
+      return;
+    } else {
+      // 订阅有效但当日额满 → 仅提示，不跳转，不重置页面
+      alert(t('alertDailyLimit'));
+      sendLocked = true;
+      const sendBtn = document.getElementById('qaSendBtn');
+      if (sendBtn) sendBtn.disabled = true;
+      return;
+    }
+  }
+  
   const dish = document.getElementById('dishName').value.trim();
   if (!dish) { alert(t('alertInvalidFood')); return; }
 
@@ -983,13 +1016,12 @@ function renderRecipeContentAppend(text) {
   if (oldRecipeContent) oldRecipeContent.innerHTML = html;
   
   setTimeout(() => {
-    if (recipeList && recipeList.lastElementChild) {
-        const nameEl = recipeList.lastElementChild.querySelector('.recipe-card-name');
-        if (nameEl) {
-            nameEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }
-}, 100);
+  if (recipeList && recipeList.lastElementChild) {
+    const nameEl = recipeList.lastElementChild.querySelector('.recipe-card-name');
+    const target = nameEl || recipeList.lastElementChild;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}, 200);  // 延时从 100 延长到 200ms，确保 DOM 渲染完成
 }
 function updateLimitInfo() {
   const el = document.getElementById('limitInfo');
