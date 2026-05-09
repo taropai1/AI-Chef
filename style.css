@@ -20,6 +20,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 .page{display:none}
 .page.active{display:block}
 .nav-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;cursor:pointer;border:1px solid #e5e7eb;margin:0 4px;flex-shrink:0}
+.nav {z-index: 9999;}
 
 /* ==================== 营销首页 ==================== */
 .home-wrap{max-width:900px;margin:0 auto;padding:28px}
