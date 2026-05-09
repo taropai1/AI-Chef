@@ -12,9 +12,10 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   color: #4a90e2;
   white-space: nowrap;
   cursor: pointer;
-  display: flex;            /* 会让SVG和可能存在的文字对齐 */
-  align-items: center;      /* 垂直居中 */
-  margin-top: 3px;          /* 和导航按钮对齐的微调，值可以改到刚好 */
+  display: flex;
+  align-items: center;
+  margin-top: 3px;       /* 垂直微调 */
+  margin-left: 30px;     /* 向右移动，数值可根据需求调整 */
 }
 .nav-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
 .lang-selector{position:relative;z-index:30}
