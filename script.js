@@ -1970,26 +1970,23 @@ logout = function() {
 })();
 
 // ==================== 导航栏交互 ====================
-function toggleLangDropdown() {
-  const dd = document.getElementById('langDropdown');
-  const md = document.getElementById('moreDropdown');
-  if (md) md.classList.remove('show');
-  if (dd) dd.classList.toggle('show');
-}
 
-function toggleMoreDropdown() {
-  const md = document.getElementById('moreDropdown');
-  const dd = document.getElementById('langDropdown');
-  if (dd) dd.classList.remove('show');
-  if (md) md.classList.toggle('show');
-}
+// 多语言切换
+document.getElementById('langSelect').addEventListener('change', function() {
+  switchLang(this.value);
+  this.blur();
+});
 
-// 点击外部关闭下拉
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.lang-selector') && !e.target.closest('.more-selector')) {
-    document.getElementById('langDropdown')?.classList.remove('show');
-    document.getElementById('moreDropdown')?.classList.remove('show');
-  }
+// 更多选项跳转
+document.getElementById('moreSelect').addEventListener('change', function() {
+  const val = this.value;
+  this.value = '';
+  this.blur();
+  if (val === 'login') showPage('page-login-register');
+  else if (val === 'subscribe') showPage('page-subscribe');
+  else if (val === 'profile') showPage('page-profile');
+  else if (val === 'howto') openHowToModal();
+  else if (val === 'legal') showPage('page-legal');
 });
 
 // AI 助手独立模式入口
@@ -2003,17 +2000,28 @@ function openAiStandalone() {
   switchGeneratorMode('ai_standalone');
 }
 
-// 多语言选项点击
-document.getElementById('langDropdown').addEventListener('click', function(e) {
-  const target = e.target.closest('.lang-option');
-  if (target) {
-    switchLang(target.dataset.lang);
-    document.getElementById('langDropdown').classList.remove('show');
+// 扩展 switchGeneratorMode 支持 ai_standalone
+const originalSwitchGeneratorMode = switchGeneratorMode;
+switchGeneratorMode = function(mode) {
+  originalSwitchGeneratorMode(mode);
+  if (mode === 'ai_standalone') {
+    const recipeContent = document.getElementById('recipeContentWrapper');
+    const qaContent = document.getElementById('qaContent');
+    if (recipeContent) recipeContent.classList.remove('show');
+    if (qaContent) qaContent.classList.add('show');
+    const modeDesc = document.getElementById('modeDesc');
+    if (modeDesc) {
+      modeDesc.textContent = t('enterQuestion') || 'Ask about any food topic...';
+      modeDesc.classList.add('right-normal');
+      modeDesc.classList.remove('left-indent');
+    }
   }
-});
+};
 
 // 更新更多选项中的登录/个人中心显示
 function updateMoreMenu() {
+  const loginOpt = document.getElementById('moreLogin');
+  const profileOpt = document.getElementById('moreProfile');
   const loginItem = document.getElementById('moreLogin');
   const profileItem = document.getElementById('moreProfile');
   if (loginItem && profileItem) {
@@ -2027,22 +2035,53 @@ function updateMoreMenu() {
   }
 }
 
-// 在 updateNavButton 末尾追加调用
-const originalUpdateNavButton = updateNavButton;
+// 扩展 updateNavButton
+const originalUpdateNavButton2 = updateNavButton;
 updateNavButton = function() {
-  originalUpdateNavButton();
+  originalUpdateNavButton2();
   updateMoreMenu();
 };
 
-// 在 renderLanguage 中追加更多选项菜单的多语言
-const originalRenderLanguage2 = renderLanguage;
+// 扩展 renderLanguage 更新导航 select 文字
+const originalRenderLanguage3 = renderLanguage;
 renderLanguage = function() {
-  originalRenderLanguage2();
-  document.querySelectorAll('.more-option[data-key]').forEach(opt => {
-    const key = opt.getAttribute('data-key');
-    if (key) opt.textContent = t(key);
-  });
+  originalRenderLanguage3();
+  // 更新更多选项文字
+  const loginOpt = document.getElementById('moreLogin');
+  const subscribeOpt = document.getElementById('moreSubscribe');
+  const profileOpt = document.getElementById('moreProfile');
+  const howtoOpt = document.querySelector('#moreSelect option[value="howto"]');
+  const legalOpt = document.querySelector('#moreSelect option[value="legal"]');
+  if (loginOpt) loginOpt.textContent = t('loginTitle');
+  if (subscribeOpt) subscribeOpt.textContent = t('pricingTitle');
+  if (profileOpt) profileOpt.textContent = t('profileSub');
+  if (howtoOpt) howtoOpt.textContent = t('howToTitle');
+  if (legalOpt) legalOpt.textContent = t('legalPrivacyTitle');
+  // 更新多语言 select 选项
+  const langSelect = document.getElementById('langSelect');
+  if (langSelect) {
+    const langNames = { en:'English', es:'Español', fr:'Français', de:'Deutsch', it:'Italiano', pt:'Português', 'zh-CN':'简体中文' };
+    Array.from(langSelect.options).forEach(opt => {
+      opt.textContent = langNames[opt.value] || opt.value;
+    });
+  }
 };
+
+// 修复 showVideo 支持无食谱场景
+const originalShowVideo = showVideo;
+showVideo = function() {
+  const dishNameEl = document.getElementById('recipeNameDisplay');
+  let dish = dishNameEl ? dishNameEl.innerText.trim() : '';
+  if (!dish || dish === 'Please generate a recipe first' || dish.startsWith('生成失败')) {
+    dish = document.getElementById('dishName')?.value?.trim() || 'popular cooking';
+  }
+  fetch(`https://vid.taropai.com?dish=${encodeURIComponent(dish)}`)
+    .then(res => res.json())
+    .then(data => renderVideoGrid(data.videos || []))
+    .catch(() => renderVideoGrid([]));
+  document.getElementById('videoModal').classList.add('show');
+};
+
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
     // 将所有逻辑完全隔离，任何错误都不会影响主程序
