@@ -1969,6 +1969,80 @@ logout = function() {
   switchGeneratorMode('recipe');
 })();
 
+// ==================== 导航栏交互 ====================
+function toggleLangDropdown() {
+  const dd = document.getElementById('langDropdown');
+  const md = document.getElementById('moreDropdown');
+  if (md) md.classList.remove('show');
+  if (dd) dd.classList.toggle('show');
+}
+
+function toggleMoreDropdown() {
+  const md = document.getElementById('moreDropdown');
+  const dd = document.getElementById('langDropdown');
+  if (dd) dd.classList.remove('show');
+  if (md) md.classList.toggle('show');
+}
+
+// 点击外部关闭下拉
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.lang-selector') && !e.target.closest('.more-selector')) {
+    document.getElementById('langDropdown')?.classList.remove('show');
+    document.getElementById('moreDropdown')?.classList.remove('show');
+  }
+});
+
+// AI 助手独立模式入口
+function openAiStandalone() {
+  const plan = userData?.plan || 'free';
+  if (plan === 'free' || plan === 'starter') {
+    alert(t('aiStandaloneUpgrade') || 'This feature is available for Pro and above plans. Please upgrade to use.');
+    return;
+  }
+  showPage('page-generator');
+  switchGeneratorMode('ai_standalone');
+}
+
+// 多语言选项点击
+document.getElementById('langDropdown').addEventListener('click', function(e) {
+  const target = e.target.closest('.lang-option');
+  if (target) {
+    switchLang(target.dataset.lang);
+    document.getElementById('langDropdown').classList.remove('show');
+  }
+});
+
+// 更新更多选项中的登录/个人中心显示
+function updateMoreMenu() {
+  const loginItem = document.getElementById('moreLogin');
+  const profileItem = document.getElementById('moreProfile');
+  if (loginItem && profileItem) {
+    if (userData && userData.email) {
+      loginItem.style.display = 'none';
+      profileItem.style.display = 'block';
+    } else {
+      loginItem.style.display = 'block';
+      profileItem.style.display = 'none';
+    }
+  }
+}
+
+// 在 updateNavButton 末尾追加调用
+const originalUpdateNavButton = updateNavButton;
+updateNavButton = function() {
+  originalUpdateNavButton();
+  updateMoreMenu();
+};
+
+// 在 renderLanguage 中追加更多选项菜单的多语言
+const originalRenderLanguage2 = renderLanguage;
+renderLanguage = function() {
+  originalRenderLanguage2();
+  document.querySelectorAll('.more-option[data-key]').forEach(opt => {
+    const key = opt.getAttribute('data-key');
+    if (key) opt.textContent = t(key);
+  });
+};
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
     // 将所有逻辑完全隔离，任何错误都不会影响主程序
