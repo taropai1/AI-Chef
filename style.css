@@ -16,6 +16,9 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 .nav-icon-link:hover{background:#f3f4f6}
 .nav-icon-link svg{width:24px;height:24px}
 
+/* AI Chef 图标稍大 */
+#navAiChef svg{width:28px;height:28px}
+
 /* 多语言下拉 */
 .lang-selector{position:relative;z-index:30}
 .lang-dropdown{position:absolute;top:100%;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;flex-direction:column;z-index:1000;max-height:300px;overflow-y:auto;min-width:120px}
@@ -47,7 +50,6 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 
 /* 旧版导航元素隐藏 */
 .nav-right{display:none!important}
-.nav {z-index: 9999;}
 
 /* ==================== 营销首页 ==================== */
 .home-wrap{max-width:900px;margin:0 auto;padding:28px}
