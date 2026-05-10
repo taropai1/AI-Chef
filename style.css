@@ -7,48 +7,37 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 .nav{background:#fff;padding:12px 0;position:sticky;top:0;z-index:9999;border-bottom:1px solid #e5e7eb}
 .nav-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:nowrap;max-width:920px;margin:0 auto;padding:0 16px;width:100%}
 
-/* Logo */
-.logo{font-size:16px;font-weight:600;color:#4a90e2;white-space:nowrap;cursor:pointer;display:flex;align-items:center;flex-shrink:0;margin-right:auto}
+.logo{display:flex;align-items:center;flex-shrink:0;margin-right:auto;cursor:pointer}
 
-/* 导航图标区 */
 .nav-icons{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .nav-icon-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;cursor:pointer;transition:background 0.2s ease}
 .nav-icon-link:hover{background:#f3f4f6}
 .nav-icon-link svg{width:24px;height:24px}
 
-/* AI Chef 图标稍大 */
-#navAiChef svg{width:28px;height:28px}
+/* 原生 select 模拟为导航图标 */
+.lang-selector,.more-selector{position:relative}
+.nav-select{width:36px;height:36px;border:none;border-radius:8px;background:transparent;font-size:0;cursor:pointer;appearance:none;-webkit-appearance:none;text-indent:-9999px}
+.nav-select:hover{background:#f3f4f6}
+.nav-select option{font-size:14px;text-indent:0;padding:8px 12px;color:#1f2937;background:#fff}
 
-/* 多语言下拉 */
-.lang-selector{position:relative;z-index:30}
-.lang-dropdown{position:absolute;top:100%;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;flex-direction:column;z-index:1000;max-height:300px;overflow-y:auto;min-width:120px}
-.lang-dropdown.show{display:flex}
-.lang-option{padding:8px 12px;font-size:14px;cursor:pointer;white-space:nowrap;color:#1f2937}
-.lang-option:hover{background:#f1f5f9}
+/* 语言 select 用地球图标作为背景提示 */
+.lang-selector::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:24px;height:24px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='2' y1='12' x2='22' y2='12'/%3E%3Cpath d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/%3E%3C/svg%3E") center/contain no-repeat}
 
-/* 更多选项下拉 */
-.more-selector{position:relative;z-index:30}
-.more-dropdown{position:absolute;top:100%;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;flex-direction:column;z-index:1000;min-width:160px}
-.more-dropdown.show{display:flex}
-.more-option{padding:10px 16px;font-size:14px;cursor:pointer;white-space:nowrap;color:#1f2937}
-.more-option:hover{background:#f1f5f9}
+/* 更多选项 select 用三点图标作为背景提示 */
+.more-selector::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:24px;height:24px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='6' r='1.4' fill='%236b7280'/%3E%3Ccircle cx='12' cy='12' r='1.4' fill='%236b7280'/%3E%3Ccircle cx='12' cy='18' r='1.4' fill='%236b7280'/%3E%3C/svg%3E") center/contain no-repeat}
 
-/* 页面显示 */
 .page{display:none;position:relative;z-index:1}
 .page.active{display:block}
 
-/* 移动端适配 */
 @media (max-width:767px){
   .nav-inner{padding:0 12px}
   .nav-icons{gap:8px}
   .nav-icon-link{width:32px;height:32px}
   .nav-icon-link svg{width:20px;height:20px}
-  #navAiChef svg{width:24px;height:24px}
-  .more-dropdown{right:-10px}
-  .lang-dropdown{right:-10px}
+  .nav-select{width:32px;height:32px}
+  .lang-selector::before,.more-selector::before{width:20px;height:20px}
 }
 
-/* 旧版导航元素隐藏 */
 .nav-right{display:none!important}
 
 /* ==================== 营销首页 ==================== */
