@@ -4,32 +4,48 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 .container{max-width:920px;margin:0 auto;padding:0 16px;width:100%}
 
 /* ==================== 导航栏 ==================== */
-.nav{width: 100%;background:#fff;padding:1px 0;position:sticky;top:0;z-index:10;border-bottom:1px solid #e5e7eb}
-.nav-inner{display:flex;max-width: 1200px;margin: 0 auto;padding: 8px 30px;justify-content:space-between;align-items:center;flex-wrap:nowrap}
-.logo{
-  font-size: 22px;
-  font-weight: 600;
-  color: #4a90e2;
-  white-space: nowrap;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  margin-top: 3px;       /* 垂直微调 */
-  margin-left: 10px;     /* 向右移动，数值可根据需求调整 */
-}
-.nav-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.nav{background:#fff;padding:12px 0;position:sticky;top:0;z-index:9999;border-bottom:1px solid #e5e7eb}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:nowrap;max-width:1200px;margin:0 auto;padding:0 20px;width:100%}
+
+/* Logo */
+.logo{font-size:16px;font-weight:600;color:#4a90e2;white-space:nowrap;cursor:pointer;display:flex;align-items:center;flex-shrink:0;margin-right:auto}
+
+/* 导航图标区 */
+.nav-icons{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.nav-icon-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;cursor:pointer;transition:background 0.2s ease}
+.nav-icon-link:hover{background:#f3f4f6}
+.nav-icon-link svg{width:24px;height:24px}
+
+/* AI Chef 图标稍大 */
+#navAiChef svg{width:28px;height:28px}
+
+/* 多语言下拉 */
 .lang-selector{position:relative;z-index:30}
-.lang-btn{padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;background:#f9fafb;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;user-select:none}
-.lang-dropdown{position:absolute;top:100%;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;flex-direction:column;z-index:1000;max-height:300px;overflow-y:auto}
-.lang-option{padding:8px 12px;font-size:14px;cursor:pointer;white-space:nowrap}
+.lang-dropdown{position:absolute;top:100%;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;flex-direction:column;z-index:1000;max-height:300px;overflow-y:auto;min-width:120px}
+.lang-dropdown.show{display:flex}
+.lang-option{padding:8px 12px;font-size:14px;cursor:pointer;white-space:nowrap;color:#1f2937}
 .lang-option:hover{background:#f1f5f9}
-.btn{height:36px;padding:0 16px;border-radius:8px;border:none;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer;white-space:nowrap}
-.btn-primary{background:#4a90e2;color:#fff}
-.btn-primary:disabled{background:#94a3b8;cursor:not-allowed}
-.btn-outline{background:#f1f5f9;color:#1f2937}
-.page{display:none}
-.page.active{display:block}
-.nav-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;cursor:pointer;border:1px solid #e5e7eb;margin:0 4px;flex-shrink:0}
+
+/* 更多选项下拉 */
+.more-selector{position:relative;z-index:30}
+.more-dropdown{position:absolute;top:100%;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:none;flex-direction:column;z-index:1000;min-width:160px}
+.more-dropdown.show{display:flex}
+.more-option{padding:10px 16px;font-size:14px;cursor:pointer;white-space:nowrap;color:#1f2937}
+.more-option:hover{background:#f1f5f9}
+
+/* 移动端适配 */
+@media (max-width:767px){
+  .nav-inner{padding:0 12px}
+  .nav-icons{gap:8px}
+  .nav-icon-link{width:32px;height:32px}
+  .nav-icon-link svg{width:20px;height:20px}
+  #navAiChef svg{width:24px;height:24px}
+  .more-dropdown{right:-10px}
+  .lang-dropdown{right:-10px}
+}
+
+/* 旧版导航元素隐藏 */
+.nav-right{display:none!important}
 .nav {z-index: 9999;}
 
 /* ==================== 营销首页 ==================== */
