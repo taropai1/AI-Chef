@@ -1,7 +1,7 @@
 {
   "name": "AI Chef",
   "short_name": "AIChef",
-  "description": "智能食谱生成器 · 全球菜系",
+  "description": "AI-Powered Smart Recipe Maker",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f6f9",
