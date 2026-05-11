@@ -2021,6 +2021,7 @@ function openAiStandalone() {
   const plan = userData?.plan || 'free';
   if (plan === 'free' || plan === 'starter') {
     alert(t('aiStandaloneUpgrade') || 'This feature is available for Pro and above plans. Please upgrade to use.');
+    showPage('page-subscribe');
     return;
   }
   showPage('page-generator');
