@@ -2004,7 +2004,14 @@ document.getElementById('moreSelect').addEventListener('change', function() {
   if (val === 'share') addToHome();
   if (val === 'login') showPage('page-login-register');
   else if (val === 'subscribe') showPage('page-subscribe');
-  else if (val === 'profile') showPage('page-profile');
+  else if (val === 'profile') {
+  if (!userData) {
+    alert(t('pleaseLogin'));
+    showPage('page-login-register');
+  } else {
+    showPage('page-profile');
+  }
+}
   else if (val === 'howto') openHowToModal();
   else if (val === 'legal') showPage('page-legal');
 });
