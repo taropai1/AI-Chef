@@ -162,6 +162,7 @@ const translations = {
     homeBottomDesc: 'Type any food-related keywords to explore endless recipes. Get popular, authentic dishes from worldwide cuisines with AI.',
     homeSubscriptionLink: 'Subscription', 
     inputPlaceholder: 'Tap the category and cuisine buttons, choose what you want to eat!', generating: 'Generating your recipe...', generateFailed: 'Load failed, please try again!',
+    trendingVideos: 'Trending Videos', language: 'Language', more: 'More',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -235,6 +236,7 @@ const translations = {
     homeBottomDesc: '输入任意美食关键词，探索无限食谱。AI 带你解锁全球热门地道菜品。',
     homeSubscriptionLink: '订阅',
     inputPlaceholder: '点开分类和菜系按钮，选择你想吃的美味!', generating: '正在生成食谱...', generateFailed: '加载失败，请重试！',
+    trendingVideos: '热门视频', language: '语言', more: '更多',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
@@ -316,6 +318,7 @@ const translations = {
     homeBottomTitle: 'Sencillo. Rápido. Delicioso.', homeBottomDesc: 'Escribe cualquier palabra clave relacionada con comida para explorar recetas infinitas. Obtén platos populares y auténticos de cocinas del mundo con IA.',
     homeSubscriptionLink: 'Suscripción',
     inputPlaceholder: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!', generating: 'Generando tu receta...', generateFailed: 'Error de carga, inténtalo de nuevo!',
+    trendingVideos: 'Tendencias', language: 'Idioma', more: 'Más',
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -398,6 +401,7 @@ const translations = {
     homeBottomTitle: 'Simple. Rapide. Délicieux.', homeBottomDesc: 'Tapez n\'importe quel mot-clé culinaire pour explorer des recettes infinies. Obtenez des plats populaires et authentiques de cuisines du monde avec l\'IA.',
     homeSubscriptionLink: 'Abonnement',
     inputPlaceholder: 'Cliquez sur les boutons des catégories et cuisines, choisissez ce que vous voulez déguster!', generating: 'Génération de votre recette...', generateFailed: 'Échec du chargement, réessayez!',
+    trendingVideos: 'Tendances', language: 'Langue', more: 'Plus',
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -481,6 +485,7 @@ const translations = {
     homeBottomTitle: 'Einfach. Schnell. Lecker.', homeBottomDesc: 'Gib einfach Lebensmittel-Schlüsselwörter ein, um endlose Rezepte zu entdecken. Hol dir beliebte, authentische Gerichte aus aller Welt mit KI.',
     homeSubscriptionLink: 'Abonnement',
     inputPlaceholder: 'Tippe auf Kategorie- und Küchenbuttons, wähle was du essen möchtest!', generating: 'Ihr Rezept wird erstellt...', generateFailed: 'Laden fehlgeschlagen, bitte erneut versuchen!',
+    trendingVideos: 'Trends', language: 'Sprache', more: 'Mehr',
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -563,6 +568,7 @@ const translations = {
     homeBottomTitle: 'Semplice. Veloce. Delizioso.', homeBottomDesc: 'Inserisci qualsiasi parola chiave culinaria per esplorare ricette infinite. Ottieni piatti popolari e autentici da cucine di tutto il mondo con l\'IA.',
     homeSubscriptionLink: 'Abbonamento',
     inputPlaceholder: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!', generating: 'Generando la tua ricetta...', generateFailed: 'Caricamento fallito, riprova!',
+    trendingVideos: 'Tendenze', language: 'Lingua', more: 'Altro',
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -646,6 +652,7 @@ const translations = {
     homeBottomTitle: 'Simples. Rápido. Delicioso.', homeBottomDesc: 'Digite qualquer palavra-chave relacionada a comida para explorar receitas infinitas. Obtenha pratos populares e autênticos de culinárias do mundo com IA.',
     homeSubscriptionLink: 'Assinatura',
     inputPlaceholder: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!', generating: 'Gerando sua receita...', generateFailed: 'Falha no carregamento, tente novamente!',
+    trendingVideos: 'Tendências', language: 'Idioma', more: 'Mais',
   },
 }
 function t(key, params) {
@@ -1525,6 +1532,18 @@ function renderLanguage() {
   if (greetingEl) {
   greetingEl.innerText = t('personalizedGreeting').replace('Gourmet', displayName);
 }
+  const navAiChef = document.getElementById('navAiChef');
+  const navAiAssistant = document.getElementById('navAiAssistant');
+  const navVideo = document.getElementById('navVideo');
+  const navLang = document.getElementById('navLang');
+  const navMore = document.getElementById('navMore');
+
+  if (navAiChef) navAiChef.setAttribute('title', t('genTitle'));
+  if (navAiAssistant) navAiAssistant.setAttribute('title', t('aiAssistTitle'));
+  if (navVideo) navVideo.setAttribute('title', t('trendingVideos') || 'Trending Videos');
+  if (navLang) navLang.setAttribute('title', t('language') || 'Language');
+  if (navMore) navMore.setAttribute('title', t('more') || 'More');
+  
   populateCuisines();
 }
 
