@@ -13,7 +13,18 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/images/icon-192.png">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+ 
+  <div class="modal-overlay" id="howToModal" style="display:none;">
+  <div class="modal">
+    <h4 id="howToTitle">How to use</h4>
+    <ul id="howToList"></ul>
+    <p class="modal-highlight-text" id="howToHighlight"></p>
+    <button class="close-btn" onclick="closeHowToModal()">Got it</button>
+  </div>
+</div>
+<button class="help-btn" id="howToUseBtn" style="display:none;">How to use</button>
+  <body>
+  
   <div class="nav">
   <div class="container nav-inner">
     <!-- Logo -->
