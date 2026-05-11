@@ -4,9 +4,8 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 .container{max-width:920px;margin:0 auto;padding:0 16px;width:100%}
 
 /* ==================== 导航栏 ==================== */
-.nav{background:#fff;padding:8px 0;position:sticky;top:0;z-index:9999;border-bottom:1px solid #e5e7eb;width:100vw}
-.nav-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:nowrap;max-width:920px;margin:0 auto;padding:0 16px;width:100%}
-
+.nav {background: #fff;padding: 8px 0;position: sticky;top: 0;z-index: 9999;border-bottom: 1px solid #e5e7eb;width: 100vw;left: 0;right: 0;}
+.nav-inner {display: flex;justify-content: space-between;align-items: center;flex-wrap: nowrap;max-width: 920px;margin: 0 auto;padding: 0 16px;width: 100%;}
 .logo{display:flex;align-items:center;flex-shrink:0;margin-right:auto;cursor:pointer}
 
 .nav-icons{display:flex;align-items:center;gap:12px;flex-shrink:0}
