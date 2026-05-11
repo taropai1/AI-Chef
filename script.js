@@ -1532,19 +1532,18 @@ function renderLanguage() {
   if (greetingEl) {
   greetingEl.innerText = t('personalizedGreeting').replace('Gourmet', displayName);
 }
-  // 动态设置导航栏图标悬停提示
-const navAiChef = document.getElementById('navAiChef');
-const navAiAssistant = document.getElementById('navAiAssistant');
-const navVideo = document.getElementById('navVideo');
-const navLang = document.getElementById('navLang');
-const navMore = document.getElementById('navMore');
+  // 导航栏图标 tooltip 动态多语言
+var navAiChef = document.getElementById('navAiChef');
+var navAiAssistant = document.getElementById('navAiAssistant');
+var navVideo = document.getElementById('navVideo');
+var langSelect = document.getElementById('langSelect');
+var moreSelect = document.getElementById('moreSelect');
 
 if (navAiChef) navAiChef.setAttribute('title', t('genTitle'));
 if (navAiAssistant) navAiAssistant.setAttribute('title', t('aiAssistTitle'));
-if (navVideo) navVideo.setAttribute('title', t('trendingVideos') || 'Trending Videos');
-if (navLang) navLang.setAttribute('title', t('language') || 'Language');
-if (navMore) navMore.setAttribute('title', t('more') || 'More');
-  
+if (navVideo) navVideo.setAttribute('title', t('trendingVideos'));
+if (langSelect) langSelect.setAttribute('title', t('language'));
+if (moreSelect) moreSelect.setAttribute('title', t('more'));
   populateCuisines();
 }
 
