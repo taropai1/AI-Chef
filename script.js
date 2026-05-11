@@ -1982,6 +1982,7 @@ document.getElementById('moreSelect').addEventListener('change', function() {
   const val = this.value;
   this.value = '';
   this.blur();
+  if (val === 'share') addToHome();
   if (val === 'login') showPage('page-login-register');
   else if (val === 'subscribe') showPage('page-subscribe');
   else if (val === 'profile') showPage('page-profile');
