@@ -1532,17 +1532,18 @@ function renderLanguage() {
   if (greetingEl) {
   greetingEl.innerText = t('personalizedGreeting').replace('Gourmet', displayName);
 }
-  const navAiChef = document.getElementById('navAiChef');
-  const navAiAssistant = document.getElementById('navAiAssistant');
-  const navVideo = document.getElementById('navVideo');
-  const navLang = document.getElementById('navLang');
-  const navMore = document.getElementById('navMore');
+  // 动态设置导航栏图标悬停提示
+const navAiChef = document.getElementById('navAiChef');
+const navAiAssistant = document.getElementById('navAiAssistant');
+const navVideo = document.getElementById('navVideo');
+const navLang = document.getElementById('navLang');
+const navMore = document.getElementById('navMore');
 
-  if (navAiChef) navAiChef.setAttribute('title', t('genTitle'));
-  if (navAiAssistant) navAiAssistant.setAttribute('title', t('aiAssistTitle'));
-  if (navVideo) navVideo.setAttribute('title', t('trendingVideos') || 'Trending Videos');
-  if (navLang) navLang.setAttribute('title', t('language') || 'Language');
-  if (navMore) navMore.setAttribute('title', t('more') || 'More');
+if (navAiChef) navAiChef.setAttribute('title', t('genTitle'));
+if (navAiAssistant) navAiAssistant.setAttribute('title', t('aiAssistTitle'));
+if (navVideo) navVideo.setAttribute('title', t('trendingVideos') || 'Trending Videos');
+if (navLang) navLang.setAttribute('title', t('language') || 'Language');
+if (navMore) navMore.setAttribute('title', t('more') || 'More');
   
   populateCuisines();
 }
