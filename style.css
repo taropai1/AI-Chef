@@ -26,13 +26,10 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 }
 .nav-tooltip {
   position: absolute;
-  bottom: -28px;
+  bottom: -22px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(30,30,30,0.85);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 6px;
+  color: #6b7280;
   font-size: 12px;
   white-space: nowrap;
   pointer-events: none;
