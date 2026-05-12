@@ -334,6 +334,26 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 .ai-standalone .mode-desc { display: none; }
 .func-row.ai-mode { border-top: 1px solid #e5e7eb; padding-top: 10px; margin-top: 4px; }
 .ai-standalone .gen-title-new { display: none; }
+/* AI 模式下快捷按钮宽度约束，防止挤出右侧图标 */
+@media (max-width: 767px) {
+  .ai-standalone #btnRecipeMode,
+  .ai-standalone #openVideoBtn {
+    min-width: 90px;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 768px) {
+  .ai-standalone #btnRecipeMode,
+  .ai-standalone #openVideoBtn {
+    min-width: auto;
+    max-width: none;
+    width: auto;
+  }
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
