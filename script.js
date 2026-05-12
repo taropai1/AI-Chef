@@ -1793,7 +1793,11 @@ function switchGeneratorMode(mode) {
       `;
       setTimeout(() => populateCuisines(), 50);
     }
-    <button class="select-btn" id="btnRecipeMode" onclick="switchGeneratorMode('recipe')">${t('generate')}</button>
+    const recipeBtn = document.getElementById('btnRecipeMode');
+if (recipeBtn) {
+    recipeBtn.onclick = function() { switchGeneratorMode('recipe'); };
+    recipeBtn.textContent = t('generate') || 'Generate Recipe';
+}
     if (mainWrap) mainWrap.classList.remove('ai-standalone');
     if (funcRow) funcRow.classList.remove('ai-mode');
    } else {
