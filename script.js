@@ -1532,18 +1532,33 @@ function renderLanguage() {
   if (greetingEl) {
   greetingEl.innerText = t('personalizedGreeting').replace('Gourmet', displayName);
 }
-  // 导航栏图标 tooltip 动态多语言
-var navAiChef = document.getElementById('navAiChef');
-var navAiAssistant = document.getElementById('navAiAssistant');
-var navVideo = document.getElementById('navVideo');
-var langSelect = document.getElementById('langSelect');
-var moreSelect = document.getElementById('moreSelect');
+  // 导航栏图标 tooltip 自定义即时显示
+const tipMap = {
+  navAiChef: t('genTitle'),
+  navAiAssistant: t('aiAssistTitle'),
+  navVideo: t('trendingVideos'),
+  langSelect: t('language'),
+  moreSelect: t('more')
+};
 
-if (navAiChef) navAiChef.setAttribute('title', t('genTitle'));
-if (navAiAssistant) navAiAssistant.setAttribute('title', t('aiAssistTitle'));
-if (navVideo) navVideo.setAttribute('title', t('trendingVideos'));
-if (langSelect) langSelect.setAttribute('title', t('language'));
-if (moreSelect) moreSelect.setAttribute('title', t('more'));
+const tooltipEl = document.getElementById('navTooltip');
+
+Object.keys(tipMap).forEach(function(id) {
+  const el = document.getElementById(id);
+  if (!el || !tooltipEl) return;
+  el.removeAttribute('title');
+  el.addEventListener('mouseenter', function() {
+    tooltipEl.textContent = tipMap[id];
+    tooltipEl.style.display = 'block';
+    const rect = el.getBoundingClientRect();
+    const navRect = el.closest('.nav').getBoundingClientRect();
+    tooltipEl.style.left = (rect.left + rect.width / 2) - navRect.left + 'px';
+    tooltipEl.style.top = (rect.bottom - navRect.top + 4) + 'px';
+  });
+  el.addEventListener('mouseleave', function() {
+    tooltipEl.style.display = 'none';
+  });
+});
   populateCuisines();
 }
 
