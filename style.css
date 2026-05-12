@@ -24,6 +24,20 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   padding: 0 16px;
   width: 100%;
 }
+.nav-tooltip {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.85);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10000;
+}
 .logo{display:flex;align-items:center;flex-shrink:0;margin-right:auto;cursor:pointer}
 
 .nav-icons{display:flex;align-items:center;gap:12px;flex-shrink:0}
