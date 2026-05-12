@@ -1581,12 +1581,13 @@ async function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     if (pageId === 'page-generator') {
-        if (userData)
-            await refreshUserData();
-        updateLimitInfo();
-        populateCuisines();
-        switchGeneratorMode('recipe');  // ← 新增这一行，强制重置为食谱模式
+    if (userData) await refreshUserData();
+    updateLimitInfo();
+    populateCuisines();
+    if (generatorMode !== 'ai_standalone') {
+        switchGeneratorMode('recipe');
     }
+}
     if (pageId === 'page-subscribe')
         renderPayPal();
     if (pageId === 'page-profile') {
@@ -1792,6 +1793,7 @@ function switchGeneratorMode(mode) {
       `;
       setTimeout(() => populateCuisines(), 50);
     }
+    <button class="select-btn" id="btnRecipeMode" onclick="switchGeneratorMode('recipe')">${t('generate')}</button>
     if (mainWrap) mainWrap.classList.remove('ai-standalone');
     if (funcRow) funcRow.classList.remove('ai-mode');
    } else {
@@ -1813,11 +1815,11 @@ function switchGeneratorMode(mode) {
         if (modeDesc)
             modeDesc.style.display = 'none';
         if (selectGroup) {
-            selectGroup.innerHTML = `
-                    <button class="select-btn" id="goToRecipeBtn" onclick="backToGenerator()">${t('genTitle')}</button>
-                    <button class="select-btn" id="goToVideoBtn" onclick="showVideo()">${t('trendingVideos')}</button>
-                  `;
-        }
+    selectGroup.innerHTML = `
+        <button class="select-btn" id="btnRecipeMode" onclick="backToGenerator()">${t('recipeShort') || 'Recipes'}</button>
+        <button class="select-btn" id="openVideoBtn" onclick="showVideo()">${t('videoShort') || 'Videos'}</button>
+    `;
+}
         if (mainWrap)
             mainWrap.classList.add('ai-standalone');
         if (funcRow)
@@ -2005,6 +2007,19 @@ logout = function() {
 
     const inputPl = document.getElementById('qaInput');
     if (inputPl) inputPl.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';
+    
+    // ========== 更多选项下拉文案（新增） ==========
+    const shareOpt = document.querySelector('#moreSelect option[value="share"]');
+    const loginOpt = document.getElementById('moreLogin');
+    const subscribeOpt = document.getElementById('moreSubscribe');
+    const profileOpt = document.getElementById('moreProfile');
+    const legalOpt = document.querySelector('#moreSelect option[value="legal"]');
+
+    if (shareOpt) shareOpt.textContent = t('addToHome') || 'Add to Home';
+    if (loginOpt) loginOpt.textContent = t('loginSignUp') || 'Login / Sign Up';
+    if (subscribeOpt) subscribeOpt.textContent = t('subscribeBtn') || 'Subscribe Now';
+    if (profileOpt) profileOpt.textContent = t('profileMenu') || 'Profile';
+    if (legalOpt) legalOpt.textContent = t('legalLink') || 'Privacy / Terms';
   };
 
   // 设置默认分类/菜系
@@ -2033,22 +2048,32 @@ document.getElementById('langSelect').addEventListener('change', function() {
 
 // 更多选项跳转
 document.getElementById('moreSelect').addEventListener('change', function() {
-  const val = this.value;
-  this.value = '';
-  this.blur();
-  if (val === 'share') addToHome();
-  if (val === 'login') showPage('page-login-register');
-  else if (val === 'subscribe') showPage('page-subscribe');
-  else if (val === 'profile') {
-  if (!userData) {
-    alert(t('pleaseLogin'));
-    showPage('page-login-register');
-  } else {
-    showPage('page-profile');
-  }
-}
-  else if (val === 'howto') openHowToModal();
-  else if (val === 'legal') showPage('page-legal');
+    const val = this.value;
+    this.value = '';
+    this.blur();
+    if (val === 'share')
+        addToHome();
+    else if (val === 'login') {
+        if (userData && userData.email) {
+            showPage('page-profile');
+        } else {
+            showPage('page-login-register');
+        }
+    }
+    else if (val === 'subscribe')
+        showPage('page-subscribe');
+    else if (val === 'profile') {
+        if (!userData) {
+            alert(t('pleaseLogin'));
+            showPage('page-login-register');
+        } else {
+            showPage('page-profile');
+        }
+    }
+    else if (val === 'howto')
+        openHowToModal();
+    else if (val === 'legal')
+        showPage('page-legal');
 });
 
 // AI 助手独立模式入口
@@ -2087,19 +2112,25 @@ switchGeneratorMode = function(mode) {
 
 // 更新更多选项中的登录/个人中心显示
 function updateMoreMenu() {
-  const loginOpt = document.getElementById('moreLogin');
-  const profileOpt = document.getElementById('moreProfile');
-  const loginItem = document.getElementById('moreLogin');
-  const profileItem = document.getElementById('moreProfile');
-  if (loginItem && profileItem) {
-    if (userData && userData.email) {
-      loginItem.style.display = 'none';
-      profileItem.style.display = 'block';
-    } else {
-      loginItem.style.display = 'block';
-      profileItem.style.display = 'none';
+    const loginOpt = document.getElementById('moreLogin');
+    const profileOpt = document.getElementById('moreProfile');
+    const loginItem = document.getElementById('moreLogin');
+    const profileItem = document.getElementById('moreProfile');
+    
+    // 同步文案
+    if (loginOpt) loginOpt.textContent = t('loginSignUp') || 'Login / Sign Up';
+    if (profileOpt) profileOpt.textContent = t('profileMenu') || 'Profile';
+    
+    // 显示/隐藏
+    if (loginItem && profileItem) {
+        if (userData && userData.email) {
+            loginItem.style.display = 'none';
+            profileItem.style.display = 'block';
+        } else {
+            loginItem.style.display = 'block';
+            profileItem.style.display = 'none';
+        }
     }
-  }
 }
 
 // 扩展 updateNavButton
