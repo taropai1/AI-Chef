@@ -1189,22 +1189,6 @@ function initVideoPlayerControls() {
   });
 }
 
-// ==================== 使用说明弹窗 ====================
-function openHowToModal() {
-  const modal = document.getElementById('howToModal');
-  const titleEl = document.getElementById('howToTitle');
-  const listEl = document.getElementById('howToList');
-  const highlightEl = document.getElementById('howToHighlight');
-  if (titleEl) titleEl.innerText = t('howToTitle');
-  if (listEl) {
-    const items = t('howToList');
-    listEl.innerHTML = Array.isArray(items) ? items.map(li => `<li>${li}</li>`).join('') : '';
-  }
-  if (highlightEl) highlightEl.innerText = t('howToHighlight');
-  modal.classList.add('show');
-}
-function closeHowToModal() { document.getElementById('howToModal').classList.remove('show'); }
-
 // ==================== 登录/注册 ====================
 function switchAuthTab(tab) {
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
