@@ -47,11 +47,11 @@ const CUISINE_MAP = {
 };
 
 const PLANS = {
-  free: { dailyLimit: 3, qPerRecipe: 0 },
-  starter: { dailyLimit: 10, qPerRecipe: 5 },
-  pro: { dailyLimit: 30, qPerRecipe: 5 },
-  premium: { dailyLimit: 80, qPerRecipe: 5 },
-  business: { dailyLimit: 300, qPerRecipe: 5 }
+  free: { dailyLimit: 3, aiTrialLimit: 10, aiDailyLimit: 0 },
+  starter: { dailyLimit: 10, aiTrialLimit: 10, aiDailyLimit: 0 },
+  pro: { dailyLimit: 30, aiTrialLimit: 0, aiDailyLimit: 100 },
+  premium: { dailyLimit: 80, aiTrialLimit: 0, aiDailyLimit: 200 },
+  business: { dailyLimit: 300, aiTrialLimit: 0, aiDailyLimit: 300 }
 };
 let currentLang = localStorage.getItem('aiChefLang');
 if (!currentLang) {
@@ -1046,76 +1046,68 @@ function updateLimitInfo() {
 
 // ==================== 问答 ====================
 async function askQuestion() {
-    if (!userData || !userData.lastRecipeText) {
-        alert(t('alertNoRecipe'));
-        return;
-    }
-    if (userData.qLeft <= 0) {
-        alert(t('qLimitReached') + ' ' + t('alertNoPoints'));
-        return;
-    }
+    if (!userData) { alert(t('pleaseLogin')); return; }
     const question = document.getElementById('qaInput').value.trim();
-    if (!question)
-        return;
+    if (!question) return;
+
+    const plan = userData.plan || 'free';
+    if (plan === 'free' || plan === 'starter') {
+        const trialUsed = userData.aiTrialUsed || 0;
+        if (trialUsed >= 10) { alert(t('aiTrialUsedUp')); showPage('page-subscribe'); return; }
+    }
+    if (plan === 'pro' || plan === 'premium' || plan === 'business') {
+        const aiLimit = PLANS[plan]?.aiDailyLimit || 0;
+        if ((userData.aiDailyUsed || 0) >= aiLimit) { alert(t('aiDailyLimitReached')); return; }
+    }
 
     const sendBtn = document.getElementById('qaSendBtn');
-if (sendBtn) sendBtn.disabled = true;
-    const historyEl = document.getElementById('qaHistory');  // 注意 ID 是 qaHistory
+    if (sendBtn) sendBtn.disabled = true;
+    const historyEl = document.getElementById('qaHistory');
     addQABubble(question, true);
-    historyEl.scrollTop = historyEl.scrollHeight;  //  自动滚动到底部
-    document.getElementById('qaInput').value = '';  // 立即清空
+    historyEl.scrollTop = historyEl.scrollHeight;
+    document.getElementById('qaInput').value = '';
+
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
-
         const lang = getCurrentLang();
-const langMap = {
-    'en': 'English',
-    'es': 'Español',
-    'fr': 'Français',
-    'de': 'Deutsch',
-    'it': 'Italiano',
-    'pt': 'Português',
-    'zh-CN': '中文'
-};
-const targetLang = langMap[lang] || 'English';
-
-      const systemContent = `You are a professional nutrition chef assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks. The following recipe is for reference:\n\n${userData.lastRecipeText}`;
-       const response = await fetch(DEEPSEEK_API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
+        const targetLang = langMap[lang] || 'English';
+        const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks.`;
+        
+        const response = await fetch(DEEPSEEK_API, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'deepseek-v4-flash',
-                temperature: 0.3,
-                max_tokens: 300,
-                messages: [
-                    { role: 'system', content: systemContent },
-                    { role: 'user', content: question }
-                ],
-                cache_prefix: 'ai_chef_recipe_',
+                model: 'deepseek-v4-flash', temperature: 0.3, max_tokens: 300,
+                messages: [{ role: 'system', content: systemContent }, { role: 'user', content: question }],
+                cache_prefix: 'ai_chef_ai_',
             }),
             signal: controller.signal
         });
-
         clearTimeout(timeoutId);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
         const data = await response.json();
         let answer = data.choices[0].message.content.replace(/\*/g, '');
         const lines = answer.split('\n');
         if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
 
         addQABubble(answer, false);
-        historyEl.scrollTop = historyEl.scrollHeight;  // 再次滚动到底部
+        historyEl.scrollTop = historyEl.scrollHeight;
 
-        const res = await apiCall('/api/user/record-question', { method: 'POST' });
-        userData.qLeft = res.qLeft;
-        document.getElementById('qaLimitNote').innerText = `${t('qLeft')}: ${userData.qLeft}`;
+        await initDeviceId();
+        const res = await apiCall('/api/user/record-ai-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
+        if (plan === 'free' || plan === 'starter') {
+            userData.aiTrialUsed = res.aiTrialUsed;
+        } else {
+            userData.aiDailyUsed = res.aiDailyUsed;
+            const remaining = (PLANS[plan]?.aiDailyLimit || 0) - userData.aiDailyUsed;
+            document.getElementById('qaLimitNote').innerText = `${t('aiQuestionsLeft')}: ${remaining}`;
+        }
     } catch (error) {
-    addQABubble('Error, please try again.', false);
+        addQABubble('Error, please try again.', false);
     } finally {
-    unlockSend();
-}
+        unlockSend();
+    }
 }
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
@@ -1547,13 +1539,19 @@ Object.keys(tipMap).forEach(function(id) {
 }
 
 function renderProfile() {
-  if (!userData) {
-    document.getElementById('profileNickname').innerText = 'Gourmet'; document.getElementById('profileEmail').innerText = '';
-    document.getElementById('profileJoined').innerText = ''; document.getElementById('subStatus').innerText = 'Free';
-    document.getElementById('subExpiryText').innerText = "You're on the free tier.";
-    document.getElementById('familyArea').style.display = 'none'; document.getElementById('setPasswordArea').style.display = 'none';
-    return;
-  }
+    if (!userData) {
+        document.getElementById('profileNickname').innerText = 'Gourmet';
+        document.getElementById('profileEmail').innerText = '';
+        document.getElementById('profileJoined').innerText = '';
+        document.getElementById('subStatus').innerText = 'Free';
+        document.getElementById('subExpiryText').innerText = "You're on the free tier.";
+        document.getElementById('familyArea').style.display = 'none';
+        document.getElementById('setPasswordArea').style.display = 'none';
+        // 未登录时隐藏 AI 试用次数提示
+        const aiTrialInfoEl = document.getElementById('aiTrialInfo');
+        if (aiTrialInfoEl) aiTrialInfoEl.style.display = 'none';
+        return;
+    }
   const savedAvatar = localStorage.getItem(`avatar_${userData.email}`); const avatarImg = document.getElementById('profileAvatarImg');
   if (avatarImg) { avatarImg.src = savedAvatar || '/images/default-avatar.png'; const navAvatar = document.getElementById('navAvatar'); if (navAvatar) navAvatar.src = avatarImg.src; }
   document.getElementById('profileNickname').innerText = userData.nickname || 'Gourmet'; document.getElementById('profileEmail').innerText = userData.email;
@@ -1564,12 +1562,21 @@ function renderProfile() {
   const subExpiryEl = document.getElementById('subExpiryText');
   if (plan === 'free') { subExpiryEl.innerText = t('freeTierDesc') || "You're on the free tier."; }
   else { const expireStr = userData.expireAt ? new Date(userData.expireAt).toLocaleDateString() : ''; subExpiryEl.innerText = expireStr ? `${planDisplay} · Expires ${expireStr}` : planDisplay; }
+  const aiTrialInfoEl = document.getElementById('aiTrialInfo');
+if (aiTrialInfoEl) {
+  if (plan === 'free' || plan === 'starter') {
+    const remaining = Math.max(0, 10 - (userData.aiTrialUsed || 0));
+    aiTrialInfoEl.innerText = `AI 助手试用：剩余 ${remaining} / 10 次`;
+    aiTrialInfoEl.style.display = 'block';
+  } else {
+    aiTrialInfoEl.style.display = 'none';
+  }
+}
   const familyArea = document.getElementById('familyArea');
   if (plan === 'premium') { familyArea.style.display = 'block'; document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || ''); }
   else { familyArea.style.display = 'none'; }
   document.getElementById('setPasswordArea').style.display = userData.hasPassword ? 'none' : 'block';
 }
-
 async function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
@@ -1759,6 +1766,10 @@ function switchGeneratorMode(mode) {
   const recipeContent = document.getElementById('recipeContentWrapper');
   const qaContent = document.getElementById('qaContent');
   const btns = document.querySelectorAll('.mode-btn');
+  const mainWrap = document.getElementById('mainWrap');
+  const modeGroup = document.querySelector('.mode-group');
+  const selectGroup = document.getElementById('selectGroup');
+  const funcRow = document.querySelector('.func-row');
   
   btns.forEach(b => b.classList.remove('active'));
   
@@ -1772,16 +1783,51 @@ function switchGeneratorMode(mode) {
     }
     if (recipeContent) recipeContent.classList.add('show');
     if (qaContent) qaContent.classList.remove('show');
+    if (modeGroup) modeGroup.style.display = '';
+    if (modeDesc) modeDesc.style.display = '';
+    if (selectGroup) {
+      selectGroup.innerHTML = `
+        <div class="select-wrapper"><button class="select-btn" id="categoryBtn">${t('genMealType')}</button><select id="mealType" class="transparent-select"><option value="standard">${t('optStandard')}</option><option value="baby">${t('optBaby')}</option><option value="pregnancy">${t('optPregnancy')}</option></select></div>
+        <div class="select-wrapper"><button class="select-btn" id="cuisineBtn">${t('genCuisine')}</button><select id="cuisine" class="transparent-select"></select></div>
+      `;
+      setTimeout(() => populateCuisines(), 50);
+    }
+    if (mainWrap) mainWrap.classList.remove('ai-standalone');
+    if (funcRow) funcRow.classList.remove('ai-mode');
   } else {
     if (slider) slider.classList.add('right');
     if (btns[1]) btns[1].classList.add('active');
     if (modeDesc) {
-      modeDesc.textContent = t('enterQuestion') || 'Ask about this recipe...';
+      modeDesc.textContent = t('enterQuestion') || 'Ask about any food topic...';
       modeDesc.classList.add('right-normal');
       modeDesc.classList.remove('left-indent');
     }
     if (qaContent) qaContent.classList.add('show');
     if (recipeContent) recipeContent.classList.remove('show');
+    if (modeGroup) modeGroup.style.display = 'none';
+    if (modeDesc) modeDesc.style.display = 'none';
+    if (selectGroup) {
+      selectGroup.innerHTML = `
+        <button class="select-btn" id="goToRecipeBtn" onclick="backToGenerator()">${t('genTitle')}</button>
+        <button class="select-btn" id="goToVideoBtn" onclick="showVideo()">${t('trendingVideos')}</button>
+      `;
+    }
+    if (mainWrap) mainWrap.classList.add('ai-standalone');
+    if (funcRow) funcRow.classList.add('ai-mode');
+  }
+}
+
+function backToGenerator() {
+  const recipeList = document.getElementById('recipeList');
+  const hasRecipes = recipeList && recipeList.children.length > 0;
+  switchGeneratorMode('recipe');
+  if (hasRecipes) {
+    document.getElementById('mainWrap')?.classList.add('top-fixed');
+    document.getElementById('contentBlock')?.classList.add('show');
+    document.getElementById('recipeContentWrapper')?.classList.add('show');
+    document.getElementById('qaContent')?.classList.remove('show');
+  } else {
+    clearContentOnReset();
   }
 }
 
@@ -1821,26 +1867,11 @@ function handleSend(e) {
     showGeneratingTip();
     generateRecipe();
     qaInput.value = '';
-  } else {
-    if (!val) {
-      showTipModal('Please enter a question.');
-      return;
-    }
-    // 这里会正确校验食谱是否存在，未登录状态已被上面拦截，所以不会误报
-    if (!userData.lastRecipeText) {
-      alert(t('alertNoRecipe'));
-      return;
-    }
-    if (userData.qLeft <= 0) {
-      alert(t('qLimitReached'));
-      switchGeneratorMode('recipe');
-      return;
-    }
-    
+      } else {
+    if (!val) { showTipModal('Please enter a question.'); return; }
     sendLocked = true;
     const btn = document.getElementById('qaSendBtn');
     if (btn) btn.disabled = true;
-    
     askQuestion();
   }
 }
@@ -2015,9 +2046,13 @@ document.getElementById('moreSelect').addEventListener('change', function() {
 function openAiStandalone() {
   const plan = userData?.plan || 'free';
   if (plan === 'free' || plan === 'starter') {
-    alert(t('aiStandaloneUpgrade') || 'This feature is available for Pro and above plans. Please upgrade to use.');
-    showPage('page-subscribe');
-    return;
+    const trialLimit = 10;
+    const trialUsed = userData.aiTrialUsed || 0;
+    if (trialUsed >= trialLimit) {
+      alert(t('aiTrialUsedUp'));
+      showPage('page-subscribe');
+      return;
+    }
   }
   showPage('page-generator');
   switchGeneratorMode('ai_standalone');
