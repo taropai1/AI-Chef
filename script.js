@@ -1720,7 +1720,6 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   const videoBtn = document.getElementById('openVideoBtn');
 if (videoBtn) videoBtn.onclick = showVideo;
   initVideoPlayerControls();
-  document.querySelector('#howToModal .close-btn').addEventListener('click', closeHowToModal);
   document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
@@ -1794,27 +1793,35 @@ function switchGeneratorMode(mode) {
     }
     if (mainWrap) mainWrap.classList.remove('ai-standalone');
     if (funcRow) funcRow.classList.remove('ai-mode');
-  } else {
-    if (slider) slider.classList.add('right');
-    if (btns[1]) btns[1].classList.add('active');
-    if (modeDesc) {
-      modeDesc.textContent = t('enterQuestion') || 'Ask about any food topic...';
-      modeDesc.classList.add('right-normal');
-      modeDesc.classList.remove('left-indent');
+   } else {
+        if (slider)
+            slider.classList.add('right');
+        if (btns[1])
+            btns[1].classList.add('active');
+        if (modeDesc) {
+            modeDesc.textContent = t('enterQuestion') || 'Ask about any food topic...';
+            modeDesc.classList.add('right-normal');
+            modeDesc.classList.remove('left-indent');
+        }
+        if (qaContent)
+            qaContent.classList.add('show');
+        if (recipeContent)
+            recipeContent.classList.remove('show');
+        if (modeGroup)
+            modeGroup.style.display = 'none';
+        if (modeDesc)
+            modeDesc.style.display = 'none';
+        if (selectGroup) {
+            selectGroup.innerHTML = `
+                    <button class="select-btn" id="goToRecipeBtn" onclick="backToGenerator()">${t('genTitle')}</button>
+                    <button class="select-btn" id="goToVideoBtn" onclick="showVideo()">${t('trendingVideos')}</button>
+                  `;
+        }
+        if (mainWrap)
+            mainWrap.classList.add('ai-standalone');
+        if (funcRow)
+            funcRow.classList.add('ai-mode');
     }
-    if (qaContent) qaContent.classList.add('show');
-    if (recipeContent) recipeContent.classList.remove('show');
-    if (modeGroup) modeGroup.style.display = 'none';
-    if (modeDesc) modeDesc.style.display = 'none';
-    if (selectGroup) {
-      selectGroup.innerHTML = `
-        <button class="select-btn" id="goToRecipeBtn" onclick="backToGenerator()">${t('genTitle')}</button>
-        <button class="select-btn" id="goToVideoBtn" onclick="showVideo()">${t('trendingVideos')}</button>
-      `;
-    }
-    if (mainWrap) mainWrap.classList.add('ai-standalone');
-    if (funcRow) funcRow.classList.add('ai-mode');
-  }
 }
 
 function backToGenerator() {
@@ -1829,6 +1836,7 @@ function backToGenerator() {
   } else {
     clearContentOnReset();
   }
+  setTimeout(() => populateCuisines(), 100);  // ← 新增，确保菜系下拉被填充
 }
 
 function handleSend(e) {
