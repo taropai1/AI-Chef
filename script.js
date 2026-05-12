@@ -1585,6 +1585,7 @@ async function showPage(pageId) {
             await refreshUserData();
         updateLimitInfo();
         populateCuisines();
+        switchGeneratorMode('recipe');  // ← 新增这一行，强制重置为食谱模式
     }
     if (pageId === 'page-subscribe')
         renderPayPal();
