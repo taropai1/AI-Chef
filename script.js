@@ -1707,8 +1707,6 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
 (async function init() {
   await initDeviceId(); userData = await loadUserData(); updateNavButton(); loadHistoryFromCache();
   document.querySelector('.lang-btn').addEventListener('click', (e) => { e.stopPropagation(); const dd = document.getElementById('langDropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; });
-  document.addEventListener('click', () => document.getElementById('langDropdown').style.display = 'none');
-  document.getElementById('langDropdown').addEventListener('click', (e) => { const target = e.target.closest('.lang-option'); if (target) switchLang(target.dataset.lang); });
   populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
   document.getElementById('sendCodeBtn').addEventListener('click', sendVerificationCode); document.getElementById('sendResetCodeBtn').addEventListener('click', sendResetCode); document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
   addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
