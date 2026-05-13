@@ -1045,69 +1045,76 @@ function updateLimitInfo() {
 }
 
 // ==================== 问答 ====================
-async function askQuestion() {
-    if (!userData) { alert(t('pleaseLogin')); return; }
-    const question = document.getElementById('qaInput').value.trim();
-    if (!question) return;
+async function askQuestion(containerOverride) {
+  const container = containerOverride || document;
+  const isAiPage = document.getElementById('page-ai-assistant').classList.contains('active');
+  // 如果未传入容器，自动选择当前活跃页面
+  const targetContainer = containerOverride || (isAiPage ? document.getElementById('page-ai-assistant') : document);
 
-    const plan = userData.plan || 'free';
-    if (plan === 'free' || plan === 'starter') {
-        const trialUsed = userData.aiTrialUsed || 0;
-        if (trialUsed >= 10) { alert(t('aiTrialUsedUp')); showPage('page-subscribe'); return; }
-    }
-    if (plan === 'pro' || plan === 'premium' || plan === 'business') {
-        const aiLimit = PLANS[plan]?.aiDailyLimit || 0;
-        if ((userData.aiDailyUsed || 0) >= aiLimit) { alert(t('aiDailyLimitReached')); return; }
-    }
+  if (!userData) { alert(t('pleaseLogin')); return; }
+  const qaInput = targetContainer.querySelector('#qaInput');
+  const question = qaInput ? qaInput.value.trim() : '';
+  if (!question) return;
 
-    const sendBtn = document.getElementById('qaSendBtn');
-    if (sendBtn) sendBtn.disabled = true;
-    const historyEl = document.getElementById('qaHistory');
-    addQABubble(question, true);
+  const plan = userData.plan || 'free';
+  if (plan === 'free' || plan === 'starter') {
+    const trialUsed = userData.aiTrialUsed || 0;
+    if (trialUsed >= 10) { alert(t('aiTrialUsedUp')); showPage('page-subscribe'); return; }
+  }
+  if (plan === 'pro' || plan === 'premium' || plan === 'business') {
+    const aiLimit = PLANS[plan]?.aiDailyLimit || 0;
+    if ((userData.aiDailyUsed || 0) >= aiLimit) { alert(t('aiDailyLimitReached')); return; }
+  }
+
+  const qaSendBtn = targetContainer.querySelector('#qaSendBtn');
+  if (qaSendBtn) qaSendBtn.disabled = true;
+  const historyEl = targetContainer.querySelector('#qaHistory');
+  addQABubbleTo(historyEl, question, true);
+  historyEl.scrollTop = historyEl.scrollHeight;
+  qaInput.value = '';
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const lang = getCurrentLang();
+    const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
+    const targetLang = langMap[lang] || 'English';
+    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks.`;
+
+    const response = await fetch(DEEPSEEK_API, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'deepseek-v4-flash', temperature: 0.3, max_tokens: 300,
+        messages: [{ role: 'system', content: systemContent }, { role: 'user', content: question }],
+        cache_prefix: 'ai_chef_ai_',
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    let answer = data.choices[0].message.content.replace(/\*/g, '');
+    const lines = answer.split('\n');
+    if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
+
+    addQABubbleTo(historyEl, answer, false);
     historyEl.scrollTop = historyEl.scrollHeight;
-    document.getElementById('qaInput').value = '';
 
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        const lang = getCurrentLang();
-        const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
-        const targetLang = langMap[lang] || 'English';
-        const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks.`;
-        
-        const response = await fetch(DEEPSEEK_API, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'deepseek-v4-flash', temperature: 0.3, max_tokens: 300,
-                messages: [{ role: 'system', content: systemContent }, { role: 'user', content: question }],
-                cache_prefix: 'ai_chef_ai_',
-            }),
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        let answer = data.choices[0].message.content.replace(/\*/g, '');
-        const lines = answer.split('\n');
-        if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
-
-        addQABubble(answer, false);
-        historyEl.scrollTop = historyEl.scrollHeight;
-
-        await initDeviceId();
-        const res = await apiCall('/api/user/record-ai-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
-        if (plan === 'free' || plan === 'starter') {
-            userData.aiTrialUsed = res.aiTrialUsed;
-        } else {
-            userData.aiDailyUsed = res.aiDailyUsed;
-            const remaining = (PLANS[plan]?.aiDailyLimit || 0) - userData.aiDailyUsed;
-            document.getElementById('qaLimitNote').innerText = `${t('aiQuestionsLeft')}: ${remaining}`;
-        }
-    } catch (error) {
-        addQABubble('Error, please try again.', false);
-    } finally {
-        unlockSend();
+    await initDeviceId();
+    const res = await apiCall('/api/user/record-ai-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
+    if (plan === 'free' || plan === 'starter') {
+      userData.aiTrialUsed = res.aiTrialUsed;
+    } else {
+      userData.aiDailyUsed = res.aiDailyUsed;
+      const remaining = (PLANS[plan]?.aiDailyLimit || 0) - userData.aiDailyUsed;
+      const limitNote = targetContainer.querySelector('#qaLimitNote');
+      if (limitNote) limitNote.innerText = `${t('aiQuestionsLeft')}: ${remaining}`;
     }
+  } catch (error) {
+    addQABubbleTo(historyEl, 'Error, please try again.', false);
+  } finally {
+    unlockSend();
+  }
 }
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
@@ -1629,11 +1636,12 @@ function switchLang(lang) {
     currentLang = lang;
     localStorage.setItem('aiChefLang', lang);
     document.getElementById('currentLang').innerText = getLangName(lang) + ' ▼';
-    document.documentElement.lang = lang;   // ← 新增这一行
+    document.documentElement.lang = lang;
     renderLanguage(); 
     updateLimitInfo();
     if (userData) renderProfile();
     document.getElementById('langDropdown').style.display = 'none';
+    updateMoreMenu(); // 新增
 }
 function addToHome() { if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) { alert('在Safari浏览器中，点击底部“分享”按钮，然后选择“添加到主屏幕”。'); } else if (navigator.share) { navigator.share({ title:'AI Chef', text:t('heroSubtitle'), url:window.location.href }).catch(()=>{}); } else { window.dispatchEvent(new Event('beforeinstallprompt')); alert('您可以通过浏览器菜单“添加到主屏幕”安装此应用。'); } }
 function showToast(msg) { alert(msg); } // 简化为alert，无successModal
@@ -1786,36 +1794,26 @@ document.addEventListener('change', function(e) {
 });
 
 function switchGeneratorMode(mode) {
-  generatorMode = mode;
+  // 仅保留 recipe 模式，任何其他模式均忽略
+  if (mode !== 'recipe') return;
+  generatorMode = 'recipe';
   const slider = document.getElementById('modeSlider');
   const modeDesc = document.getElementById('modeDesc');
   const recipeContent = document.getElementById('recipeContentWrapper');
   const qaContent = document.getElementById('qaContent');
   const btns = document.querySelectorAll('.mode-btn');
-  
+
   btns.forEach(b => b.classList.remove('active'));
-  
-  if (mode === 'recipe') {
-    if (slider) slider.classList.remove('right');
-    if (btns[0]) btns[0].classList.add('active');
-    if (modeDesc) {
-      modeDesc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
-      modeDesc.classList.add('left-indent');
-      modeDesc.classList.remove('right-normal');
-    }
-    if (recipeContent) recipeContent.classList.add('show');
-    if (qaContent) qaContent.classList.remove('show');
-  } else {
-    if (slider) slider.classList.add('right');
-    if (btns[1]) btns[1].classList.add('active');
-    if (modeDesc) {
-      modeDesc.textContent = t('enterQuestion') || 'Ask about this recipe...';
-      modeDesc.classList.add('right-normal');
-      modeDesc.classList.remove('left-indent');
-    }
-    if (qaContent) qaContent.classList.add('show');
-    if (recipeContent) recipeContent.classList.remove('show');
+  if (slider) slider.classList.remove('right');
+  if (btns[0]) btns[0].classList.add('active');
+
+  if (modeDesc) {
+    modeDesc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
+    modeDesc.classList.add('left-indent');
+    modeDesc.classList.remove('right-normal');
   }
+  if (recipeContent) recipeContent.classList.add('show');
+  if (qaContent) qaContent.classList.remove('show');
 }
 
 function backToGenerator() {
@@ -1836,7 +1834,9 @@ function backToGenerator() {
 function handleSend(e) {
   if (e) e.preventDefault();
   if (sendLocked) return;
-  
+  // 仅在生成器页面且为 recipe 模式时生效
+  if (!document.getElementById('page-generator').classList.contains('active')) return;
+  if (generatorMode !== 'recipe') return;
   const qaInput = document.getElementById('qaInput');
   const val = qaInput ? qaInput.value.trim() : '';
   
@@ -1951,27 +1951,42 @@ logout = function() {
 
 // ==================== 初始化 ====================
 (function initNewGenerator() {
-  const qaSendBtn = document.getElementById('qaSendBtn');
-  if (qaSendBtn) {
-    qaSendBtn.removeEventListener('click', handleSend);
-    qaSendBtn.addEventListener('click', handleSend);
-  }
+const qaSendBtn = document.getElementById('qaSendBtn');
+if (qaSendBtn) {
+  qaSendBtn.onclick = handleSend; // 保持原绑定
+}
 
-  const qaInput = document.getElementById('qaInput');
-  if (qaInput) {
-    qaInput.removeEventListener('keydown', handleSend);
-    qaInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSend(e);
-      }
-    });
-  }
+const qaInput = document.getElementById('qaInput');
+if (qaInput) {
+  qaInput.onkeydown = function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend(e);
+    }
+  };
+}
 
   // 扩展 renderLanguage 以同步生成器内多语言元素
   const originalRenderLanguage = renderLanguage;
   renderLanguage = function() {
     originalRenderLanguage();
+    // 在 renderLanguage 的扩展函数中，originalRenderLanguage() 调用之后添加：
+const moreSelect = document.getElementById('moreSelect');
+if (moreSelect) {
+  const optShare = moreSelect.querySelector('option[value="share"]');
+  const optLogin = moreSelect.querySelector('option[value="login"]');
+  const optSubscribe = moreSelect.querySelector('option[value="subscribe"]');
+  const optProfile = moreSelect.querySelector('option[value="profile"]');
+  const optHowto = moreSelect.querySelector('option[value="howto"]');
+  const optLegal = moreSelect.querySelector('option[value="legal"]');
+
+  if (optShare) optShare.textContent = t('addToHome');
+  if (optLogin) optLogin.textContent = t('loginSignUp');
+  if (optSubscribe) optSubscribe.textContent = t('subscribeBtn');
+  if (optProfile) optProfile.textContent = t('profileMenu');
+  if (optHowto) optHowto.textContent = t('howToTitle');
+  if (optLegal) optLegal.textContent = t('legalLink');
+}
     updateModeBtns();
     populateCuisines();
     
@@ -2014,6 +2029,7 @@ logout = function() {
   }, 100);
 
   switchGeneratorMode('recipe');
+  document.getElementById('btnAiMode').onclick = openAiStandalone;
 })();
 
 // ==================== 导航栏交互 ====================
@@ -2160,47 +2176,171 @@ showVideo = function() {
 
 // ==================== AI 独立页面初始化 ====================
 function initAiPage() {
-  const qaSendBtn = document.getElementById('qaSendBtn');
-  if (qaSendBtn) {
-    qaSendBtn.removeEventListener('click', handleSend);
-    qaSendBtn.addEventListener('click', handleSend);
+  const aiPage = document.getElementById('page-ai-assistant');
+  if (!aiPage) return;
+
+  // 获取独立页内的专属元素
+  const qaSendBtn = aiPage.querySelector('#qaSendBtn');
+  const qaInput = aiPage.querySelector('#qaInput');
+  const qaHistory = aiPage.querySelector('#qaHistory');
+  const recipeBtn = aiPage.querySelector('#btnRecipeMode');
+  const videoBtn = aiPage.querySelector('#openVideoBtn');
+  const aiPageTitle = aiPage.querySelector('#aiPageTitle');
+  const aiPageDesc = aiPage.querySelector('#aiPageDesc');
+  const qaLimitNote = aiPage.querySelector('#qaLimitNote');
+
+  // 重置对话列表（保留欢迎语）
+  if (qaHistory) {
+    qaHistory.innerHTML = '<div class="qa-bubble ai-bubble">Hello, I\'m your AI food assistant. How can I help?</div>';
   }
 
-  const qaInput = document.getElementById('qaInput');
+  // 清除残留的旧文案
+  if (aiPageTitle) aiPageTitle.innerText = t('aiAssistTitle') || 'AI Assistant';
+  if (aiPageDesc) aiPageDesc.innerText = ''; // 移除“对此食谱提问”的描述
+  if (qaLimitNote) qaLimitNote.innerText = '';
+
+  // 输入框占位符
   if (qaInput) {
-    qaInput.removeEventListener('keydown', handleSend);
-    qaInput.addEventListener('keydown', function(e) {
+    qaInput.placeholder = t('enterQuestion') || 'Ask about any food topic...';
+  }
+
+  // 绑定发送事件（使用当前页面元素）
+  if (qaSendBtn && qaInput) {
+    qaSendBtn.onclick = function(e) {
+      e.preventDefault();
+      if (sendLocked) return;
+      if (!userData) {
+        alert(t('pleaseLogin'));
+        showPage('page-login-register');
+        return;
+      }
+      const val = qaInput.value.trim();
+      if (!val) {
+        showTipModal('Please enter a question.');
+        return;
+      }
+      sendLocked = true;
+      qaSendBtn.disabled = true;
+      askQuestionFromPage(aiPage);  // 专用发送函数
+      qaInput.value = '';
+    };
+
+    qaInput.onkeydown = function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        handleSend();
+        qaSendBtn.click();
       }
-    });
+    };
   }
 
-  // 快捷按钮文案（复用已有 id，只改文字和 onclick）
-  const recipeBtn = document.getElementById('btnRecipeMode');
-  const videoBtn = document.getElementById('openVideoBtn');
+  // 食谱按钮：跳回生成器页
   if (recipeBtn) {
     recipeBtn.textContent = t('recipeShort') || 'Recipes';
-    recipeBtn.onclick = backToGenerator;
+    recipeBtn.onclick = function() { showPage('page-generator'); };
   }
+
+  // 视频按钮：打开视频弹窗
   if (videoBtn) {
     videoBtn.textContent = t('videoShort') || 'Videos';
     videoBtn.onclick = showVideo;
   }
-
-  // 页面标题
-  const aiPageTitle = document.getElementById('aiPageTitle');
-  const aiPageDesc = document.getElementById('aiPageDesc');
-  if (aiPageTitle) aiPageTitle.innerText = t('aiAssistTitle') || 'AI Assistant';
-  if (aiPageDesc) aiPageDesc.innerText = t('enterQuestion') || 'Ask about any food topic...';
-
-  // 输入框 placeholder
-  const qaInputEl = document.getElementById('qaInput');
-  if (qaInputEl) qaInputEl.placeholder = t('enterQuestion') || 'Ask about any food topic...';
 }
 
-// ==================== 语音识别模块（绝对隔离版） ====================
+// 新增：专门用于独立页的发送逻辑（复用 askQuestion，但指定作用域）
+function askQuestionFromPage(container) {
+  if (!userData) { alert(t('pleaseLogin')); return; }
+  const qaInput = container.querySelector('#qaInput');
+  const question = qaInput ? qaInput.value.trim() : '';
+  if (!question) return;
+
+  // 套餐校验（复用原 askQuestion 中的校验逻辑，不重复粘贴完整代码，直接调用原 askQuestion，但传入元素）
+  // 为了最小化修改，我们修改原 askQuestion 函数使其兼容从容器获取元素
+  actualAskQuestion(container);
+}
+
+// 修改原 askQuestion 函数，增加可选 container 参数，不传则从全局查找
+async function askQuestion(containerOverride) {
+  const container = containerOverride || document;
+  const isAiPage = document.getElementById('page-ai-assistant').classList.contains('active');
+  // 如果未传入容器，自动选择当前活跃页面
+  const targetContainer = containerOverride || (isAiPage ? document.getElementById('page-ai-assistant') : document);
+
+  if (!userData) { alert(t('pleaseLogin')); return; }
+  const qaInput = targetContainer.querySelector('#qaInput');
+  const question = qaInput ? qaInput.value.trim() : '';
+  if (!question) return;
+
+  const plan = userData.plan || 'free';
+  if (plan === 'free' || plan === 'starter') {
+    const trialUsed = userData.aiTrialUsed || 0;
+    if (trialUsed >= 10) { alert(t('aiTrialUsedUp')); showPage('page-subscribe'); return; }
+  }
+  if (plan === 'pro' || plan === 'premium' || plan === 'business') {
+    const aiLimit = PLANS[plan]?.aiDailyLimit || 0;
+    if ((userData.aiDailyUsed || 0) >= aiLimit) { alert(t('aiDailyLimitReached')); return; }
+  }
+
+  const qaSendBtn = targetContainer.querySelector('#qaSendBtn');
+  if (qaSendBtn) qaSendBtn.disabled = true;
+  const historyEl = targetContainer.querySelector('#qaHistory');
+  addQABubbleTo(historyEl, question, true);
+  historyEl.scrollTop = historyEl.scrollHeight;
+  qaInput.value = '';
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const lang = getCurrentLang();
+    const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
+    const targetLang = langMap[lang] || 'English';
+    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks.`;
+
+    const response = await fetch(DEEPSEEK_API, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'deepseek-v4-flash', temperature: 0.3, max_tokens: 300,
+        messages: [{ role: 'system', content: systemContent }, { role: 'user', content: question }],
+        cache_prefix: 'ai_chef_ai_',
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    let answer = data.choices[0].message.content.replace(/\*/g, '');
+    const lines = answer.split('\n');
+    if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
+
+    addQABubbleTo(historyEl, answer, false);
+    historyEl.scrollTop = historyEl.scrollHeight;
+
+    await initDeviceId();
+    const res = await apiCall('/api/user/record-ai-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
+    if (plan === 'free' || plan === 'starter') {
+      userData.aiTrialUsed = res.aiTrialUsed;
+    } else {
+      userData.aiDailyUsed = res.aiDailyUsed;
+      const remaining = (PLANS[plan]?.aiDailyLimit || 0) - userData.aiDailyUsed;
+      const limitNote = targetContainer.querySelector('#qaLimitNote');
+      if (limitNote) limitNote.innerText = `${t('aiQuestionsLeft')}: ${remaining}`;
+    }
+  } catch (error) {
+    addQABubbleTo(historyEl, 'Error, please try again.', false);
+  } finally {
+    unlockSend();
+  }
+}
+
+// 辅助函数：向指定历史列表添加气泡
+function addQABubbleTo(historyEl, text, isUser) {
+  if (!historyEl) return;
+  const b = document.createElement('div');
+  b.className = isUser ? 'qa-bubble user-bubble' : 'qa-bubble ai-bubble';
+  b.textContent = text;
+  historyEl.appendChild(b);
+}
+
+  // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
     // 将所有逻辑完全隔离，任何错误都不会影响主程序
     try {
@@ -2300,6 +2440,15 @@ function initAiPage() {
                     });
                 }
 
+                // AI 独立页麦克风
+                const aiMicBtn = document.querySelector('#page-ai-assistant #qaMicBtn');
+                const aiQaInput = document.querySelector('#page-ai-assistant #qaInput');
+                if (aiMicBtn && aiQaInput) {
+                    aiMicBtn.addEventListener('click', () => {
+                        if (activeInput === aiQaInput) stopRecognition();
+                        else startRecognition(aiQaInput, aiMicBtn);
+                    });
+                 }
                 // 安全重写 switchLang
                 if (typeof window.switchLang === 'function') {
     const originalSwitchLang = window.switchLang;
