@@ -1584,9 +1584,7 @@ async function showPage(pageId) {
     if (userData) await refreshUserData();
     updateLimitInfo();
     populateCuisines();
-    if (generatorMode !== 'ai_standalone') {
-        switchGeneratorMode('recipe');
-    }
+    switchGeneratorMode('recipe');
 }
     if (pageId === 'page-subscribe')
         renderPayPal();
