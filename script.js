@@ -1748,7 +1748,6 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   const videoBtn = document.getElementById('openVideoBtn');
 if (videoBtn) videoBtn.onclick = showVideo;
   initVideoPlayerControls();
-  document.getElementById('restoreRecentLink').addEventListener('click', restoreRecentRecipes);
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
 })();
