@@ -2182,6 +2182,48 @@ showVideo = function() {
   document.getElementById('videoModal').classList.add('show');
 };
 
+// ==================== AI 独立页面初始化 ====================
+function initAiPage() {
+  const qaSendBtn = document.getElementById('qaSendBtn');
+  if (qaSendBtn) {
+    qaSendBtn.removeEventListener('click', handleSend);
+    qaSendBtn.addEventListener('click', handleSend);
+  }
+
+  const qaInput = document.getElementById('qaInput');
+  if (qaInput) {
+    qaInput.removeEventListener('keydown', handleSend);
+    qaInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+  }
+
+  // 快捷按钮文案（复用已有 id，只改文字和 onclick）
+  const recipeBtn = document.getElementById('btnRecipeMode');
+  const videoBtn = document.getElementById('openVideoBtn');
+  if (recipeBtn) {
+    recipeBtn.textContent = t('recipeShort') || 'Recipes';
+    recipeBtn.onclick = backToGenerator;
+  }
+  if (videoBtn) {
+    videoBtn.textContent = t('videoShort') || 'Videos';
+    videoBtn.onclick = showVideo;
+  }
+
+  // 页面标题
+  const aiPageTitle = document.getElementById('aiPageTitle');
+  const aiPageDesc = document.getElementById('aiPageDesc');
+  if (aiPageTitle) aiPageTitle.innerText = t('aiAssistTitle') || 'AI Assistant';
+  if (aiPageDesc) aiPageDesc.innerText = t('enterQuestion') || 'Ask about any food topic...';
+
+  // 输入框 placeholder
+  const qaInputEl = document.getElementById('qaInput');
+  if (qaInputEl) qaInputEl.placeholder = t('enterQuestion') || 'Ask about any food topic...';
+}
+
 // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
     // 将所有逻辑完全隔离，任何错误都不会影响主程序
