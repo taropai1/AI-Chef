@@ -239,7 +239,50 @@
     <button class="btn-ask" id="qaAskBtn" style="display:none;">Ask</button>
   </div>
 </div>
-  <!-- 登录/注册页 -->
+  
+   <!-- AI 助手独立页面 -->
+<div class="page" id="page-ai-assistant">
+  <div class="ai-standalone-wrap">
+    <div class="main-wrap" id="aiMainWrap">
+      <!-- 顶部标题区 -->
+      <div class="top-inner">
+        <div class="gen-title-new" id="aiPageTitle">AI Assistant</div>
+        <p class="mode-desc right-normal" id="aiPageDesc">Ask anything about food and cooking...</p>
+      </div>
+
+      <!-- 内容展示区 -->
+      <div class="content-block show" id="aiContentBlock">
+        <div class="qa-content show" id="aiQaContent">
+          <div class="qa-list-new" id="qaHistory">
+            <div class="qa-bubble ai-bubble">Hello, I'm your AI food assistant. How can I help?</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 输入卡片 -->
+      <div class="input-container" id="aiInputContainer">
+        <textarea class="input-area" id="qaInput" placeholder="Ask about any food topic..."></textarea>
+        <div class="func-row ai-mode">
+          <div class="select-group" id="aiSelectGroup">
+            <button class="select-btn" id="btnRecipeMode" onclick="backToGenerator()">Recipes</button>
+            <button class="select-btn" id="openVideoBtn" onclick="showVideo()">Videos</button>
+          </div>
+          <div class="action-group">
+            <button class="icon-btn voice-btn" id="qaMicBtn">
+              <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <button class="icon-btn send-btn" id="qaSendBtn">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-modal-new" id="aiTipModal">Error</div>
+  </div>
+</div> 
+  
+    <!-- 登录/注册页 -->
   <div class="page" id="page-login-register">
     <div class="auth-container">
       <div class="auth-card-new">
