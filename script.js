@@ -1608,27 +1608,35 @@ if (aiTrialInfoEl) {
   else { familyArea.style.display = 'none'; }
   document.getElementById('setPasswordArea').style.display = userData.hasPassword ? 'none' : 'block';
 }
+
 async function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
+    
+    // ===== 关键修复：确保生成器页面激活时发送功能可用 =====
     if (pageId === 'page-generator') {
-    if (userData) await refreshUserData();
-    updateLimitInfo();
-    populateCuisines();
-    switchGeneratorMode('recipe');
-}
+        sendLocked = false;
+        const genSendBtn = document.getElementById('qaSendBtn');
+        if (genSendBtn) genSendBtn.disabled = false;
+    }
+    // ===== 修复结束 =====
+    
+    if (pageId === 'page-generator') {
+        if (userData) await refreshUserData();
+        updateLimitInfo();
+        populateCuisines();
+        switchGeneratorMode('recipe');
+    }
     if (pageId === 'page-ai-assistant') {
-    if (userData) await refreshUserData();
-    initAiPage();
-}
-    if (pageId === 'page-subscribe')
-        renderPayPal();
+        if (userData) await refreshUserData();
+        initAiPage();
+    }
+    if (pageId === 'page-subscribe') renderPayPal();
     if (pageId === 'page-profile') {
         renderProfile();
         renderLanguage();
     }
-    if (pageId === 'page-home')
-        renderLanguage();
+    if (pageId === 'page-home') renderLanguage();
     renderLanguage();
 }
 
