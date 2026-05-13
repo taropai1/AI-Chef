@@ -354,6 +354,68 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     width: auto;
   }
 }
+
+/* ==================== AI 独立页面样式 ==================== */
+.ai-standalone-wrap {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.func-row.ai-mode {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+/* AI 页面输入卡片定位（与生成器页面保持一致） */
+#aiInputContainer {
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  #aiInputContainer {
+    width: calc(100% - 40px);
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+  }
+  #aiSelectGroup .select-btn {
+    min-width: 90px;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 768px) {
+  #aiInputContainer {
+    max-width: 700px;
+    position: static;
+    margin: 0 auto;
+  }
+  .top-fixed #aiInputContainer {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #aiSelectGroup .select-btn {
+    min-width: auto;
+    max-width: none;
+    width: auto;
+  }
+}
+
+@media (min-width: 1025px) {
+  #aiInputContainer .voice-btn {
+    display: none !important;
+  }
+}
+
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
