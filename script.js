@@ -68,6 +68,7 @@ const MAX_HISTORY = 12;
 let generatorMode = 'recipe'; // 'recipe' | 'qa'
 // 全局发送锁
 let sendLocked = false;
+let postLoginPage = null; // 记录登录后要跳转的页面
 
 function unlockSend() {
   sendLocked = false;
@@ -1224,7 +1225,18 @@ async function login() {
     await initDeviceId();
     const data = await apiCall('/api/user/login', { method: 'POST', body: JSON.stringify({ email, password: pwd, deviceId, bindCode }) });
     localStorage.setItem('authToken', data.token); userData = data.user; localStorage.removeItem('tempBindCode');
-    showPage('page-generator'); renderProfile(); updateLimitInfo();
+    
+    // ===== 修改点：根据 postLoginPage 决定跳转目标 =====
+    if (postLoginPage) {
+        showPage(postLoginPage);
+        if (postLoginPage === 'page-ai-assistant') initAiPage();
+        postLoginPage = null;
+    } else {
+        showPage('page-generator');
+    }
+    // =================================================
+    
+    renderProfile(); updateLimitInfo();
   } catch (e) { alert(t('loginFailed') + ': ' + e.message); }
 }
 
