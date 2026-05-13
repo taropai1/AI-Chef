@@ -2080,11 +2080,11 @@ document.getElementById('moreSelect').addEventListener('change', function() {
 
 // AI 助手独立模式入口
 function openAiStandalone() {
-  const plan = userData?.plan || 'free';
-  if (plan === 'free' || plan === 'starter') {
-    const trialLimit = 10;
+  // 已登录才检查配额，未登录直接进入 AI 页（发送时再提示登录）
+  if (userData) {
+    const plan = userData.plan || 'free';
     const trialUsed = userData.aiTrialUsed || 0;
-    if (trialUsed >= trialLimit) {
+    if ((plan === 'free' || plan === 'starter') && trialUsed >= 10) {
       alert(t('aiTrialUsedUp'));
       showPage('page-subscribe');
       return;
