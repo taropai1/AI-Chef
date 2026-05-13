@@ -2187,7 +2187,6 @@ function initAiPage() {
   const aiPage = document.getElementById('page-ai-assistant');
   if (!aiPage) return;
 
-  // 获取独立页内的专属元素
   const qaSendBtn = aiPage.querySelector('#qaSendBtn');
   const qaInput = aiPage.querySelector('#qaInput');
   const qaHistory = aiPage.querySelector('#qaHistory');
@@ -2197,23 +2196,19 @@ function initAiPage() {
   const aiPageDesc = aiPage.querySelector('#aiPageDesc');
   const qaLimitNote = aiPage.querySelector('#qaLimitNote');
 
-  // 重置对话列表（保留欢迎语）
-  if (qaHistory) {
-    qaHistory.innerHTML = '<div class="qa-bubble ai-bubble">Hello, I\'m your AI food assistant. How can I help?</div>';
-  }
+  // 清空顶部文案和欢迎语
+  if (aiPageTitle) aiPageTitle.innerText = '';
+  if (aiPageDesc) aiPageDesc.innerText = '';
+  if (qaHistory) qaHistory.innerHTML = '';
 
-  // 清除残留的旧文案
-  if (aiPageTitle) aiPageTitle.innerText = t('aiAssistTitle') || 'AI Assistant';
-  if (aiPageDesc) aiPageDesc.innerText = ''; // 移除“对此食谱提问”的描述
-  if (qaLimitNote) qaLimitNote.innerText = '';
-
-  // 输入框占位符
+  // 输入框占位符与清空
   if (qaInput) {
     qaInput.placeholder = t('enterQuestion') || 'Ask about any food topic...';
+    qaInput.value = '';
   }
 
-  // 绑定发送事件（使用当前页面元素）
-  if (qaSendBtn && qaInput) {
+  // 发送按钮事件（直接调用 askQuestion，传入容器）
+  if (qaSendBtn) {
     qaSendBtn.onclick = function(e) {
       e.preventDefault();
       if (sendLocked) return;
@@ -2222,17 +2217,20 @@ function initAiPage() {
         showPage('page-login-register');
         return;
       }
-      const val = qaInput.value.trim();
-      if (!val) {
+      const question = qaInput.value.trim();
+      if (!question) {
         showTipModal('Please enter a question.');
         return;
       }
       sendLocked = true;
       qaSendBtn.disabled = true;
-      askQuestionFromPage(aiPage);  // 专用发送函数
+      askQuestion(aiPage); // 传入容器，避免 ID 冲突
       qaInput.value = '';
     };
+  }
 
+  // 回车发送
+  if (qaInput) {
     qaInput.onkeydown = function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -2252,8 +2250,20 @@ function initAiPage() {
     videoBtn.textContent = t('videoShort') || 'Videos';
     videoBtn.onclick = showVideo;
   }
-}
 
+  // 更新配额提示（仅登录用户）
+  if (qaLimitNote && userData) {
+    const plan = userData.plan || 'free';
+    if (plan === 'free' || plan === 'starter') {
+      const remaining = Math.max(0, 10 - (userData.aiTrialUsed || 0));
+      qaLimitNote.innerText = `AI 试用：剩余 ${remaining} / 10 次`;
+    } else {
+      const dailyLimit = PLANS[plan]?.aiDailyLimit || 0;
+      const remaining = dailyLimit - (userData.aiDailyUsed || 0);
+      qaLimitNote.innerText = `AI 剩余：${remaining} 次`;
+    }
+  }
+}
 // 新增：专门用于独立页的发送逻辑（复用 askQuestion，但指定作用域）
 function askQuestionFromPage(container) {
   if (!userData) { alert(t('pleaseLogin')); return; }
