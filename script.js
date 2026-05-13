@@ -1543,20 +1543,25 @@ Object.keys(tipMap).forEach(function(id) {
   });
 });
   populateCuisines();
- // ========== 更多选项下拉文案（新增） ==========
-    const shareOpt = document.querySelector('#moreSelect option[value="share"]');
-    const loginOpt = document.getElementById('moreLogin');
-    const subscribeOpt = document.getElementById('moreSubscribe');
-    const profileOpt = document.getElementById('moreProfile');
-    const legalOpt = document.querySelector('#moreSelect option[value="legal"]');
+ 
+// ========== 整合：更新更多选项、AI独立页文案、模式按钮、菜系 ==========
+const moreSelect = document.getElementById('moreSelect');
+if (moreSelect) {
+    const optMap = {
+        'share': 'addToHome',
+        'login': 'loginSignUp',
+        'subscribe': 'subscribeBtn',
+        'profile': 'profileMenu',
+        'howto': 'howToTitle',
+        'legal': 'legalLink'
+    };
+    Array.from(moreSelect.options).forEach(opt => {
+        if (opt.value && optMap[opt.value]) {
+            opt.textContent = t(optMap[opt.value]) || opt.textContent;
+        }
+    });
+}
 
-    if (shareOpt) shareOpt.textContent = t('addToHome') || 'Add to Home';
-    if (loginOpt) loginOpt.textContent = t('loginSignUp') || 'Login / Sign Up';
-    if (subscribeOpt) subscribeOpt.textContent = t('subscribeBtn') || 'Subscribe Now';
-    if (profileOpt) profileOpt.textContent = t('profileMenu') || 'Profile';
-    if (legalOpt) legalOpt.textContent = t('legalLink') || 'Privacy / Terms';
-
-// AI 独立页面文案
 const aiPageTitle = document.getElementById('aiPageTitle');
 const aiPageDesc = document.getElementById('aiPageDesc');
 const aiRecipeBtn = document.querySelector('#aiSelectGroup #btnRecipeMode');
@@ -1567,6 +1572,8 @@ if (aiPageDesc) aiPageDesc.innerText = t('enterQuestion') || 'Ask about any food
 if (aiRecipeBtn) aiRecipeBtn.textContent = t('recipeShort') || 'Recipes';
 if (aiVideoBtn) aiVideoBtn.textContent = t('videoShort') || 'Videos';
 if (aiQaInput) aiQaInput.placeholder = t('enterQuestion') || 'Ask about any food topic...';
+
+updateModeBtns();
 }
 
 function renderProfile() {
@@ -1973,31 +1980,7 @@ if (qaInput) {
     }
   };
 }
-
-  // 扩展 renderLanguage 以同步生成器内多语言元素
-  const originalRenderLanguage = renderLanguage;
-  renderLanguage = function() {
-    originalRenderLanguage();
-    // 在 renderLanguage 的扩展函数中，originalRenderLanguage() 调用之后添加：
-const moreSelect = document.getElementById('moreSelect');
-if (moreSelect) {
-  const optShare = moreSelect.querySelector('option[value="share"]');
-  const optLogin = moreSelect.querySelector('option[value="login"]');
-  const optSubscribe = moreSelect.querySelector('option[value="subscribe"]');
-  const optProfile = moreSelect.querySelector('option[value="profile"]');
-  const optHowto = moreSelect.querySelector('option[value="howto"]');
-  const optLegal = moreSelect.querySelector('option[value="legal"]');
-
-  if (optShare) optShare.textContent = t('addToHome');
-  if (optLogin) optLogin.textContent = t('loginSignUp');
-  if (optSubscribe) optSubscribe.textContent = t('subscribeBtn');
-  if (optProfile) optProfile.textContent = t('profileMenu');
-  if (optHowto) optHowto.textContent = t('howToTitle');
-  if (optLegal) optLegal.textContent = t('legalLink');
-}
-    updateModeBtns();
-    populateCuisines();
-    
+  
   // 追加这一行：更新模态按钮下的描述文字
   const modeDesc = document.getElementById('modeDesc');
   if (modeDesc) {
