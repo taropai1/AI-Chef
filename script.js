@@ -2011,7 +2011,6 @@ if (qaInput) {
 
     const inputPl = document.getElementById('qaInput');
     if (inputPl) inputPl.placeholder = t('inputPlaceholder') || 'Tap the category and cuisine buttons, choose what you want to eat!';    
-  };
 
   // 设置默认分类/菜系
   const mealTypeSelect = document.getElementById('mealType');
