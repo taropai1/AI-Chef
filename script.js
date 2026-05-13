@@ -71,9 +71,12 @@ let sendLocked = false;
 let postLoginPage = null; // 记录登录后要跳转的页面
 
 function unlockSend() {
-  sendLocked = false;
-  const btn = document.getElementById('qaSendBtn');
-  if (btn) btn.disabled = false;
+    sendLocked = false;
+    // 根据当前活跃页面选择正确的发送按钮
+    const activePage = document.querySelector('.page.active');
+    if (!activePage) return;
+    const btn = activePage.querySelector('#qaSendBtn');
+    if (btn) btn.disabled = false;
 }
 // ==================== 多语言翻译（7种语言完整） ====================
 const translations = {
@@ -1059,7 +1062,11 @@ async function askQuestion(containerOverride) {
   // 如果未传入容器，自动选择当前活跃页面
   const targetContainer = containerOverride || (isAiPage ? document.getElementById('page-ai-assistant') : document);
 
-  if (!userData) { alert(t('pleaseLogin')); return; }
+  if (!userData) {
+    postLoginPage = 'page-ai-assistant';  // ← 插入这一行
+    alert(t('pleaseLogin'));
+    return;
+}
   const qaInput = targetContainer.querySelector('#qaInput');
   const question = qaInput ? qaInput.value.trim() : '';
   if (!question) return;
@@ -2213,10 +2220,11 @@ function initAiPage() {
       e.preventDefault();
       if (sendLocked) return;
       if (!userData) {
-        alert(t('pleaseLogin'));
-        showPage('page-login-register');
-        return;
-      }
+    postLoginPage = 'page-ai-assistant';  // ← 插入这一行
+    alert(t('pleaseLogin'));
+    showPage('page-login-register');
+    return;
+}
       const question = qaInput.value.trim();
       if (!question) {
         showTipModal('Please enter a question.');
@@ -2283,7 +2291,11 @@ async function askQuestion(containerOverride) {
   // 如果未传入容器，自动选择当前活跃页面
   const targetContainer = containerOverride || (isAiPage ? document.getElementById('page-ai-assistant') : document);
 
-  if (!userData) { alert(t('pleaseLogin')); return; }
+  if (!userData) {
+    postLoginPage = 'page-ai-assistant';  // ← 插入这一行
+    alert(t('pleaseLogin'));
+    return;
+}
   const qaInput = targetContainer.querySelector('#qaInput');
   const question = qaInput ? qaInput.value.trim() : '';
   if (!question) return;
