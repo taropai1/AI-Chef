@@ -87,7 +87,7 @@ const translations = {
     sectionSubscribe: 'Subscription Plans', subText: 'Subscribe', subSub: 'Unlock full access', familyText: 'Family Share',
     familySub: 'Multi-User Plan', legalLink: 'Privacy/Terms', genTitle: 'AI Recipe Generator', genMealType: 'Category',
     genCuisine: 'Cuisine', genDishName: 'What to eat?', optStandard: 'Standard', optBaby: 'Baby', optPregnancy: 'Pregnancy',
-    generate: 'Generate Recipe', generating: 'Generating...', aiAssistTitle: 'AI Assistant', enterQuestion: 'Ask about this recipe...',
+    generate: 'Generate Recipe', generating: 'Generating...', aiAssistTitle: 'AI Assistant', enterQuestion: 'Voice or text input...',
     ask: 'Ask', dishNameHint: 'Enter ingredients, dish names or food items.', watchVideo: 'Watch Video Guides',
     addToHome: 'Add', freeLimitInfo: 'Free trial: {{used}}/3', starterInfo: 'Starter: {{used}}/10 | Q left: {{qLeft}}',
     proInfo: 'Pro: {{used}}/30 | Q left: {{qLeft}}', premiumInfo: 'Premium Family: {{used}}/80 | Q left: {{qLeft}}',
@@ -176,7 +176,7 @@ const translations = {
     sectionSubscribe: '订阅套餐', subText: '订阅', subSub: '解锁全部功能', familyText: '家庭共享',
     familySub: '多账号共享套餐', legalLink: '隐私/服务', genTitle: 'AI食谱生成器', genMealType: '分类',
     genCuisine: '菜系', genDishName: '你想吃什么？', optStandard: '日常餐', optBaby: '婴儿餐', optPregnancy: '孕期餐',
-    generate: '生成食谱', generating: '生成中...', aiAssistTitle: 'AI助手', enterQuestion: '针对此食谱提问...',
+    generate: '生成食谱', generating: '生成中...', aiAssistTitle: 'AI助手', enterQuestion: '语音或文字输入...',
     ask: '提问', dishNameHint: '输入食材、菜名或食品名称', watchVideo: '观看视频指南', addToHome: '添加',
     freeLimitInfo: '免费试用：{{used}}/3', starterInfo: '基础订阅：{{used}}/10 | 剩余提问 {{qLeft}}',
     proInfo: '高级订阅：{{used}}/30 | 剩余提问 {{qLeft}}', premiumInfo: '家庭共享：{{used}}/80 | 剩余提问 {{qLeft}}',
@@ -251,7 +251,7 @@ const translations = {
     sectionSubscribe: 'Planes de suscripción', subText: 'Suscribirse', subSub: 'Acceso completo', familyText: 'Compartir en familia',
     familySub: 'Solo Premium', legalLink: 'Privacidad/Términos', genTitle: 'Generador de recetas IA', genMealType: 'Categoría',
     genCuisine: 'Cocina', genDishName: '¿Qué quieres comer?', optStandard: 'Estándar', optBaby: 'Bebé', optPregnancy: 'Embarazo',
-    generate: 'Generar receta', generating: 'Generando...', aiAssistTitle: 'Asistente IA', enterQuestion: 'Pregunta sobre esta receta...',
+    generate: 'Generar receta', generating: 'Generando...', aiAssistTitle: 'Asistente IA', enterQuestion: 'Entrada por voz o texto...',
     ask: 'Preguntar', dishNameHint: 'Ingresa ingredientes, platos o alimentos.', watchVideo: 'Ver guías en video', addToHome: 'Agregar',
     freeLimitInfo: 'Prueba gratuita: {{used}}/3', starterInfo: 'Starter: {{used}}/10 | Preguntas restantes: {{qLeft}}',
     proInfo: 'Pro: {{used}}/30 | Preguntas restantes: {{qLeft}}', premiumInfo: 'Premium Family: {{used}}/80 | Preguntas restantes: {{qLeft}}',
@@ -334,7 +334,7 @@ const translations = {
     sectionSubscribe: 'Formules d\'abonnement', subText: 'S\'abonner', subSub: 'Accès complet', familyText: 'Partage familial',
     familySub: 'Premium uniquement', legalLink: 'Confidentialité/Conditions', genTitle: 'Générateur de recettes IA', genMealType: 'Catégorie',
     genCuisine: 'Cuisine', genDishName: 'Que manger ?', optStandard: 'Standard', optBaby: 'Bébé', optPregnancy: 'Grossesse',
-    generate: 'Générer une recette', generating: 'Génération...', aiAssistTitle: 'Assistant IA', enterQuestion: 'Posez une question sur cette recette...',
+    generate: 'Générer une recette', generating: 'Génération...', aiAssistTitle: 'Assistant IA', enterQuestion: 'Saisie vocale ou textuelle...',
     ask: 'Demander', dishNameHint: 'Saisissez des ingrédients, plats ou aliments.', watchVideo: 'Regarder les guides vidéo', addToHome: 'Ajouter',
     freeLimitInfo: 'Essai gratuit: {{used}}/3', starterInfo: 'Starter: {{used}}/10 | Questions restantes: {{qLeft}}',
     proInfo: 'Pro: {{used}}/30 | Questions restantes: {{qLeft}}', premiumInfo: 'Premium Family: {{used}}/80 | Questions restantes: {{qLeft}}',
@@ -418,7 +418,7 @@ const translations = {
     sectionSubscribe: 'Abonnementpläne', subText: 'Abonnieren', subSub: 'Vollen Zugriff erhalten', familyText: 'Familienfreigabe',
     familySub: 'Nur Premium', legalLink: 'Datenschutz/AGB', genTitle: 'KI-Rezeptgenerator', genMealType: 'Kategorie',
     genCuisine: 'Küche', genDishName: 'Was möchtest du essen?', optStandard: 'Standard', optBaby: 'Baby', optPregnancy: 'Schwangerschaft',
-    generate: 'Rezept generieren', generating: 'Generiere...', aiAssistTitle: 'KI-Assistent', enterQuestion: 'Frage zu diesem Rezept...',
+    generate: 'Rezept generieren', generating: 'Generiere...', aiAssistTitle: 'KI-Assistent', enterQuestion: 'Sprache oder Text eingeben...',
     ask: 'Fragen', dishNameHint: 'Gib Zutaten, Gerichte oder Lebensmittel ein.', watchVideo: 'Videoanleitungen ansehen', addToHome: 'Hinzufügen',
     freeLimitInfo: 'Kostenlose Testversion: {{used}}/3', starterInfo: 'Starter: {{used}}/10 | Fragen übrig: {{qLeft}}',
     proInfo: 'Pro: {{used}}/30 | Fragen übrig: {{qLeft}}', premiumInfo: 'Premium Family: {{used}}/80 | Fragen übrig: {{qLeft}}',
@@ -503,7 +503,7 @@ const translations = {
     sectionSubscribe: 'Piani di abbonamento', subText: 'Abbonati', subSub: 'Accesso completo', familyText: 'Condivisione familiare',
     familySub: 'Solo Premium', legalLink: 'Privacy/Termini', genTitle: 'Generatore di ricette AI', genMealType: 'Categoria',
     genCuisine: 'Cucina', genDishName: 'Cosa vuoi mangiare?', optStandard: 'Standard', optBaby: 'Bebè', optPregnancy: 'Gravidanza',
-    generate: 'Genera ricetta', generating: 'Generazione...', aiAssistTitle: 'Assistente AI', enterQuestion: 'Chiedi informazioni su questa ricetta...',
+    generate: 'Genera ricetta', generating: 'Generazione...', aiAssistTitle: 'Assistente AI', enterQuestion: 'Input vocale o testuale...',
     ask: 'Chiedi', dishNameHint: 'Inserisci ingredienti, piatti o alimenti.', watchVideo: 'Guarda le guide video', addToHome: 'Aggiungi',
     freeLimitInfo: 'Prova gratuita: {{used}}/3', starterInfo: 'Starter: {{used}}/10 | Domande rimaste: {{qLeft}}',
     proInfo: 'Pro: {{used}}/30 | Domande rimaste: {{qLeft}}', premiumInfo: 'Premium Family: {{used}}/80 | Domande rimaste: {{qLeft}}',
@@ -587,7 +587,7 @@ const translations = {
     sectionSubscribe: 'Planos de assinatura', subText: 'Assinar', subSub: 'Acesso completo', familyText: 'Compartilhamento familiar',
     familySub: 'Apenas Premium', legalLink: 'Privacidade/Termos', genTitle: 'Gerador de receitas IA', genMealType: 'Categoria',
     genCuisine: 'Cozinha', genDishName: 'O que comer?', optStandard: 'Padrão', optBaby: 'Bebê', optPregnancy: 'Gravidez',
-    generate: 'Gerar receita', generating: 'Gerando...', aiAssistTitle: 'Assistente IA', enterQuestion: 'Pergunte sobre esta receita...',
+    generate: 'Gerar receita', generating: 'Gerando...', aiAssistTitle: 'Assistente IA', enterQuestion: 'Entrada por voz ou texto...',
     ask: 'Perguntar', dishNameHint: 'Digite ingredientes, pratos ou alimentos.', watchVideo: 'Assistir guias em vídeo', addToHome: 'Adicionar',
     freeLimitInfo: 'Teste gratuito: {{used}}/3', starterInfo: 'Starter: {{used}}/10 | Perguntas restantes: {{qLeft}}',
     proInfo: 'Pro: {{used}}/30 | Perguntas restantes: {{qLeft}}', premiumInfo: 'Premium Family: {{used}}/80 | Perguntas restantes: {{qLeft}}',
@@ -2199,8 +2199,7 @@ function initAiPage() {
   // 清空顶部文案和欢迎语
   if (aiPageTitle) aiPageTitle.innerText = '';
   if (aiPageDesc) aiPageDesc.innerText = '';
-  if (qaHistory) qaHistory.innerHTML = '';
-
+  
   // 输入框占位符与清空
   if (qaInput) {
     qaInput.placeholder = t('enterQuestion') || 'Ask about any food topic...';
