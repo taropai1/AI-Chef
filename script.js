@@ -1578,7 +1578,6 @@ if (moreSelect) {
         'login': 'loginSignUp',
         'subscribe': 'subscribeBtn',
         'profile': 'profileMenu',
-        'howto': 'howToTitle',
         'legal': 'legalLink'
     };
     Array.from(moreSelect.options).forEach(opt => {
@@ -1588,13 +1587,9 @@ if (moreSelect) {
     });
 }
 
-const aiPageTitle = document.getElementById('aiPageTitle');
-const aiPageDesc = document.getElementById('aiPageDesc');
 const aiRecipeBtn = document.querySelector('#aiSelectGroup #btnRecipeMode');
 const aiVideoBtn = document.querySelector('#aiSelectGroup #openVideoBtn');
 const aiQaInput = document.getElementById('qaInput');
-if (aiPageTitle) aiPageTitle.innerText = t('aiAssistTitle') || 'AI Assistant';
-if (aiPageDesc) aiPageDesc.innerText = t('enterQuestion') || 'Ask about any food topic...';
 if (aiRecipeBtn) aiRecipeBtn.textContent = t('recipeShort') || 'Recipes';
 if (aiVideoBtn) aiVideoBtn.textContent = t('videoShort') || 'Videos';
 if (aiQaInput) aiQaInput.placeholder = t('enterQuestion') || 'Ask about any food topic...';
@@ -2123,8 +2118,6 @@ switchGeneratorMode = function(mode) {
 function updateMoreMenu() {
     const loginOpt = document.getElementById('moreLogin');
     const profileOpt = document.getElementById('moreProfile');
-    const loginItem = document.getElementById('moreLogin');
-    const profileItem = document.getElementById('moreProfile');
     
     // 同步文案
     if (loginOpt) loginOpt.textContent = t('loginSignUp') || 'Login / Sign Up';
@@ -2159,11 +2152,11 @@ renderLanguage = function() {
   const profileOpt = document.getElementById('moreProfile');
   const howtoOpt = document.querySelector('#moreSelect option[value="howto"]');
   const legalOpt = document.querySelector('#moreSelect option[value="legal"]');
-  if (loginOpt) loginOpt.textContent = t('loginTitle');
-  if (subscribeOpt) subscribeOpt.textContent = t('pricingTitle');
-  if (profileOpt) profileOpt.textContent = t('profileSub');
+  if (loginOpt) loginOpt.textContent = t('loginSignUp');
+  if (subscribeOpt) subscribeOpt.textContent = t('subscribeBtn');
+  if (profileOpt) profileOpt.textContent = t('profileMenu');
   if (howtoOpt) howtoOpt.textContent = t('howToTitle');
-  if (legalOpt) legalOpt.textContent = t('legalPrivacyTitle');
+  if (legalOpt) legalOpt.textContent = t('legalLink');
   // 更新多语言 select 选项
   const langSelect = document.getElementById('langSelect');
   if (langSelect) {
