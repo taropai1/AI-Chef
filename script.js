@@ -2166,7 +2166,6 @@ updateNavButton = function() {
   originalUpdateNavButton2();
   updateMoreMenu();
 };
-
 // 扩展 renderLanguage 更新导航 select 文字
 const originalRenderLanguage3 = renderLanguage;
 renderLanguage = function() {
