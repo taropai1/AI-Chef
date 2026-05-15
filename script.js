@@ -1097,30 +1097,32 @@ async function askQuestion(containerOverride) {
     const targetLang = langMap[lang] || 'English';
     const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks.`;
 
+    // ===== 上下文记忆构建 messages（放在 fetch 之前）=====
+    const shortQuestion = question.length <= 30;
+    const hasReferenceWords = /它|这|那|这个|那个|其|this|that|it|diese|dieses|esto|eso|ce|cette|questo|questa|isso|esse/i.test(question);
+    const mayReferToPrevious = (hasReferenceWords && shortQuestion) || shortQuestion;
+
+    const messages = [{ role: 'system', content: systemContent }];
+    if (mayReferToPrevious && lastQA.q) {
+        messages.push({ role: 'user', content: lastQA.q });
+        messages.push({ role: 'assistant', content: lastQA.a });
+    }
+    messages.push({ role: 'user', content: question });
+    // ====================================================
+
     const response = await fetch(DEEPSEEK_API, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      // 在 body: JSON.stringify(...) 之前构建 messages
-const shortQuestion = question.length <= 30;
-const hasReferenceWords = /它|这|那|这个|那个|其|this|that|it|diese|dieses|esto|eso|ce|cette|questo|questa|isso|esse/i.test(question);
-const mayReferToPrevious = (hasReferenceWords && shortQuestion) || shortQuestion;
-
-const messages = [{ role: 'system', content: systemContent }];
-if (mayReferToPrevious && lastQA.q) {
-  messages.push({ role: 'user', content: lastQA.q });
-  messages.push({ role: 'assistant', content: lastQA.a });
-}
-messages.push({ role: 'user', content: question });
-
-// 然后在 fetch 的 body 中使用 messages 变量
-body: JSON.stringify({
-  model: 'deepseek-v4-flash',
-  temperature: 0.3,
-  max_tokens: 300,
-  messages: messages,  // 直接引用变量
-  cache_prefix: 'ai_chef_ai_',
-})
-      signal: controller.signal
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'deepseek-v4-flash',
+            temperature: 0.3,
+            max_tokens: 300,
+            messages: messages,
+            cache_prefix: 'ai_chef_ai_',
+        }),
+        signal: controller.signal
     });
+    
     clearTimeout(timeoutId);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
