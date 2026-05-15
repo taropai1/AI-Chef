@@ -69,6 +69,7 @@ let generatorMode = 'recipe'; // 'recipe' | 'qa'
 // 全局发送锁
 let sendLocked = false;
 let postLoginPage = null; // 记录登录后要跳转的页面
+let lastQA = { q: '', a: '' }; // 存储上一轮问答
 
 function unlockSend() {
     sendLocked = false;
@@ -1100,7 +1101,17 @@ async function askQuestion(containerOverride) {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'deepseek-v4-flash', temperature: 0.3, max_tokens: 300,
-        messages: [{ role: 'system', content: systemContent }, { role: 'user', content: question }],
+        // 上下文记忆：三级判定机制
+const shortQuestion = question.length <= 30;
+const hasReferenceWords = /它|这|那|这个|那个|其|this|that|it|diese|dieses|esto|eso|ce|cette|questo|questa|isso|esse/i.test(question);
+const mayReferToPrevious = (hasReferenceWords && shortQuestion) || shortQuestion;
+
+const messages = [{ role: 'system', content: systemContent }];
+if (mayReferToPrevious && lastQA.q) {
+  messages.push({ role: 'user', content: lastQA.q });
+  messages.push({ role: 'assistant', content: lastQA.a });
+}
+messages.push({ role: 'user', content: question });
         cache_prefix: 'ai_chef_ai_',
       }),
       signal: controller.signal
@@ -1113,6 +1124,7 @@ async function askQuestion(containerOverride) {
     if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
 
     addQABubbleTo(historyEl, answer, false);
+    lastQA = { q: question, a: answer };
     historyEl.scrollTop = historyEl.scrollHeight;
 
     await initDeviceId();
@@ -2050,9 +2062,12 @@ if (qaInput) {
   }, 100);
 
   switchGeneratorMode('recipe');
-  document.getElementById('btnAiMode').onclick = function() {
-  switchGeneratorMode('qa');
-  setTimeout(openAiStandalone, 200);
+document.getElementById('btnAiMode').onclick = function() {
+  switchGeneratorMode('qa');                 
+  setTimeout(() => {
+    switchGeneratorMode('recipe');
+    setTimeout(openAiStandalone, 50);
+  }, 150);
 };
 })();
 
