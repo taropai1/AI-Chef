@@ -1099,9 +1099,7 @@ async function askQuestion(containerOverride) {
 
     const response = await fetch(DEEPSEEK_API, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'deepseek-v4-flash', temperature: 0.3, max_tokens: 300,
-        // 上下文记忆：三级判定机制
+      // 在 body: JSON.stringify(...) 之前构建 messages
 const shortQuestion = question.length <= 30;
 const hasReferenceWords = /它|这|那|这个|那个|其|this|that|it|diese|dieses|esto|eso|ce|cette|questo|questa|isso|esse/i.test(question);
 const mayReferToPrevious = (hasReferenceWords && shortQuestion) || shortQuestion;
@@ -1112,8 +1110,15 @@ if (mayReferToPrevious && lastQA.q) {
   messages.push({ role: 'assistant', content: lastQA.a });
 }
 messages.push({ role: 'user', content: question });
-        cache_prefix: 'ai_chef_ai_',
-      }),
+
+// 然后在 fetch 的 body 中使用 messages 变量
+body: JSON.stringify({
+  model: 'deepseek-v4-flash',
+  temperature: 0.3,
+  max_tokens: 300,
+  messages: messages,  // 直接引用变量
+  cache_prefix: 'ai_chef_ai_',
+})
       signal: controller.signal
     });
     clearTimeout(timeoutId);
