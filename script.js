@@ -2158,17 +2158,6 @@ function updateMoreMenu() {
     // 同步文案
     if (loginOpt) loginOpt.textContent = t('loginSignUp') || 'Login / Sign Up';
     if (profileOpt) profileOpt.textContent = t('profileMenu') || 'Profile';
-    
-    // 显示/隐藏
-    if (loginItem && profileItem) {
-        if (userData && userData.email) {
-            loginItem.style.display = 'none';
-            profileItem.style.display = 'block';
-        } else {
-            loginItem.style.display = 'block';
-            profileItem.style.display = 'none';
-        }
-    }
 }
 
 // 扩展 updateNavButton
