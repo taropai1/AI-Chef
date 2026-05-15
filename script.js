@@ -2050,7 +2050,10 @@ if (qaInput) {
   }, 100);
 
   switchGeneratorMode('recipe');
-  document.getElementById('btnAiMode').onclick = openAiStandalone;
+  document.getElementById('btnAiMode').onclick = function() {
+  switchGeneratorMode('qa');
+  setTimeout(openAiStandalone, 200);
+};
 })();
 
 // ==================== 导航栏交互 ====================
