@@ -1135,7 +1135,7 @@ async function askQuestion(containerOverride) {
     historyEl.scrollTop = historyEl.scrollHeight;
 
     await initDeviceId();
-    const res = await apiCall('/api/user/record-ai-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
+    const res = await apiCall('/api/user/record-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
     if (plan === 'free' || plan === 'starter') {
       userData.aiTrialUsed = res.aiTrialUsed;
     } else {
