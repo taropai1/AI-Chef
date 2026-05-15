@@ -1830,26 +1830,37 @@ document.addEventListener('change', function(e) {
 });
 
 function switchGeneratorMode(mode) {
-  // 仅保留 recipe 模式，任何其他模式均忽略
-  if (mode !== 'recipe') return;
-  generatorMode = 'recipe';
   const slider = document.getElementById('modeSlider');
-  const modeDesc = document.getElementById('modeDesc');
+  const btns = document.querySelectorAll('.mode-btn');
   const recipeContent = document.getElementById('recipeContentWrapper');
   const qaContent = document.getElementById('qaContent');
-  const btns = document.querySelectorAll('.mode-btn');
+  const modeDesc = document.getElementById('modeDesc');
 
   btns.forEach(b => b.classList.remove('active'));
-  if (slider) slider.classList.remove('right');
-  if (btns[0]) btns[0].classList.add('active');
 
-  if (modeDesc) {
-    modeDesc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
-    modeDesc.classList.add('left-indent');
-    modeDesc.classList.remove('right-normal');
+  if (mode === 'recipe') {
+    generatorMode = 'recipe';
+    if (slider) slider.classList.remove('right');
+    if (btns[0]) btns[0].classList.add('active');
+    if (modeDesc) {
+      modeDesc.textContent = t('dishNameHint') || 'Enter ingredients, dish names or food items.';
+      modeDesc.classList.add('left-indent');
+      modeDesc.classList.remove('right-normal');
+    }
+    if (recipeContent) recipeContent.classList.add('show');
+    if (qaContent) qaContent.classList.remove('show');
+  } else if (mode === 'qa') {
+    // 仅为视觉效果，不切换 generatorMode，不显示问答区
+    if (slider) slider.classList.add('right');
+    if (btns[1]) btns[1].classList.add('active');
+    if (modeDesc) {
+      modeDesc.textContent = t('enterQuestion') || 'Ask about any food topic...';
+      modeDesc.classList.add('right-normal');
+      modeDesc.classList.remove('left-indent');
+    }
+    if (recipeContent) recipeContent.classList.remove('show');
+    if (qaContent) qaContent.classList.remove('show');
   }
-  if (recipeContent) recipeContent.classList.add('show');
-  if (qaContent) qaContent.classList.remove('show');
 }
 
 function backToGenerator() {
