@@ -2358,8 +2358,8 @@ async function askQuestion(containerOverride) {
     const lang = getCurrentLang();
     const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
     const targetLang = langMap[lang] || 'English';
-    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks.`;
-
+    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 6 lines). Do not use asterisks. If a conversation history is provided, you MUST use it to understand context and answer follow-up questions accurately.`;
+    
     const response = await fetch(DEEPSEEK_API, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2374,7 +2374,7 @@ async function askQuestion(containerOverride) {
     const data = await response.json();
     let answer = data.choices[0].message.content.replace(/\*/g, '');
     const lines = answer.split('\n');
-    if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
+    if (lines.length > 6) answer = lines.slice(0, 6).join('\n');
 
     addQABubbleTo(historyEl, answer, false);
     historyEl.scrollTop = historyEl.scrollHeight;
