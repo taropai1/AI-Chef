@@ -142,7 +142,7 @@ const translations = {
     featureBusiness2: '300 AI questions per day', featureBusiness3: 'Priority generation queue', featureBusiness4: 'Commercial usage rights',
     featureBusiness5: 'Extended recipe permissions', freeTierDesc: "You're on the free tier.", promoTitle: 'Go Premium',
     promoSub: 'Unlock everything for your cooking', promoFeature1: 'Unlimited recipes', promoFeature2: 'Family sharing',
-    promoFeature3: 'Nutrition insights', promoFeature4: 'Ad-free experience',personalizedGreeting: 'Dear Gourmet! Enjoy your meal!', howToUse: 'How to use', qLeft: 'Q left',
+    promoFeature3: 'Nutrition insights', promoFeature4: 'Ad-free experience',personalizedGreeting: 'Dear Gourmet! Enjoy your meal!', howToUse: 'How to use', qLeft: 'AI Assistant: {{remaining}} left',
     howToTitle: 'How to use', ingredients: 'Ingredients', instructions: 'Instructions', nutrition: 'Nutrition', warnings: 'Allergens & Safety', minutes: 'mins',
     howToList: [
       'You can enter one or more ingredients, such as potatoes, spinach, chicken breast, salmon.',
@@ -168,7 +168,7 @@ const translations = {
     homeSubscriptionLink: 'Subscription', 
     inputPlaceholder: 'Tap the category and cuisine buttons, choose what you want to eat!', generating: 'Generating your recipe...', generateFailed: 'Load failed, please try again!',
     trendingVideos: 'Trending Videos', language: 'Language', more: 'More', recipeShort: 'Recipes', videoShort: 'Videos', loginSignUp: 'Login / Sign Up', profileMenu: 'Profile', addToHome: 'Share / Add to Home',
-    subscribeBtn: 'Subscribe Now',
+    subscribeBtn: 'Subscribe Now', freeTrialStatus: 'Recipes left: {{recipeLeft}}/3, AI questions left: {{aiLeft}}/10',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -218,7 +218,7 @@ const translations = {
     featurePremium5: '健康与营养分析', featureBusiness1: '每日 300 次生成', featureBusiness2: '每日300次AI问答', featureBusiness3: '优先生成队列',
     featureBusiness4: '商业使用授权', featureBusiness5: '扩展食谱权限', freeTierDesc: '您当前为免费用户。', promoTitle: '升级高级版',
     promoSub: '解锁全部烹饪功能', promoFeature1: '无限食谱生成', promoFeature2: '家庭共享', promoFeature3: '营养分析', promoFeature4: '无广告体验',
-    howToTitle: '使用说明', ingredients: '食材准备', instructions: '制作方法', nutrition: '营养参数', warnings: '风险提示与建议', minutes: '分钟', personalizedGreeting: '亲爱的美食家！祝您用餐愉快！', howToUse: '使用说明', qLeft: '剩余提问',
+    howToTitle: '使用说明', ingredients: '食材准备', instructions: '制作方法', nutrition: '营养参数', warnings: '风险提示与建议', minutes: '分钟', personalizedGreeting: '亲爱的美食家！祝您用餐愉快！', howToUse: '使用说明', qLeft: 'AI助手：剩余{{remaining}}次',
     howToList: [
       '可输入单种或多种食材，例如：土豆、菠菜、鸡胸肉、三文鱼。',
       '可搜索各类经典餐食，例如：炙烤牛排、烤杂蔬、煎蛋卷、意面。',
@@ -243,7 +243,7 @@ const translations = {
     homeSubscriptionLink: '订阅',
     inputPlaceholder: '点开分类和菜系按钮，选择你想吃的美味!', generating: '正在生成食谱...', generateFailed: '加载失败，请重试！',
     trendingVideos: '热门视频', language: '语言', more: '更多',recipeShort: '食谱',videoShort: '视频',loginSignUp: '登录/注册', profileMenu: '个人账户', addToHome: '分享/加到主屏',
-    subscribeBtn: '付费订阅',
+    subscribeBtn: '付费订阅', freeTrialStatus: '食谱剩余：{{recipeLeft}}/3 次，AI问答剩余：{{aiLeft}}/10 次',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
@@ -304,7 +304,7 @@ const translations = {
     featureBusiness1: '300 generaciones diarias', featureBusiness2: '300 preguntas IA al día', featureBusiness3: 'Cola de generación prioritaria',
     featureBusiness4: 'Derechos de uso comercial', featureBusiness5: 'Permisos extendidos de recetas', freeTierDesc: 'Estás en el nivel gratuito.',
     promoTitle: 'Hazte Premium', promoSub: 'Desbloquea todo para tu cocina', promoFeature1: 'Recetas ilimitadas', promoFeature2: 'Compartir en familia',
-    promoFeature3: 'Información nutricional', promoFeature4: 'Sin anuncios', personalizedGreeting: '¡Querido Gourmet! ¡Buen provecho!', howToUse: 'Guía de uso', qLeft: 'Preguntas pendientes',
+    promoFeature3: 'Información nutricional', promoFeature4: 'Sin anuncios', personalizedGreeting: '¡Querido Gourmet! ¡Buen provecho!', howToUse: 'Guía de uso', qLeft: 'Asistente IA: {{remaining}} restantes',
     howToList: [
       'Puedes ingresar uno o más ingredientes, como papas, espinacas, pechuga de pollo, salmón.',
       'Puedes buscar platos y comidas clásicas, como bistec a la parrilla, verduras asadas, tortilla, pasta.',
@@ -326,7 +326,7 @@ const translations = {
     homeSubscriptionLink: 'Suscripción',
     inputPlaceholder: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!', generating: 'Generando tu receta...', generateFailed: 'Error de carga, inténtalo de nuevo!',
     trendingVideos: 'Tendencias', language: 'Idioma', more: 'Más', recipeShort: 'Recetas', videoShort: 'Videos', loginSignUp: 'Ingresar / Registrarse', profileMenu: 'Perfil', addToHome: 'Compartir / Añadir al inicio',
-    subscribeBtn: 'Suscríbete Ya',
+    subscribeBtn: 'Suscríbete Ya', freeTrialStatus: 'Recetas restantes: {{recipeLeft}}/3, Preguntas IA restantes: {{aiLeft}}/10',
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -388,7 +388,7 @@ const translations = {
     featureBusiness4: 'Droits d\'utilisation commerciale', featureBusiness5: 'Autorisations étendues sur les recettes', freeTierDesc: 'Vous êtes sur le niveau gratuit.',
     promoTitle: 'Passez à Premium', promoSub: 'Débloquez tout pour votre cuisine', promoFeature1: 'Recettes illimitées',
     promoFeature2: 'Partage familial', promoFeature3: 'Informations nutritionnelles', promoFeature4: 'Sans publicité',
-    howToTitle: 'Comment utiliser', warnings: 'Allergènes et Sécurité', personalizedGreeting: 'Cher Gourmet ! Bon appétit !', howToUse: 'Guide d\'utilisation', qLeft: 'Questions restantes',
+    howToTitle: 'Comment utiliser', warnings: 'Allergènes et Sécurité', personalizedGreeting: 'Cher Gourmet ! Bon appétit !', howToUse: 'Guide d\'utilisation', qLeft: 'Assistant IA:{{remaining}} restant',
     howToList: [
       'Vous pouvez entrer un ou plusieurs ingrédients, comme des pommes de terre, épinards, blanc de poulet, saumon.',
       'Vous pouvez rechercher des plats et repas classiques, comme steak grillé, légumes rôtis, omelette, pâtes.',
@@ -410,7 +410,7 @@ const translations = {
     homeSubscriptionLink: 'Abonnement',
     inputPlaceholder: 'Cliquez sur les boutons des catégories et cuisines, choisissez ce que vous voulez déguster!', generating: 'Génération de votre recette...', generateFailed: 'Échec du chargement, réessayez!',
     trendingVideos: 'Tendances', language: 'Langue', more: 'Plus', recipeShort: 'Recettes', videoShort: 'Vidéos', loginSignUp: 'Connexion / Inscription', profileMenu: 'Profil', addToHome: "Partager / Ajouter à l'accueil",
-    subscribeBtn: "S'abonner Maintenant",
+    subscribeBtn: "S'abonner Maintenant", freeTrialStatus: 'Recettes restantes : {{recipeLeft}}/3, Questions IA restantes : {{aiLeft}}/10',
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -473,7 +473,7 @@ const translations = {
     featureBusiness4: 'Kommerzielle Nutzungsrechte', featureBusiness5: 'Erweiterte Rezeptberechtigungen', freeTierDesc: 'Sie befinden sich in der kostenlosen Stufe.',
     promoTitle: 'Premium sichern', promoSub: 'Alles für Ihre Küche freischalten', promoFeature1: 'Unbegrenzte Rezepte',
     promoFeature2: 'Familienfreigabe', promoFeature3: 'Nährwertanalyse', promoFeature4: 'Werbefrei',
-    howToTitle: 'Verwendung', warnings: 'Allergene & Sicherheit', personalizedGreeting: 'Lieber Gourmet! Guten Appetit!', howToUse: 'Benutzerhandbuch', qLeft: 'Offene Fragen',     
+    howToTitle: 'Verwendung', warnings: 'Allergene & Sicherheit', personalizedGreeting: 'Lieber Gourmet! Guten Appetit!', howToUse: 'Benutzerhandbuch', qLeft: 'KI-Assistent:{{remaining}} übrig',     
     howToList: [
       'Sie können eine oder mehrere Zutaten eingeben, wie Kartoffeln, Spinat, Hähnchenbrust, Lachs.',
       'Sie können nach klassischen Gerichten und Mahlzeiten suchen, wie gegrilltes Steak, Ofengemüse, Omelett, Pasta.',
@@ -495,7 +495,7 @@ const translations = {
     homeSubscriptionLink: 'Abonnement',
     inputPlaceholder: 'Tippe auf Kategorie- und Küchenbuttons, wähle was du essen möchtest!', generating: 'Ihr Rezept wird erstellt...', generateFailed: 'Laden fehlgeschlagen, bitte erneut versuchen!',
     trendingVideos: 'Trends', language: 'Sprache', more: 'Mehr', recipeShort: 'Rezepte', videoShort: 'Videos', loginSignUp: 'Anmelden / Registrieren', profileMenu: 'Profil', addToHome: 'Teilen / Zur Startseite',
-    subscribeBtn: 'Jetzt Abonnieren',
+    subscribeBtn: 'Jetzt Abonnieren', freeTrialStatus: 'Rezepte übrig: {{recipeLeft}}/3, KI-Fragen übrig: {{aiLeft}}/10',
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -556,7 +556,7 @@ const translations = {
     featureBusiness1: '300 generazioni al giorno', featureBusiness2: '300 domande IA al giorno', featureBusiness3: 'Coda di generazione prioritaria',
     featureBusiness4: 'Diritti di utilizzo commerciale', featureBusiness5: 'Permessi estesi sulle ricette', freeTierDesc: 'Sei nel livello gratuito.',
     promoTitle: 'Passa a Premium', promoSub: 'Sblocca tutto per la tua cucina', promoFeature1: 'Ricette illimitate', promoFeature2: 'Condivisione familiare',
-    promoFeature3: 'Informazioni nutrizionali', promoFeature4: 'Senza pubblicità', personalizedGreeting: 'Caro Gourmet! Buon appetito!', howToUse: 'Guida all\'uso', qLeft: 'Domande in sospeso',
+    promoFeature3: 'Informazioni nutrizionali', promoFeature4: 'Senza pubblicità', personalizedGreeting: 'Caro Gourmet! Buon appetito!', howToUse: 'Guida all\'uso', qLeft: 'Assistente AI:{{remaining}} rimasti',
     howToTitle: 'Come usare', warnings: 'Allergeni e Sicurezza',
     howToList: [
       'Puoi inserire uno o più ingredienti, come patate, spinaci, petto di pollo, salmone.',
@@ -579,7 +579,7 @@ const translations = {
     homeSubscriptionLink: 'Abbonamento',
     inputPlaceholder: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!', generating: 'Generando la tua ricetta...', generateFailed: 'Caricamento fallito, riprova!',
     trendingVideos: 'Tendenze', language: 'Lingua', more: 'Altro', recipeShort: 'Ricette', videoShort: 'Video', loginSignUp: 'Accedi / Registrati', profileMenu: 'Profilo', addToHome: 'Condividi / Aggiungi alla home',
-    subscribeBtn: 'Abbonati Subito',
+    subscribeBtn: 'Abbonati Subito', freeTrialStatus: 'Ricette rimanenti: {{recipeLeft}}/3, Domande IA rimanenti: {{aiLeft}}/10',
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -641,7 +641,7 @@ const translations = {
     featureBusiness4: 'Direitos de uso comercial', featureBusiness5: 'Permissões estendidas de receitas', freeTierDesc: 'Você está no nível gratuito.',
     promoTitle: 'Seja Premium', promoSub: 'Desbloqueie tudo para sua cozinha', promoFeature1: 'Receitas ilimitadas', promoFeature2: 'Compartilhamento familiar',
     promoFeature3: 'Informações nutricionais', promoFeature4: 'Sem anúncios',
-    howToTitle: 'Como usar', warnings: 'Alérgenos e Segurança', personalizedGreeting: 'Querido Gourmet! Bom apetite!', howToUse: 'Guia de uso', qLeft: 'Perguntas pendentes',
+    howToTitle: 'Como usar', warnings: 'Alérgenos e Segurança', personalizedGreeting: 'Querido Gourmet! Bom apetite!', howToUse: 'Guia de uso', qLeft: 'Assistente IA:{{remaining}} restantes',
     howToTitle: 'Cómo usar', warnings: 'Alérgenos y Seguridad',
     howToList: [
       'Você pode inserir um ou mais ingredientes, como batatas, espinafre, peito de frango, salmão.',
@@ -664,7 +664,7 @@ const translations = {
     homeSubscriptionLink: 'Assinatura',
     inputPlaceholder: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!', generating: 'Gerando sua receita...', generateFailed: 'Falha no carregamento, tente novamente!',
     trendingVideos: 'Tendências', language: 'Idioma', more: 'Mais', recipeShort: 'Receitas', videoShort: 'Vídeos', loginSignUp: 'Entrar / Cadastrar', profileMenu: 'Perfil', addToHome: 'Compartilhar / Adicionar à home',
-    subscribeBtn: 'Assine Agora',
+    subscribeBtn: 'Assine Agora', freeTrialStatus: 'Receitas restantes: {{recipeLeft}}/3, Perguntas IA restantes: {{aiLeft}}/10',
   },
 }
 function t(key, params) {
@@ -1243,17 +1243,15 @@ function initAiPage() {
     }
 
     // 配额提示（仅登录用户）
-    if (qaLimitNote && userData) {
-        const plan = userData.plan || 'free';
-        if (plan === 'free' || plan === 'starter') {
-            const remaining = Math.max(0, 10 - (userData.aiTrialUsed || 0));
-            qaLimitNote.innerText = `AI 试用：剩余 ${remaining} / 10 次`;
-        } else {
-            const dailyLimit = PLANS[plan]?.aiDailyLimit || 0;
-            const remaining = dailyLimit - (userData.aiDailyUsed || 0);
-            qaLimitNote.innerText = `AI 剩余：${remaining} 次`;
-        }
+if (qaLimitNote && userData) {
+    const plan = userData.plan || 'free';
+    if (plan === 'free' || plan === 'starter') {
+        const remaining = Math.max(0, 10 - (userData.aiTrialUsed || 0));
+        qaLimitNote.innerText = t('qLeft', { remaining });
+    } else {
+        qaLimitNote.innerText = '';  // 付费用户不显示配额提示
     }
+}
 }
 
 // ==================== 视频模块 ====================
@@ -1769,13 +1767,14 @@ function renderProfile() {
   else { const expireStr = userData.expireAt ? new Date(userData.expireAt).toLocaleDateString() : ''; subExpiryEl.innerText = expireStr ? `${planDisplay} · Expires ${expireStr}` : planDisplay; }
   const aiTrialInfoEl = document.getElementById('aiTrialInfo');
 if (aiTrialInfoEl) {
-  if (plan === 'free' || plan === 'starter') {
-    const remaining = Math.max(0, 10 - (userData.aiTrialUsed || 0));
-    aiTrialInfoEl.innerText = `AI 助手试用：剩余 ${remaining} / 10 次`;
-    aiTrialInfoEl.style.display = 'block';
-  } else {
-    aiTrialInfoEl.style.display = 'none';
-  }
+    if (plan === 'free' || plan === 'starter') {
+        const recipeLeft = Math.max(0, 3 - (userData.freeUsed || 0));
+        const aiLeft = Math.max(0, 10 - (userData.aiTrialUsed || 0));
+        aiTrialInfoEl.innerText = t('freeTrialStatus', { recipeLeft, aiLeft });
+        aiTrialInfoEl.style.display = 'block';
+    } else {
+        aiTrialInfoEl.style.display = 'none';
+    }
 }
   const familyArea = document.getElementById('familyArea');
   if (plan === 'premium') { familyArea.style.display = 'block'; document.getElementById('ownerInviteCode').innerText = t('inviteCodeTitle') + ': ' + (userData.inviteCode || ''); }
