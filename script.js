@@ -1110,6 +1110,9 @@ async function askQuestion(containerOverride) {
     messages.push({ role: 'user', content: question });
     // ====================================================
 
+    console.log('当前 lastQA:', JSON.stringify(lastQA));
+console.log('发送的 messages:', JSON.stringify(messages));
+   
     const response = await fetch(DEEPSEEK_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1132,6 +1135,9 @@ async function askQuestion(containerOverride) {
 
     addQABubbleTo(historyEl, answer, false);
     lastQA = { q: question, a: answer };
+
+    console.log('已存储 lastQA:', JSON.stringify(lastQA));
+    
     historyEl.scrollTop = historyEl.scrollHeight;
 
     await initDeviceId();
