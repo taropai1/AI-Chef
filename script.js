@@ -167,7 +167,7 @@ const translations = {
     homeBottomDesc: 'Type any food-related keywords to explore endless recipes. Get popular, authentic dishes from worldwide cuisines with AI.',
     homeSubscriptionLink: 'Subscription', 
     inputPlaceholder: 'Tap the category and cuisine buttons, choose what you want to eat!', generating: 'Generating your recipe...', generateFailed: 'Load failed, please try again!',
-    trendingVideos: 'Trending Videos', language: 'Language', more: 'More', recipeShort: 'Recipes', videoShort: 'Videos', loginSignUp: 'Login / Sign Up', profileMenu: 'Profile', addToHome: 'Add to Home',
+    trendingVideos: 'Trending Videos', language: 'Language', more: 'More', recipeShort: 'Recipes', videoShort: 'Videos', loginSignUp: 'Login / Sign Up', profileMenu: 'Profile', addToHome: 'Share / Add to Home',
     subscribeBtn: 'Subscribe Now',
   },
   'zh-CN': {
@@ -242,7 +242,7 @@ const translations = {
     homeBottomDesc: '输入任意美食关键词，探索无限食谱。AI 带你解锁全球热门地道菜品。',
     homeSubscriptionLink: '订阅',
     inputPlaceholder: '点开分类和菜系按钮，选择你想吃的美味!', generating: '正在生成食谱...', generateFailed: '加载失败，请重试！',
-    trendingVideos: '热门视频', language: '语言', more: '更多',recipeShort: '食谱',videoShort: '视频',loginSignUp: '登录/注册', profileMenu: '个人账户', addToHome: '添加屏幕',
+    trendingVideos: '热门视频', language: '语言', more: '更多',recipeShort: '食谱',videoShort: '视频',loginSignUp: '登录/注册', profileMenu: '个人账户', addToHome: '分享/加到主屏',
     subscribeBtn: '付费订阅',
   },
   es: {
@@ -325,7 +325,7 @@ const translations = {
     homeBottomTitle: 'Sencillo. Rápido. Delicioso.', homeBottomDesc: 'Escribe cualquier palabra clave relacionada con comida para explorar recetas infinitas. Obtén platos populares y auténticos de cocinas del mundo con IA.',
     homeSubscriptionLink: 'Suscripción',
     inputPlaceholder: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!', generating: 'Generando tu receta...', generateFailed: 'Error de carga, inténtalo de nuevo!',
-    trendingVideos: 'Tendencias', language: 'Idioma', more: 'Más', recipeShort: 'Recetas', videoShort: 'Videos', loginSignUp: 'Ingresar / Registrarse', profileMenu: 'Perfil', addToHome: 'Añadir a Inicio',
+    trendingVideos: 'Tendencias', language: 'Idioma', more: 'Más', recipeShort: 'Recetas', videoShort: 'Videos', loginSignUp: 'Ingresar / Registrarse', profileMenu: 'Perfil', addToHome: 'Compartir / Añadir al inicio',
     subscribeBtn: 'Suscríbete Ya',
   },
   fr: {
@@ -409,7 +409,7 @@ const translations = {
     homeBottomTitle: 'Simple. Rapide. Délicieux.', homeBottomDesc: 'Tapez n\'importe quel mot-clé culinaire pour explorer des recettes infinies. Obtenez des plats populaires et authentiques de cuisines du monde avec l\'IA.',
     homeSubscriptionLink: 'Abonnement',
     inputPlaceholder: 'Cliquez sur les boutons des catégories et cuisines, choisissez ce que vous voulez déguster!', generating: 'Génération de votre recette...', generateFailed: 'Échec du chargement, réessayez!',
-    trendingVideos: 'Tendances', language: 'Langue', more: 'Plus', recipeShort: 'Recettes', videoShort: 'Vidéos', loginSignUp: 'Connexion / Inscription', profileMenu: 'Profil', addToHome: "Ajouter à l'accueil",
+    trendingVideos: 'Tendances', language: 'Langue', more: 'Plus', recipeShort: 'Recettes', videoShort: 'Vidéos', loginSignUp: 'Connexion / Inscription', profileMenu: 'Profil', addToHome: "Partager / Ajouter à l'accueil",
     subscribeBtn: "S'abonner Maintenant",
   },
   de: {
@@ -494,7 +494,7 @@ const translations = {
     homeBottomTitle: 'Einfach. Schnell. Lecker.', homeBottomDesc: 'Gib einfach Lebensmittel-Schlüsselwörter ein, um endlose Rezepte zu entdecken. Hol dir beliebte, authentische Gerichte aus aller Welt mit KI.',
     homeSubscriptionLink: 'Abonnement',
     inputPlaceholder: 'Tippe auf Kategorie- und Küchenbuttons, wähle was du essen möchtest!', generating: 'Ihr Rezept wird erstellt...', generateFailed: 'Laden fehlgeschlagen, bitte erneut versuchen!',
-    trendingVideos: 'Trends', language: 'Sprache', more: 'Mehr', recipeShort: 'Rezepte', videoShort: 'Videos', loginSignUp: 'Anmelden / Registrieren', profileMenu: 'Profil', addToHome: 'Zur Startseite hinzufügen',
+    trendingVideos: 'Trends', language: 'Sprache', more: 'Mehr', recipeShort: 'Rezepte', videoShort: 'Videos', loginSignUp: 'Anmelden / Registrieren', profileMenu: 'Profil', addToHome: 'Teilen / Zur Startseite',
     subscribeBtn: 'Jetzt Abonnieren',
   },
   it: {
@@ -578,7 +578,7 @@ const translations = {
     homeBottomTitle: 'Semplice. Veloce. Delizioso.', homeBottomDesc: 'Inserisci qualsiasi parola chiave culinaria per esplorare ricette infinite. Ottieni piatti popolari e autentici da cucine di tutto il mondo con l\'IA.',
     homeSubscriptionLink: 'Abbonamento',
     inputPlaceholder: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!', generating: 'Generando la tua ricetta...', generateFailed: 'Caricamento fallito, riprova!',
-    trendingVideos: 'Tendenze', language: 'Lingua', more: 'Altro', recipeShort: 'Ricette', videoShort: 'Video', loginSignUp: 'Accedi / Registrati', profileMenu: 'Profilo', addToHome: 'Aggiungi alla Home',
+    trendingVideos: 'Tendenze', language: 'Lingua', more: 'Altro', recipeShort: 'Ricette', videoShort: 'Video', loginSignUp: 'Accedi / Registrati', profileMenu: 'Profilo', addToHome: 'Condividi / Aggiungi alla home',
     subscribeBtn: 'Abbonati Subito',
   },
   pt: {
@@ -663,7 +663,7 @@ const translations = {
     homeBottomTitle: 'Simples. Rápido. Delicioso.', homeBottomDesc: 'Digite qualquer palavra-chave relacionada a comida para explorar receitas infinitas. Obtenha pratos populares e autênticos de culinárias do mundo com IA.',
     homeSubscriptionLink: 'Assinatura',
     inputPlaceholder: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!', generating: 'Gerando sua receita...', generateFailed: 'Falha no carregamento, tente novamente!',
-    trendingVideos: 'Tendências', language: 'Idioma', more: 'Mais', recipeShort: 'Receitas', videoShort: 'Vídeos', loginSignUp: 'Entrar / Cadastrar', profileMenu: 'Perfil', addToHome: 'Adicionar à Tela Inicial',
+    trendingVideos: 'Tendências', language: 'Idioma', more: 'Mais', recipeShort: 'Receitas', videoShort: 'Vídeos', loginSignUp: 'Entrar / Cadastrar', profileMenu: 'Perfil', addToHome: 'Compartilhar / Adicionar à home',
     subscribeBtn: 'Assine Agora',
   },
 }
