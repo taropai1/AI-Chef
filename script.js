@@ -1058,99 +1058,204 @@ function updateLimitInfo() {
 
 // ==================== 问答 ====================
 async function askQuestion(containerOverride) {
-  const container = containerOverride || document;
-  const isAiPage = document.getElementById('page-ai-assistant').classList.contains('active');
-  // 如果未传入容器，自动选择当前活跃页面
-  const targetContainer = containerOverride || (isAiPage ? document.getElementById('page-ai-assistant') : document);
+    const container = containerOverride || document;
+    const isAiPage = document.getElementById('page-ai-assistant').classList.contains('active');
+    const targetContainer = containerOverride || (isAiPage ? document.getElementById('page-ai-assistant') : document);
 
-  if (!userData) {
-    postLoginPage = 'page-ai-assistant';  // ← 插入这一行
-    alert(t('pleaseLogin'));
-    return;
-}
-  const qaInput = targetContainer.querySelector('#qaInput');
-  const question = qaInput ? qaInput.value.trim() : '';
-  if (!question) return;
-
-  const plan = userData.plan || 'free';
-  if (plan === 'free' || plan === 'starter') {
-    const trialUsed = userData.aiTrialUsed || 0;
-    if (trialUsed >= 10) { alert(t('aiTrialUsedUp')); showPage('page-subscribe'); return; }
-  }
-  if (plan === 'pro' || plan === 'premium' || plan === 'business') {
-    const aiLimit = PLANS[plan]?.aiDailyLimit || 0;
-    if ((userData.aiDailyUsed || 0) >= aiLimit) { alert(t('aiDailyLimitReached')); return; }
-  }
-
-  const qaSendBtn = targetContainer.querySelector('#qaSendBtn');
-  if (qaSendBtn) qaSendBtn.disabled = true;
-  const historyEl = targetContainer.querySelector('#qaHistory');
-  addQABubbleTo(historyEl, question, true);
-  historyEl.scrollTop = historyEl.scrollHeight;
-  qaInput.value = '';
-
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const lang = getCurrentLang();
-    const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
-    const targetLang = langMap[lang] || 'English';
-    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 6 lines). Do not use asterisks. If a conversation history is provided, you MUST use it to understand context and answer follow-up questions accurately.`;
-    
-    // ===== 上下文记忆构建 messages（放在 fetch 之前）=====
-    const shortQuestion = question.length <= 30;
-    const hasReferenceWords = /它|这|那|这个|那个|其|this|that|it|diese|dieses|esto|eso|ce|cette|questo|questa|isso|esse/i.test(question);
-    const mayReferToPrevious = (hasReferenceWords && shortQuestion) || shortQuestion;
-
-    const messages = [{ role: 'system', content: systemContent }];
-    if (mayReferToPrevious && lastQA.q) {
-        messages.push({ role: 'user', content: lastQA.q });
-        messages.push({ role: 'assistant', content: lastQA.a });
+    if (!userData) {
+        postLoginPage = 'page-ai-assistant';
+        alert(t('pleaseLogin'));
+        return;
     }
-    messages.push({ role: 'user', content: question });
-    // ====================================================
+    const qaInput = targetContainer.querySelector('#qaInput');
+    const question = qaInput ? qaInput.value.trim() : '';
+    if (!question) return;
 
-    const response = await fetch(DEEPSEEK_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            model: 'deepseek-v4-flash',
-            temperature: 0.3,
-            max_tokens: 300,
-            messages: messages,
-            cache_prefix: 'ai_chef_ai_',
-        }),
-        signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    let answer = data.choices[0].message.content.replace(/\*/g, '');
-    const lines = answer.split('\n');
-    if (lines.length > 5) answer = lines.slice(0, 5).join('\n');
-
-    addQABubbleTo(historyEl, answer, false);
-    lastQA = { q: question, a: answer };
-    
-    historyEl.scrollTop = historyEl.scrollHeight;
-
-    await initDeviceId();
-    const res = await apiCall('/api/user/record-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
+    const plan = userData.plan || 'free';
     if (plan === 'free' || plan === 'starter') {
-      userData.aiTrialUsed = res.aiTrialUsed;
-    } else {
-      userData.aiDailyUsed = res.aiDailyUsed;
-      const remaining = (PLANS[plan]?.aiDailyLimit || 0) - userData.aiDailyUsed;
-      const limitNote = targetContainer.querySelector('#qaLimitNote');
-      if (limitNote) limitNote.innerText = `${t('aiQuestionsLeft')}: ${remaining}`;
+        const trialUsed = userData.aiTrialUsed || 0;
+        if (trialUsed >= 10) {
+            alert(t('aiTrialUsedUp'));
+            showPage('page-subscribe');
+            return;
+        }
     }
-  } catch (error) {
-    addQABubbleTo(historyEl, 'Error, please try again.', false);
-  } finally {
-    unlockSend();
-  }
+    if (plan === 'pro' || plan === 'premium' || plan === 'business') {
+        const aiLimit = PLANS[plan]?.aiDailyLimit || 0;
+        if ((userData.aiDailyUsed || 0) >= aiLimit) {
+            alert(t('aiDailyLimitReached'));
+            return;
+        }
+    }
+
+    const qaSendBtn = targetContainer.querySelector('#qaSendBtn');
+    if (qaSendBtn) qaSendBtn.disabled = true;
+    const historyEl = targetContainer.querySelector('#qaHistory');
+    addQABubbleTo(historyEl, question, true);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    qaInput.value = '';
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        const lang = getCurrentLang();
+        const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
+        const targetLang = langMap[lang] || 'English';
+        const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 6 lines). Do not use asterisks. If a conversation history is provided, you MUST use it to understand context and answer follow-up questions accurately.`;
+
+        // 三级判定构建消息
+        const shortQuestion = question.length <= 30;
+        const hasReferenceWords = /它|这|那|这个|那个|其|this|that|it|diese|dieses|esto|eso|ce|cette|questo|questa|isso|esse/i.test(question);
+        const mayReferToPrevious = (hasReferenceWords && shortQuestion) || shortQuestion;
+
+        const messages = [{ role: 'system', content: systemContent }];
+        if (mayReferToPrevious && lastQA.q) {
+            messages.push({ role: 'user', content: lastQA.q });
+            messages.push({ role: 'assistant', content: lastQA.a });
+        }
+        messages.push({ role: 'user', content: question });
+
+        const response = await fetch(DEEPSEEK_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'deepseek-v4-flash',
+                temperature: 0.3,
+                max_tokens: 300,
+                messages: messages,
+                cache_prefix: 'ai_chef_ai_',
+            }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        let answer = data.choices[0].message.content.replace(/\*/g, '');
+        const lines = answer.split('\n');
+        if (lines.length > 6) answer = lines.slice(0, 6).join('\n');
+
+        addQABubbleTo(historyEl, answer, false);
+        lastQA = { q: question, a: answer };
+        historyEl.scrollTop = historyEl.scrollHeight;
+
+        // 配额记录（独立 try-catch，避免干扰用户）
+        try {
+            await initDeviceId();
+            const res = await apiCall('/api/user/record-question', {
+                method: 'POST',
+                body: JSON.stringify({ deviceId })
+            });
+            if (plan === 'free' || plan === 'starter') {
+                userData.aiTrialUsed = res.aiTrialUsed;
+            } else {
+                userData.aiDailyUsed = res.aiDailyUsed;
+                const remaining = (PLANS[plan]?.aiDailyLimit || 0) - userData.aiDailyUsed;
+                const limitNote = targetContainer.querySelector('#qaLimitNote');
+                if (limitNote) limitNote.innerText = `${t('aiQuestionsLeft')}: ${remaining}`;
+            }
+        } catch (err) {
+            console.warn('Record AI question failed:', err);
+        }
+    } catch (error) {
+        addQABubbleTo(historyEl, 'Error, please try again.', false);
+    } finally {
+        unlockSend();
+    }
 }
+
+// 辅助函数：向指定历史列表添加气泡
+function addQABubbleTo(historyEl, text, isUser) {
+    if (!historyEl) return;
+    const b = document.createElement('div');
+    b.className = isUser ? 'qa-bubble user-bubble' : 'qa-bubble ai-bubble';
+    b.textContent = text;
+    historyEl.appendChild(b);
+}
+
+// ==================== AI 独立页面初始化 ====================
+function initAiPage() {
+    const aiPage = document.getElementById('page-ai-assistant');
+    if (!aiPage) return;
+
+    const qaSendBtn = aiPage.querySelector('#qaSendBtn');
+    const qaInput = aiPage.querySelector('#qaInput');
+    const qaHistory = aiPage.querySelector('#qaHistory');
+    const recipeBtn = aiPage.querySelector('#btnRecipeMode');
+    const videoBtn = aiPage.querySelector('#openVideoBtn');
+    const aiPageTitle = aiPage.querySelector('#aiPageTitle');
+    const aiPageDesc = aiPage.querySelector('#aiPageDesc');
+    const qaLimitNote = aiPage.querySelector('#qaLimitNote');
+
+    // 清空顶部文案和欢迎语
+    if (aiPageTitle) aiPageTitle.innerText = '';
+    if (aiPageDesc) aiPageDesc.innerText = '';
+
+    // 输入框占位符与清空
+    if (qaInput) {
+        qaInput.placeholder = t('enterQuestion') || 'Ask about any food topic...';
+        qaInput.value = '';
+    }
+
+    // 发送按钮事件
+    if (qaSendBtn) {
+        qaSendBtn.onclick = function(e) {
+            e.preventDefault();
+            if (sendLocked) return;
+            if (!userData) {
+                postLoginPage = 'page-ai-assistant';
+                alert(t('pleaseLogin'));
+                showPage('page-login-register');
+                return;
+            }
+            const question = qaInput.value.trim();
+            if (!question) {
+                showTipModal('Please enter a question.');
+                return;
+            }
+            sendLocked = true;
+            qaSendBtn.disabled = true;
+            askQuestion(aiPage);
+            qaInput.value = '';
+        };
+    }
+
+    // 回车发送
+    if (qaInput) {
+        qaInput.onkeydown = function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                qaSendBtn.click();
+            }
+        };
+    }
+
+    // 食谱按钮：跳回生成器页
+    if (recipeBtn) {
+        recipeBtn.textContent = t('recipeShort') || 'Recipes';
+        recipeBtn.onclick = function() { showPage('page-generator'); };
+    }
+
+    // 视频按钮：打开视频弹窗
+    if (videoBtn) {
+        videoBtn.textContent = t('videoShort') || 'Videos';
+        videoBtn.onclick = showVideo;
+    }
+
+    // 配额提示（仅登录用户）
+    if (qaLimitNote && userData) {
+        const plan = userData.plan || 'free';
+        if (plan === 'free' || plan === 'starter') {
+            const remaining = Math.max(0, 10 - (userData.aiTrialUsed || 0));
+            qaLimitNote.innerText = `AI 试用：剩余 ${remaining} / 10 次`;
+        } else {
+            const dailyLimit = PLANS[plan]?.aiDailyLimit || 0;
+            const remaining = dailyLimit - (userData.aiDailyUsed || 0);
+            qaLimitNote.innerText = `AI 剩余：${remaining} 次`;
+        }
+    }
+}
+
 // ==================== 视频模块 ====================
 const VIDEO_API = "https://vid.taropai.com";
 
@@ -2224,186 +2329,6 @@ showVideo = function() {
     .catch(() => renderVideoGrid([]));
   document.getElementById('videoModal').classList.add('show');
 };
-
-// ==================== AI 独立页面初始化 ====================
-function initAiPage() {
-  const aiPage = document.getElementById('page-ai-assistant');
-  if (!aiPage) return;
-
-  const qaSendBtn = aiPage.querySelector('#qaSendBtn');
-  const qaInput = aiPage.querySelector('#qaInput');
-  const qaHistory = aiPage.querySelector('#qaHistory');
-  const recipeBtn = aiPage.querySelector('#btnRecipeMode');
-  const videoBtn = aiPage.querySelector('#openVideoBtn');
-  const aiPageTitle = aiPage.querySelector('#aiPageTitle');
-  const aiPageDesc = aiPage.querySelector('#aiPageDesc');
-  const qaLimitNote = aiPage.querySelector('#qaLimitNote');
-
-  // 清空顶部文案和欢迎语
-  if (aiPageTitle) aiPageTitle.innerText = '';
-  if (aiPageDesc) aiPageDesc.innerText = '';
-  
-  // 输入框占位符与清空
-  if (qaInput) {
-    qaInput.placeholder = t('enterQuestion') || 'Ask about any food topic...';
-    qaInput.value = '';
-  }
-
-  // 发送按钮事件（直接调用 askQuestion，传入容器）
-  if (qaSendBtn) {
-    qaSendBtn.onclick = function(e) {
-      e.preventDefault();
-      if (sendLocked) return;
-      if (!userData) {
-    postLoginPage = 'page-ai-assistant';  // ← 插入这一行
-    alert(t('pleaseLogin'));
-    showPage('page-login-register');
-    return;
-}
-      const question = qaInput.value.trim();
-      if (!question) {
-        showTipModal('Please enter a question.');
-        return;
-      }
-      sendLocked = true;
-      qaSendBtn.disabled = true;
-      askQuestion(aiPage); // 传入容器，避免 ID 冲突
-      qaInput.value = '';
-    };
-  }
-
-  // 回车发送
-  if (qaInput) {
-    qaInput.onkeydown = function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        qaSendBtn.click();
-      }
-    };
-  }
-
-  // 食谱按钮：跳回生成器页
-  if (recipeBtn) {
-    recipeBtn.textContent = t('recipeShort') || 'Recipes';
-    recipeBtn.onclick = function() { showPage('page-generator'); };
-  }
-
-  // 视频按钮：打开视频弹窗
-  if (videoBtn) {
-    videoBtn.textContent = t('videoShort') || 'Videos';
-    videoBtn.onclick = showVideo;
-  }
-
-  // 更新配额提示（仅登录用户）
-  if (qaLimitNote && userData) {
-    const plan = userData.plan || 'free';
-    if (plan === 'free' || plan === 'starter') {
-      const remaining = Math.max(0, 10 - (userData.aiTrialUsed || 0));
-      qaLimitNote.innerText = `AI 试用：剩余 ${remaining} / 10 次`;
-    } else {
-      const dailyLimit = PLANS[plan]?.aiDailyLimit || 0;
-      const remaining = dailyLimit - (userData.aiDailyUsed || 0);
-      qaLimitNote.innerText = `AI 剩余：${remaining} 次`;
-    }
-  }
-}
-// 新增：专门用于独立页的发送逻辑（复用 askQuestion，但指定作用域）
-function askQuestionFromPage(container) {
-  if (!userData) { alert(t('pleaseLogin')); return; }
-  const qaInput = container.querySelector('#qaInput');
-  const question = qaInput ? qaInput.value.trim() : '';
-  if (!question) return;
-
-  // 套餐校验（复用原 askQuestion 中的校验逻辑，不重复粘贴完整代码，直接调用原 askQuestion，但传入元素）
-  // 为了最小化修改，我们修改原 askQuestion 函数使其兼容从容器获取元素
-  actualAskQuestion(container);
-}
-
-// 修改原 askQuestion 函数，增加可选 container 参数，不传则从全局查找
-async function askQuestion(containerOverride) {
-  const container = containerOverride || document;
-  const isAiPage = document.getElementById('page-ai-assistant').classList.contains('active');
-  // 如果未传入容器，自动选择当前活跃页面
-  const targetContainer = containerOverride || (isAiPage ? document.getElementById('page-ai-assistant') : document);
-
-  if (!userData) {
-    postLoginPage = 'page-ai-assistant';  // ← 插入这一行
-    alert(t('pleaseLogin'));
-    return;
-}
-  const qaInput = targetContainer.querySelector('#qaInput');
-  const question = qaInput ? qaInput.value.trim() : '';
-  if (!question) return;
-
-  const plan = userData.plan || 'free';
-  if (plan === 'free' || plan === 'starter') {
-    const trialUsed = userData.aiTrialUsed || 0;
-    if (trialUsed >= 10) { alert(t('aiTrialUsedUp')); showPage('page-subscribe'); return; }
-  }
-  if (plan === 'pro' || plan === 'premium' || plan === 'business') {
-    const aiLimit = PLANS[plan]?.aiDailyLimit || 0;
-    if ((userData.aiDailyUsed || 0) >= aiLimit) { alert(t('aiDailyLimitReached')); return; }
-  }
-
-  const qaSendBtn = targetContainer.querySelector('#qaSendBtn');
-  if (qaSendBtn) qaSendBtn.disabled = true;
-  const historyEl = targetContainer.querySelector('#qaHistory');
-  addQABubbleTo(historyEl, question, true);
-  historyEl.scrollTop = historyEl.scrollHeight;
-  qaInput.value = '';
-
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const lang = getCurrentLang();
-    const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
-    const targetLang = langMap[lang] || 'English';
-    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 6 lines). Do not use asterisks. If a conversation history is provided, you MUST use it to understand context and answer follow-up questions accurately.`;
-    
-    const response = await fetch(DEEPSEEK_API, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'deepseek-v4-flash', temperature: 0.3, max_tokens: 300,
-        messages: [{ role: 'system', content: systemContent }, { role: 'user', content: question }],
-        cache_prefix: 'ai_chef_ai_',
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    let answer = data.choices[0].message.content.replace(/\*/g, '');
-    const lines = answer.split('\n');
-    if (lines.length > 6) answer = lines.slice(0, 6).join('\n');
-
-    addQABubbleTo(historyEl, answer, false);
-    historyEl.scrollTop = historyEl.scrollHeight;
-
-    await initDeviceId();
-    const res = await apiCall('/api/user/record-question', { method: 'POST', body: JSON.stringify({ deviceId }) });
-    if (plan === 'free' || plan === 'starter') {
-      userData.aiTrialUsed = res.aiTrialUsed;
-    } else {
-      userData.aiDailyUsed = res.aiDailyUsed;
-      const remaining = (PLANS[plan]?.aiDailyLimit || 0) - userData.aiDailyUsed;
-      const limitNote = targetContainer.querySelector('#qaLimitNote');
-      if (limitNote) limitNote.innerText = `${t('aiQuestionsLeft')}: ${remaining}`;
-    }
-  } catch (error) {
-    addQABubbleTo(historyEl, 'Error, please try again.', false);
-  } finally {
-    unlockSend();
-  }
-}
-
-// 辅助函数：向指定历史列表添加气泡
-function addQABubbleTo(historyEl, text, isUser) {
-  if (!historyEl) return;
-  const b = document.createElement('div');
-  b.className = isUser ? 'qa-bubble user-bubble' : 'qa-bubble ai-bubble';
-  b.textContent = text;
-  historyEl.appendChild(b);
-}
 
   // ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
