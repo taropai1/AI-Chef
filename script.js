@@ -1110,9 +1110,6 @@ async function askQuestion(containerOverride) {
     messages.push({ role: 'user', content: question });
     // ====================================================
 
-    console.log('当前 lastQA:', JSON.stringify(lastQA));
-console.log('发送的 messages:', JSON.stringify(messages));
-   
     const response = await fetch(DEEPSEEK_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1135,8 +1132,6 @@ console.log('发送的 messages:', JSON.stringify(messages));
 
     addQABubbleTo(historyEl, answer, false);
     lastQA = { q: question, a: answer };
-
-    console.log('已存储 lastQA:', JSON.stringify(lastQA));
     
     historyEl.scrollTop = historyEl.scrollHeight;
 
@@ -1875,11 +1870,11 @@ function switchGeneratorMode(mode) {
     if (recipeContent) recipeContent.classList.add('show');
     if (qaContent) qaContent.classList.remove('show');
   } else if (mode === 'qa') {
-    // 仅为视觉效果，不切换 generatorMode，不显示问答区
+    // 仅视觉效果，不切换 generatorMode，不显示问答区
     if (slider) slider.classList.add('right');
     if (btns[1]) btns[1].classList.add('active');
     if (modeDesc) {
-      modeDesc.textContent = t('enterQuestion') || 'Ask about any food topic...';
+      modeDesc.textContent = '';  // 去掉 AI 助手按钮下的说明文案
       modeDesc.classList.add('right-normal');
       modeDesc.classList.remove('left-indent');
     }
@@ -2075,12 +2070,9 @@ if (qaInput) {
   }, 100);
 
   switchGeneratorMode('recipe');
-document.getElementById('btnAiMode').onclick = function() {
-  switchGeneratorMode('qa');                 
-  setTimeout(() => {
-    switchGeneratorMode('recipe');
-    setTimeout(openAiStandalone, 50);
-  }, 150);
+  document.getElementById('btnAiMode').onclick = function() {
+  switchGeneratorMode('qa');
+  setTimeout(openAiStandalone, 200);
 };
 })();
 
