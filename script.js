@@ -1095,8 +1095,8 @@ async function askQuestion(containerOverride) {
     const lang = getCurrentLang();
     const langMap = { 'en':'English','es':'Español','fr':'Français','de':'Deutsch','it':'Italiano','pt':'Português','zh-CN':'中文' };
     const targetLang = langMap[lang] || 'English';
-    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 5 lines). Do not use asterisks.`;
-
+    const systemContent = `You are a professional food and cooking assistant. You MUST answer all questions in ${targetLang}. Keep responses concise (max 6 lines). Do not use asterisks. If a conversation history is provided, you MUST use it to understand context and answer follow-up questions accurately.`;
+    
     // ===== 上下文记忆构建 messages（放在 fetch 之前）=====
     const shortQuestion = question.length <= 30;
     const hasReferenceWords = /它|这|那|这个|那个|其|this|that|it|diese|dieses|esto|eso|ce|cette|questo|questa|isso|esse/i.test(question);
@@ -1607,6 +1607,27 @@ if (moreSelect) {
     });
 }
 
+// 同步分类按钮文字
+const mealTypeSelect = document.getElementById('mealType');
+const categoryBtn = document.getElementById('categoryBtn');
+if (mealTypeSelect && categoryBtn) {
+    if (mealTypeSelect.selectedIndex > 0) {
+        categoryBtn.textContent = mealTypeSelect.options[mealTypeSelect.selectedIndex].text;
+    } else {
+        categoryBtn.textContent = t('genMealType');
+    }
+}
+// 同步菜系按钮文字
+const cuisineSelect = document.getElementById('cuisine');
+const cuisineBtn = document.getElementById('cuisineBtn');
+if (cuisineSelect && cuisineBtn) {
+    if (cuisineSelect.selectedIndex > 0) {
+        cuisineBtn.textContent = cuisineSelect.options[cuisineSelect.selectedIndex].text;
+    } else {
+        cuisineBtn.textContent = t('genCuisine');
+    }
+}
+  
 const aiRecipeBtn = document.querySelector('#aiSelectGroup #btnRecipeMode');
 const aiVideoBtn = document.querySelector('#aiSelectGroup #openVideoBtn');
 const aiQaInput = document.getElementById('qaInput');
