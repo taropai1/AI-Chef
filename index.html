@@ -475,6 +475,37 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+    <!-- 视频页面 -->
+<div class="page" id="page-video">
+  <div class="video-page-wrapper">
+    <!-- 顶部播放器区 -->
+    <div class="video-player-section">
+      <video id="mainVideoPlayer" controls muted loop playsinline></video>
+      <div class="video-info-bar">
+        <span id="currentVideoTitle" class="video-title"></span>
+        <span id="currentVideoSource" class="video-source"></span>
+      </div>
+    </div>
+
+    <!-- 分类标签栏 -->
+    <div class="video-categories" id="videoCategories">
+      <button class="video-cat-btn active" data-cat="All">All</button>
+      <button class="video-cat-btn" data-cat="Creative Food">Creative Food</button>
+      <button class="video-cat-btn" data-cat="Cooking Tutorial">Cooking Tutorial</button>
+      <button class="video-cat-btn" data-cat="Dessert & Drinks">Dessert & Drinks</button>
+      <button class="video-cat-btn" data-cat="Creator Picks">Creator Picks</button>
+    </div>
+
+    <!-- 视频卡片网格 -->
+    <div class="video-grid" id="videoGrid"></div>
+
+    <!-- 底部说明 -->
+    <div class="video-footer" id="videoFooter">
+      <p>原创视频由本站制作，其他视频来自 YouTube、TikTok、Ins、可颂、小红书等平台，版权归原作者所有。</p>
+    </div>
+  </div>
+</div>
+  
+    <script src="script.js"></script>
 </body>
 </html>
