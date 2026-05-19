@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Admin</title>
+  <title>视频管理后台</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
     body { background: #f5f7fa; padding: 20px; color: #1f2937; }
@@ -25,63 +25,63 @@
 </head>
 <body>
 <div class="container">
-  <h1>Video Management</h1>
+  <h1>视频管理</h1>
 
   <div class="auth-section" id="authSection">
-    <label>Admin Key: </label>
-    <input type="password" id="adminKeyInput" placeholder="Enter Admin Key">
-    <button onclick="login()">Login</button>
+    <label>管理员密钥：</label>
+    <input type="password" id="adminKeyInput" placeholder="请输入管理员密钥">
+    <button onclick="login()">登录</button>
     <div id="authMsg" class="error" style="margin-top:8px;"></div>
   </div>
 
   <div id="mainSection" style="display:none;">
     <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-      <h3 style="margin-bottom:12px;">Set Featured Video</h3>
+      <h3 style="margin-bottom:12px;">设置主推视频</h3>
       <select id="featuredSelect" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;">
-        <option value="">-- Select a video --</option>
+        <option value="">-- 请选择视频 --</option>
       </select>
-      <button onclick="setFeatured()" style="margin-left:10px;">Set as Featured</button>
+      <button onclick="setFeatured()" style="margin-left:10px;">设为主推</button>
       <span id="featuredMsg" class="msg"></span>
     </div>
 
-    <h3>Video List</h3>
+    <h3>视频列表</h3>
     <div style="overflow-x:auto;">
       <table>
         <thead>
-          <tr><th>Title</th><th>Source</th><th>Category</th><th>Weight</th><th>Action</th></tr>
+          <tr><th>标题</th><th>来源</th><th>分类</th><th>权重</th><th>操作</th></tr>
         </thead>
         <tbody id="videoTbody"></tbody>
       </table>
     </div>
 
     <div style="background:#fff;border-radius:12px;padding:20px;margin-top:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-      <h3 id="formTitle">Add / Edit Video</h3>
+      <h3 id="formTitle">添加 / 编辑视频</h3>
       <div class="form-row">
-        <input type="text" id="vId" placeholder="Video ID (unique)">
-        <input type="text" id="vTitle" placeholder="Title">
-        <input type="text" id="vUrl" placeholder="Video URL">
-        <input type="text" id="vCover" placeholder="Cover Image URL">
+        <input type="text" id="vId" placeholder="视频 ID（唯一）">
+        <input type="text" id="vTitle" placeholder="标题">
+        <input type="text" id="vUrl" placeholder="视频播放地址">
+        <input type="text" id="vCover" placeholder="封面图片地址">
       </div>
       <div class="form-row">
         <select id="vSource">
-          <option value="Original">Original</option>
+          <option value="Original">原创</option>
           <option value="YouTube">YouTube</option>
           <option value="Dailymotion">Dailymotion</option>
           <option value="Odysee">Odysee</option>
           <option value="PeerTube">PeerTube</option>
-          <option value="Keso">Keso</option>
-          <option value="Xiaohongshu">Xiaohongshu</option>
+          <option value="Keso">可颂</option>
+          <option value="Xiaohongshu">小红书</option>
         </select>
         <select id="vCategory">
-          <option value="Creative Food">Creative Food</option>
-          <option value="Cooking Tutorial">Cooking Tutorial</option>
-          <option value="Dessert & Drinks">Dessert & Drinks</option>
-          <option value="Creator Picks">Creator Picks</option>
+          <option value="Creative Food">创意美食</option>
+          <option value="Cooking Tutorial">烹饪教程</option>
+          <option value="Dessert & Drinks">甜品饮品</option>
+          <option value="Creator Picks">博主精选</option>
         </select>
-        <input type="number" id="vWeight" placeholder="Weight (higher = first)" value="0">
+        <input type="number" id="vWeight" placeholder="权重（数字越大越靠前）" value="0">
       </div>
-      <button onclick="saveVideo()">Save Video</button>
-      <button onclick="resetForm()" style="background:#6b7280;margin-left:10px;">Reset</button>
+      <button onclick="saveVideo()">保存视频</button>
+      <button onclick="resetForm()" style="background:#6b7280;margin-left:10px;">重置</button>
       <div id="formMsg" class="msg"></div>
     </div>
   </div>
@@ -109,15 +109,14 @@
         document.getElementById('mainSection').style.display = 'block';
         await loadVideos();
       } else {
-        document.getElementById('authMsg').innerText = 'Invalid Admin Key';
+        document.getElementById('authMsg').innerText = '密钥错误，请重试';
       }
     } catch (e) {
-      document.getElementById('authMsg').innerText = 'Connection error';
+      document.getElementById('authMsg').innerText = '网络连接失败';
     }
   }
 
-  // 页面加载时若已有 session，自动登录
-  window.onload = () => {
+  window.onload = function() {
     if (adminKey) {
       document.getElementById('adminKeyInput').value = adminKey;
       login();
@@ -130,7 +129,7 @@
     const videos = data.videos || [];
     renderTable(videos);
     const sel = document.getElementById('featuredSelect');
-    sel.innerHTML = '<option value="">-- Select a video --</option>' +
+    sel.innerHTML = '<option value="">-- 请选择视频 --</option>' +
       videos.map(v => `<option value="${v.id}">${v.title}</option>`).join('');
   }
 
@@ -143,30 +142,36 @@
         <td>${v.category}</td>
         <td>${v.weight}</td>
         <td>
-          <button onclick="editVideo('${v.id}')">Edit</button>
-          <button class="danger" onclick="deleteVideo('${v.id}')">Delete</button>
+          <button onclick="editVideo('${v.id}')">编辑</button>
+          <button class="danger" onclick="deleteVideo('${v.id}')">删除</button>
         </td>
       </tr>
     `).join('');
   }
 
   window.editVideo = async function(id) {
-    // 需要获取完整列表，这里简化：直接请求列表后查找
-    const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
-    const data = await res.json();
-    const videos = data.videos || [];
-    const v = videos.find(v => v.id === id);
-    if (!v) return alert('Video not found');
-    document.getElementById('vId').value = v.id;
-    document.getElementById('vTitle').value = v.title;
-    document.getElementById('vUrl').value = v.url;
-    document.getElementById('vCover').value = v.cover || '';
-    document.getElementById('vSource').value = v.source;
-    document.getElementById('vCategory').value = v.category;
-    document.getElementById('vWeight').value = v.weight;
-    document.getElementById('vId').disabled = true;
-    document.getElementById('formTitle').innerText = 'Edit Video';
-    window.scrollTo({ top: document.getElementById('vId').offsetTop - 100, behavior: 'smooth' });
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
+      const data = await res.json();
+      const videos = data.videos || [];
+      const v = videos.find(v => v.id === id);
+      if (!v) {
+        alert('未找到该视频');
+        return;
+      }
+      document.getElementById('vId').value = v.id;
+      document.getElementById('vTitle').value = v.title;
+      document.getElementById('vUrl').value = v.url;
+      document.getElementById('vCover').value = v.cover || '';
+      document.getElementById('vSource').value = v.source;
+      document.getElementById('vCategory').value = v.category;
+      document.getElementById('vWeight').value = v.weight;
+      document.getElementById('vId').disabled = true;
+      document.getElementById('formTitle').innerText = '编辑视频';
+      window.scrollTo({ top: document.getElementById('vId').offsetTop - 100, behavior: 'smooth' });
+    } catch (e) {
+      alert('获取视频失败：' + e.message);
+    }
   };
 
   window.saveVideo = async function() {
@@ -174,30 +179,34 @@
     const title = document.getElementById('vTitle').value.trim();
     const url = document.getElementById('vUrl').value.trim();
     if (!id || !title || !url) {
-      document.getElementById('formMsg').innerText = 'Please fill in ID, Title, URL';
+      document.getElementById('formMsg').innerText = '请填写 ID、标题和播放地址';
       return;
     }
     const video = {
-      id,
-      title,
-      url,
+      id: id,
+      title: title,
+      url: url,
       cover: document.getElementById('vCover').value.trim(),
       source: document.getElementById('vSource').value,
       category: document.getElementById('vCategory').value,
-      weight: parseInt(document.getElementById('vWeight').value) || 0,
+      weight: parseInt(document.getElementById('vWeight').value) || 0
     };
-    const res = await fetch(`${API_BASE}/api/admin/videos`, {
-      method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(video)
-    });
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('formMsg').innerText = 'Saved!';
-      resetForm();
-      await loadVideos();
-    } else {
-      document.getElementById('formMsg').innerText = data.error || 'Error';
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/videos`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(video)
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('formMsg').innerText = '保存成功！';
+        resetForm();
+        await loadVideos();
+      } else {
+        document.getElementById('formMsg').innerText = data.error || '保存失败';
+      }
+    } catch (e) {
+      document.getElementById('formMsg').innerText = '网络错误，请稍后重试';
     }
   };
 
@@ -208,21 +217,25 @@
     document.getElementById('vUrl').value = '';
     document.getElementById('vCover').value = '';
     document.getElementById('vWeight').value = '0';
-    document.getElementById('formTitle').innerText = 'Add / Edit Video';
+    document.getElementById('formTitle').innerText = '添加 / 编辑视频';
     document.getElementById('formMsg').innerText = '';
   };
 
   window.deleteVideo = async function(id) {
-    if (!confirm('Delete this video?')) return;
-    const res = await fetch(`${API_BASE}/api/admin/videos?id=${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: getHeaders()
-    });
-    const data = await res.json();
-    if (data.success) {
-      await loadVideos();
-    } else {
-      alert('Delete failed');
+    if (!confirm('确定要删除这个视频吗？')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/videos?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      const data = await res.json();
+      if (data.success) {
+        await loadVideos();
+      } else {
+        alert('删除失败');
+      }
+    } catch (e) {
+      alert('网络错误，删除失败');
     }
   };
 
@@ -230,16 +243,20 @@
     const sel = document.getElementById('featuredSelect');
     const id = sel.value;
     if (!id) return;
-    const res = await fetch(`${API_BASE}/api/admin/videos/featured`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify({ id })
-    });
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('featuredMsg').innerText = 'Featured video updated!';
-    } else {
-      document.getElementById('featuredMsg').innerText = 'Error: ' + (data.error || '');
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/videos/featured`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ id: id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('featuredMsg').innerText = '主推视频已更新！';
+      } else {
+        document.getElementById('featuredMsg').innerText = '操作失败：' + (data.error || '');
+      }
+    } catch (e) {
+      document.getElementById('featuredMsg').innerText = '网络错误，请稍后重试';
     }
   };
 </script>
