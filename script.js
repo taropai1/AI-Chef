@@ -1353,60 +1353,55 @@ function playFeaturedVideo(featured, videos, player, titleEl, sourceEl) {
 }
 
 function renderVideoGrid(videos, player, titleEl, sourceEl) {
-    const grid = document.getElementById('videoGrid');
-    if (!grid) {
-        console.error('videoGrid 容器不存在');
-        return;
+  const grid = document.getElementById('videoGrid');
+  if (!grid) {
+    console.error('videoGrid 容器不存在');
+    return;
+  }
+  grid.innerHTML = '';
+
+  if (!videos || videos.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px;">暂无视频，请稍后刷新</p>';
+    return;
+  }
+
+  let html = '';
+  for (const v of videos) {
+    try {
+      const coverUrl = v.cover || '';
+      const title = v.title || '无标题';
+      const source = v.source || 'Original';
+      const url = v.url || '';
+      html += `
+        <div class="video-card" data-url="${url}" data-title="${title}" data-source="${source}">
+          <img class="video-card-img" src="${coverUrl}" alt="${title}" loading="lazy" onerror="this.style.display='none'">
+          <div class="video-card-info">
+            <div class="video-card-title">${title}</div>
+            <div class="video-card-meta">${source === 'Original' ? '原创' : '来自 ' + source}</div>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      console.error('构建卡片出错:', v, e);
     }
-    // 清空网格
-    grid.innerHTML = '';
+  }
 
-    if (!videos || videos.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px;">暂无视频，请稍后刷新</p>';
-        return;
-    }
+  grid.innerHTML = html;
 
-    let html = '';
-    for (const v of videos) {
-        try {
-            const coverUrl = v.cover || '';
-            const title = v.title || '无标题';
-            const source = v.source || 'Original';
-            const url = v.url || '';
-
-            html += `
-                <div class="video-card" data-url="${url}" data-title="${title}" data-source="${source}">
-                  <img class="video-card-img" src="${coverUrl}" alt="${title}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22320%22 height=%22180%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22320%22 height=%22180%22/%3E%3Ctext x=%2210%22 y=%2295%22 font-size=%2214%22 fill=%22%236b7280%22%3EPreview%3C/text%3E%3C/svg%3E'">
-                  <div class="video-card-info">
-                    <div class="video-card-title">${title}</div>
-                    <div class="video-card-meta">${source === 'Original' ? 'Original' : 'From ' + source}</div>
-                  </div>
-                </div>
-            `;
-        } catch (e) {
-            console.error('构建视频卡片时出错:', v, e);
-        }
-    }
-
-    grid.innerHTML = html;
-
-    // 绑定点击事件
-    const cards = grid.querySelectorAll('.video-card');
-    for (const card of cards) {
-        card.addEventListener('click', function() {
-            const videoUrl = this.dataset.url;
-            const videoTitle = this.dataset.title;
-            const videoSource = this.dataset.source;
-            if (!videoUrl) return;
-            player.src = videoUrl;
-            player.muted = false;
-            player.play().catch(err => console.warn('播放失败:', err));
-            titleEl.textContent = videoTitle;
-            sourceEl.textContent = videoSource === 'Original' ? 'Original' : 'From ' + videoSource;
-        });
-    }
-
-    console.log('已渲染', cards.length, '个视频卡片');
+  const cards = grid.querySelectorAll('.video-card');
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const videoUrl = card.dataset.url;
+      const videoTitle = card.dataset.title;
+      const videoSource = card.dataset.source;
+      if (!videoUrl) return;
+      player.src = videoUrl;
+      player.muted = false;
+      player.play().catch(err => console.warn('自动播放失败:', err));
+      titleEl.textContent = videoTitle;
+      sourceEl.textContent = videoSource === 'Original' ? '原创' : '来自 ' + videoSource;
+    });
+  });
 }
 
 // ==================== 登录/注册 ====================
