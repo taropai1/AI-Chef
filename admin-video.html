@@ -53,7 +53,11 @@
       <div class="chart-box"><canvas id="sourceChart"></canvas></div>
       <div class="chart-box"><canvas id="categoryChart"></canvas></div>
     </div>
-
+    <!-- 手动采集按钮 -->
+<div style="background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;align-items:center;gap:12px;">
+  <button id="manualCollectBtn" onclick="manualCollect()" style="background:#10b981;">立即采集视频</button>
+  <span id="collectStatus" style="font-size:14px;color:#6b7280;"></span>
+</div>
     <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
       <h3 style="margin-bottom:12px;">设置主推视频</h3>
       <select id="featuredSelect" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;width:300px;">
