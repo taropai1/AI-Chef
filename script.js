@@ -1293,8 +1293,8 @@ async function initVideoPage() {
     featured = data.featured;
     allVideos = data.list;
   } catch (err) {
-    console.error('Failed to fetch videos:', err);
-    grid.innerHTML = '<p style="text-align:center;color:#6b7280;">Failed to load videos.</p>';
+    console.error('获取视频失败:', err);
+    if (grid) grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px;">加载视频失败，请检查网络</p>';
     return;
   }
 
@@ -1304,23 +1304,52 @@ async function initVideoPage() {
       catBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const cat = btn.dataset.cat;
-      const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
-      const data = await res.json();
-      allVideos = data.list;
-      renderVideoGrid(allVideos, player, titleEl, sourceEl);
+      try {
+        const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
+        const data = await res.json();
+        allVideos = data.list;
+        featured = data.featured;
+        playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl);
+        renderVideoGrid(allVideos, player, titleEl, sourceEl);
+      } catch (e) {
+        console.error('分类加载失败:', e);
+      }
     };
   });
 
-  // 播放主推视频
-  if (featured) {
-    player.src = featured.url;
-    titleEl.textContent = featured.title;
-    sourceEl.textContent = featured.source === 'Original' ? 'Original' : `From ${featured.source}`;
-    player.play().catch(() => {});
-  }
+  // 动态选择主推视频并播放
+  playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl);
 
   // 渲染卡片
   renderVideoGrid(allVideos, player, titleEl, sourceEl);
+}
+
+// 新增辅助函数：动态选择并播放主推视频
+function playFeaturedVideo(featured, videos, player, titleEl, sourceEl) {
+  let selectedVideo = null;
+
+  // 如果已有手动设置的主推视频（且仍然在列表中），优先使用
+  if (featured && videos.some(v => v.id === featured.id)) {
+    selectedVideo = featured;
+  } else {
+    // 否则，从推荐视频中随机选一个
+    const promoted = videos.filter(v => v.promoted);
+    if (promoted.length > 0) {
+      selectedVideo = promoted[Math.floor(Math.random() * promoted.length)];
+    } else if (videos.length > 0) {
+      // 没有推荐视频，从排序后的前20条中随机选一个
+      const topPool = videos.slice(0, 20);
+      selectedVideo = topPool[Math.floor(Math.random() * topPool.length)];
+    }
+  }
+
+  if (selectedVideo) {
+    player.src = selectedVideo.url;
+    titleEl.textContent = selectedVideo.title;
+    sourceEl.textContent = selectedVideo.source === 'Original' ? 'Original' : `From ${selectedVideo.source}`;
+    // 尝试自动播放
+    player.play().catch(() => {});
+  }
 }
 
 function renderVideoGrid(videos, player, titleEl, sourceEl) {
