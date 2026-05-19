@@ -1236,11 +1236,18 @@ function initAiPage() {
         recipeBtn.onclick = function() { showPage('page-generator'); };
     }
 
-    // 视频按钮：打开视频弹窗
-    if (videoBtn) {
-        videoBtn.textContent = t('videoShort') || 'Videos';
-        videoBtn.onclick = showVideo;
-    }
+    // 视频按钮：跳转到视频页面
+if (videoBtn) {
+    videoBtn.textContent = t('videoShort') || 'Videos';
+    videoBtn.onclick = function() {
+        if (!userData) {
+            alert(t('pleaseLogin'));
+            showPage('page-login-register');
+            return;
+        }
+        showPage('page-video');
+    };
+}
 
     // 配额提示（仅登录用户）
 if (qaLimitNote && userData) {
@@ -1942,7 +1949,16 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
 
   const videoBtn = document.getElementById('openVideoBtn');
-if (videoBtn) videoBtn.onclick = showVideo;
+if (videoBtn) {
+  videoBtn.onclick = function() {
+    if (!userData) {
+      alert(t('pleaseLogin'));
+      showPage('page-login-register');
+      return;
+    }
+    showPage('page-video');
+  };
+}
   initVideoPlayerControls();
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
