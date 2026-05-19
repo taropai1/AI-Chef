@@ -1989,7 +1989,6 @@ if (videoBtn) {
     showPage('page-video');
   };
 }
-  initVideoPlayerControls();
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
 })();
@@ -2367,22 +2366,7 @@ renderLanguage = function() {
   }
 };
 
-// 修复 showVideo 支持无食谱场景
-const originalShowVideo = showVideo;
-showVideo = function() {
-  const dishNameEl = document.getElementById('recipeNameDisplay');
-  let dish = dishNameEl ? dishNameEl.innerText.trim() : '';
-  if (!dish || dish === 'Please generate a recipe first' || dish.startsWith('生成失败')) {
-    dish = document.getElementById('dishName')?.value?.trim() || 'popular cooking';
-  }
-  fetch(`https://vid.taropai.com?dish=${encodeURIComponent(dish)}`)
-    .then(res => res.json())
-    .then(data => renderVideoGrid(data.videos || []))
-    .catch(() => renderVideoGrid([]));
-  document.getElementById('videoModal').classList.add('show');
-};
-
-  // ==================== 语音识别模块（绝对隔离版） ====================
+// ==================== 语音识别模块（绝对隔离版） ====================
 (function initVoiceInput() {
     // 将所有逻辑完全隔离，任何错误都不会影响主程序
     try {
