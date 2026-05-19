@@ -66,8 +66,9 @@
         <select id="vSource">
           <option value="Original">Original</option>
           <option value="YouTube">YouTube</option>
-          <option value="TikTok">TikTok</option>
-          <option value="Ins">Ins</option>
+          <option value="Dailymotion">Dailymotion</option>
+          <option value="Odysee">Odysee</option>
+          <option value="PeerTube">PeerTube</option>
           <option value="Keso">Keso</option>
           <option value="Xiaohongshu">Xiaohongshu</option>
         </select>
@@ -100,7 +101,6 @@
   async function login() {
     adminKey = document.getElementById('adminKeyInput').value.trim();
     if (!adminKey) return;
-    // 简单验证：尝试获取视频列表
     try {
       const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
       if (res.ok) {
@@ -116,7 +116,7 @@
     }
   }
 
-  // 页面加载时如果已有 session，自动登录
+  // 页面加载时若已有 session，自动登录
   window.onload = () => {
     if (adminKey) {
       document.getElementById('adminKeyInput').value = adminKey;
@@ -129,7 +129,6 @@
     const data = await res.json();
     const videos = data.videos || [];
     renderTable(videos);
-    // 填充主推选择框
     const sel = document.getElementById('featuredSelect');
     sel.innerHTML = '<option value="">-- Select a video --</option>' +
       videos.map(v => `<option value="${v.id}">${v.title}</option>`).join('');
@@ -151,10 +150,12 @@
     `).join('');
   }
 
-  function editVideo(id) {
-    const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, { headers: getHeaders() });
+  window.editVideo = async function(id) {
+    // 需要获取完整列表，这里简化：直接请求列表后查找
+    const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
     const data = await res.json();
-    const v = data.videos ? data.videos.find(v => v.id === id) : null;
+    const videos = data.videos || [];
+    const v = videos.find(v => v.id === id);
     if (!v) return alert('Video not found');
     document.getElementById('vId').value = v.id;
     document.getElementById('vTitle').value = v.title;
@@ -166,9 +167,9 @@
     document.getElementById('vId').disabled = true;
     document.getElementById('formTitle').innerText = 'Edit Video';
     window.scrollTo({ top: document.getElementById('vId').offsetTop - 100, behavior: 'smooth' });
-  }
+  };
 
-  async function saveVideo() {
+  window.saveVideo = async function() {
     const id = document.getElementById('vId').value.trim();
     const title = document.getElementById('vTitle').value.trim();
     const url = document.getElementById('vUrl').value.trim();
@@ -198,9 +199,9 @@
     } else {
       document.getElementById('formMsg').innerText = data.error || 'Error';
     }
-  }
+  };
 
-  function resetForm() {
+  window.resetForm = function() {
     document.getElementById('vId').disabled = false;
     document.getElementById('vId').value = '';
     document.getElementById('vTitle').value = '';
@@ -209,9 +210,9 @@
     document.getElementById('vWeight').value = '0';
     document.getElementById('formTitle').innerText = 'Add / Edit Video';
     document.getElementById('formMsg').innerText = '';
-  }
+  };
 
-  async function deleteVideo(id) {
+  window.deleteVideo = async function(id) {
     if (!confirm('Delete this video?')) return;
     const res = await fetch(`${API_BASE}/api/admin/videos?id=${encodeURIComponent(id)}`, {
       method: 'DELETE',
@@ -223,9 +224,9 @@
     } else {
       alert('Delete failed');
     }
-  }
+  };
 
-  async function setFeatured() {
+  window.setFeatured = async function() {
     const sel = document.getElementById('featuredSelect');
     const id = sel.value;
     if (!id) return;
@@ -240,7 +241,7 @@
     } else {
       document.getElementById('featuredMsg').innerText = 'Error: ' + (data.error || '');
     }
-  }
+  };
 </script>
 </body>
 </html>
