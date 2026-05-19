@@ -34,6 +34,11 @@
     .form-row input, .form-row select { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; }
     .msg { color: green; margin: 10px 0; }
     .error { color: red; }
+    .top-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .top-box { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .top-box h3 { font-size: 14px; color: #1f2937; margin-bottom: 12px; }
+    .top-box ol { padding-left: 20px; font-size: 13px; color: #374151; }
+    .top-box li { margin-bottom: 6px; display: flex; justify-content: space-between; }
   </style>
 </head>
 <body>
@@ -48,16 +53,34 @@
   </div>
 
   <div id="mainSection" style="display:none;">
+    <!-- 手动采集按钮 -->
+    <div style="background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;align-items:center;gap:12px;">
+      <button id="manualCollectBtn" onclick="manualCollect()" style="background:#10b981;">立即采集视频</button>
+      <span id="collectStatus" style="font-size:14px;color:#6b7280;"></span>
+    </div>
+
+    <!-- 数据看板 -->
     <div class="data-cards" id="dataCards"></div>
+
+    <!-- 来源和分类图表 -->
     <div class="charts-row">
       <div class="chart-box"><canvas id="sourceChart"></canvas></div>
       <div class="chart-box"><canvas id="categoryChart"></canvas></div>
     </div>
-    <!-- 手动采集按钮 -->
-<div style="background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;align-items:center;gap:12px;">
-  <button id="manualCollectBtn" onclick="manualCollect()" style="background:#10b981;">立即采集视频</button>
-  <span id="collectStatus" style="font-size:14px;color:#6b7280;"></span>
-</div>
+
+    <!-- 热度前20 和 知名博主前20 -->
+    <div class="top-list">
+      <div class="top-box">
+        <h3>热门视频 Top 20（按播放量）</h3>
+        <ol id="topVideos"></ol>
+      </div>
+      <div class="top-box">
+        <h3>知名博主 Top 20（按视频数量）</h3>
+        <ol id="topAuthors"></ol>
+      </div>
+    </div>
+
+    <!-- 主推设置 -->
     <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
       <h3 style="margin-bottom:12px;">设置主推视频</h3>
       <select id="featuredSelect" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;width:300px;">
@@ -73,7 +96,7 @@
     <div style="overflow-x:auto;">
       <table>
         <thead>
-          <tr><th>展示标题</th><th>原标题</th><th>来源</th><th>作者</th><th>分类</th><th>播放量</th><th>权重</th><th>推荐</th><th>操作</th></tr>
+          <tr><th>展示标题</th><th>作者</th><th>来源</th><th>分类</th><th>播放量</th><th>推荐</th><th>操作</th></tr>
         </thead>
         <tbody id="videoTbody"></tbody>
       </table>
@@ -83,6 +106,7 @@
   </div>
 </div>
 
+<!-- 编辑/添加视频弹窗 -->
 <div class="modal" id="videoModal">
   <div class="modal-content">
     <h3 id="modalTitle">编辑视频</h3>
@@ -163,18 +187,34 @@
     }
   };
 
+  // 销毁旧图表（避免 Canvas 冲突）
+  function destroyCharts() {
+    const c1 = Chart.getChart('sourceChart');
+    if (c1) c1.destroy();
+    const c2 = Chart.getChart('categoryChart');
+    if (c2) c2.destroy();
+  }
+
   async function loadDashboard() {
     try {
       const res = await fetch(`${API_BASE}/api/admin/videos?page=1&limit=9999`, { headers: getHeaders() });
       const data = await res.json();
       allVideosCache = data.videos || [];
+
+      // 基础卡片
+      const total = allVideosCache.length;
+      const promotedCount = allVideosCache.filter(v => v.promoted).length;
+      const originalCount = allVideosCache.filter(v => v.source === 'Original').length;
+      const autoCount = total - originalCount;
       document.getElementById('dataCards').innerHTML = `
-        <div class="data-card"><h3>视频总数</h3><div class="value">${allVideosCache.length}</div></div>
-        <div class="data-card"><h3>已推荐</h3><div class="value">${allVideosCache.filter(v=>v.promoted).length}</div></div>
-        <div class="data-card"><h3>原创视频</h3><div class="value">${allVideosCache.filter(v=>v.source==='Original').length}</div></div>
-        <div class="data-card"><h3>自动采集</h3><div class="value">${allVideosCache.filter(v=>v.source!=='Original').length}</div></div>
+        <div class="data-card"><h3>视频总数</h3><div class="value">${total}</div></div>
+        <div class="data-card"><h3>已推荐</h3><div class="value">${promotedCount}</div></div>
+        <div class="data-card"><h3>原创视频</h3><div class="value">${originalCount}</div></div>
+        <div class="data-card"><h3>自动采集</h3><div class="value">${autoCount}</div></div>
       `;
 
+      // 来源分布饼图
+      destroyCharts();
       const sourceCounts = {};
       allVideosCache.forEach(v => sourceCounts[v.source] = (sourceCounts[v.source]||0)+1);
       new Chart(document.getElementById('sourceChart'), {
@@ -185,6 +225,7 @@
         }
       });
 
+      // 分类分布饼图
       const catCounts = {};
       allVideosCache.forEach(v => catCounts[v.category] = (catCounts[v.category]||0)+1);
       new Chart(document.getElementById('categoryChart'), {
@@ -194,6 +235,30 @@
           datasets: [{ data: Object.values(catCounts), backgroundColor: ['#4a90e2','#f59e0b','#10b981','#ef4444'] }]
         }
       });
+
+      // 热度前20
+      const sortedByViews = [...allVideosCache].sort((a,b) => (b.stats?.views||0) - (a.stats?.views||0)).slice(0,20);
+      let topVhtml = '';
+      sortedByViews.forEach((v,i) => {
+        topVhtml += `<li><span>${i+1}. ${v.title}</span><span>${(v.stats?.views||0).toLocaleString()} 次播放</span></li>`;
+      });
+      document.getElementById('topVideos').innerHTML = topVhtml || '<li>暂无数据</li>';
+
+      // 知名博主前20（按视频数量+总播放量）
+      const authorMap = {};
+      allVideosCache.forEach(v => {
+        const a = v.author || '未知博主';
+        if (!authorMap[a]) authorMap[a] = { count: 0, totalViews: 0 };
+        authorMap[a].count++;
+        authorMap[a].totalViews += (v.stats?.views||0);
+      });
+      const authorList = Object.entries(authorMap).sort((a,b) => b[1].count - a[1].count || b[1].totalViews - a[1].totalViews).slice(0,20);
+      let topAhtml = '';
+      authorList.forEach(([name, info], i) => {
+        topAhtml += `<li><span>${i+1}. ${name}</span><span>${info.count} 个视频 / ${info.totalViews.toLocaleString()} 播放</span></li>`;
+      });
+      document.getElementById('topAuthors').innerHTML = topAhtml || '<li>暂无数据</li>';
+
     } catch (e) { console.error(e); }
   }
 
@@ -208,12 +273,10 @@
     tbody.innerHTML = videos.map(v => `
       <tr>
         <td>${v.title || ''}</td>
-        <td>${v.originalTitle || ''}</td>
-        <td>${v.source}</td>
         <td>${v.author || '-'}</td>
+        <td>${v.source}</td>
         <td>${v.category}</td>
-        <td>${(v.stats && v.stats.views) ? v.stats.views.toLocaleString() : 0}</td>
-        <td>${v.weight}</td>
+        <td>${(v.stats?.views||0).toLocaleString()}</td>
         <td>
           <button class="${v.promoted ? 'warning' : ''}" onclick="togglePromote('${v.id}', ${!v.promoted})">
             ${v.promoted ? '已推荐' : '未推荐'}
@@ -239,13 +302,12 @@
   }
 
   async function togglePromote(id, setPromoted) {
-    // 获取当前视频完整数据，然后更新 promoted 字段
     const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, { headers: getHeaders() });
     const data = await res.json();
     const v = data.video;
     if (!v) return alert('未找到视频');
     v.promoted = setPromoted;
-    v.edited = true; // 标记为手动编辑
+    v.edited = true;
     await fetch(`${API_BASE}/api/admin/videos`, {
       method: 'POST',
       headers: getHeaders(),
@@ -297,9 +359,7 @@
     const title = document.getElementById('editTitle').value.trim();
     const url = document.getElementById('editUrl').value.trim();
     if (!title || !url) { alert('标题和播放链接必填'); return; }
-
     const id = document.getElementById('modalTitle').innerText.includes('添加') ? 'vid_' + Date.now() : document.getElementById('editTitle').dataset.id || document.getElementById('editOriginalTitle').value;
-
     const video = {
       id: id,
       title: title,
@@ -318,7 +378,6 @@
       promoted: document.getElementById('editPromoted').checked,
       edited: true
     };
-
     try {
       const res = await fetch(`${API_BASE}/api/admin/videos`, {
         method: 'POST',
@@ -367,64 +426,46 @@
     } catch (e) { document.getElementById('featuredMsg').innerText = '网络错误'; }
   };
 
-// 手动触发采集（优化版）
-window.manualCollect = async function() {
-  const btn = document.getElementById('manualCollectBtn');
-  const status = document.getElementById('collectStatus');
-  if (!btn || !status) return;
+  // 手动采集（优化版，带自动刷新）
+  window.manualCollect = async function() {
+    const btn = document.getElementById('manualCollectBtn');
+    const status = document.getElementById('collectStatus');
+    if (!btn || !status) return;
 
-  // 获取或提示输入 CRON_SECRET
-  let secret = sessionStorage.getItem('cronSecret');
-  if (!secret) {
-    secret = prompt('请输入 CRON_SECRET（采集触发密钥）');
+    let secret = sessionStorage.getItem('cronSecret');
     if (!secret) {
-      status.textContent = '已取消采集';
-      setTimeout(() => { status.textContent = ''; }, 3000);
-      return;
+      secret = prompt('请输入 CRON_SECRET（采集触发密钥）');
+      if (!secret) { status.textContent = '已取消采集'; return; }
+      sessionStorage.setItem('cronSecret', secret);
     }
-    sessionStorage.setItem('cronSecret', secret);
-  }
-
-  btn.disabled = true;
-  btn.textContent = '采集中...';
-  status.textContent = '正在抓取最新视频，请稍候...';
-
-  try {
-    const res = await fetch(`${API_BASE}/api/cron`, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + secret,
-        'Content-Type': 'application/json'
+    btn.disabled = true;
+    btn.textContent = '采集中...';
+    status.textContent = '正在抓取最新视频，请稍候...';
+    try {
+      const res = await fetch(`${API_BASE}/api/cron`, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + secret,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (res.ok) {
+        status.textContent = '采集成功！正在刷新数据...';
+        // 强制刷新页面以显示最新数据
+        setTimeout(() => { location.reload(); }, 1500);
+      } else if (res.status === 401) {
+        status.textContent = '密钥错误，请重新输入';
+        sessionStorage.removeItem('cronSecret');
+      } else {
+        status.textContent = '采集失败，服务器错误';
       }
-    });
-
-    if (res.ok) {
-      const text = await res.text();
-      status.textContent = '采集成功！数据已更新。';
-      await loadVideos(currentPage);
-      await loadDashboard();
-    } else if (res.status === 401) {
-      status.textContent = '密钥错误，请重新输入正确的 CRON_SECRET。';
-      sessionStorage.removeItem('cronSecret'); // 清除错误密钥
-    } else {
-      const errText = await res.text();
-      status.textContent = '采集失败，服务器返回: ' + errText;
+    } catch (e) {
+      status.textContent = '网络错误，采集失败';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '立即采集视频';
     }
-  } catch (e) {
-    status.textContent = '网络错误，采集失败（可能是跨域或 Worker 未响应）。';
-    console.error(e);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '立即采集视频';
-    setTimeout(() => { status.textContent = ''; }, 8000);
-  }
-};
-
-// 首次使用时提示输入 CRON_SECRET 并缓存（可选）
-if (!sessionStorage.getItem('cronSecret')) {
-  const secret = prompt('请输入 CRON_SECRET（用于手动采集）');
-  if (secret) sessionStorage.setItem('cronSecret', secret);
-}
+  };
 </script>
 </body>
 </html>
