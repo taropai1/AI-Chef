@@ -366,6 +366,50 @@
       document.getElementById('featuredMsg').innerText = data.success ? '主推视频已更新' : '操作失败';
     } catch (e) { document.getElementById('featuredMsg').innerText = '网络错误'; }
   };
+
+// 手动触发采集
+window.manualCollect = async function() {
+  const btn = document.getElementById('manualCollectBtn');
+  const status = document.getElementById('collectStatus');
+  if (!btn || !status) return;
+
+  btn.disabled = true;
+  btn.textContent = '采集中...';
+  status.textContent = '正在抓取最新视频，请稍候...';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/cron`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + (sessionStorage.getItem('cronSecret') || prompt('请输入 CRON_SECRET')),
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (res.ok) {
+      const text = await res.text();
+      status.textContent = '采集成功！数据已更新。';
+      // 可选：自动刷新视频列表
+      await loadVideos(currentPage);
+      await loadDashboard();
+    } else {
+      status.textContent = '采集失败，请检查 CRON_SECRET 是否正确。';
+    }
+  } catch (e) {
+    status.textContent = '网络错误，采集失败。';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '立即采集视频';
+    // 状态信息5秒后自动清除
+    setTimeout(() => { status.textContent = ''; }, 5000);
+  }
+};
+
+// 首次使用时提示输入 CRON_SECRET 并缓存（可选）
+if (!sessionStorage.getItem('cronSecret')) {
+  const secret = prompt('请输入 CRON_SECRET（用于手动采集）');
+  if (secret) sessionStorage.setItem('cronSecret', secret);
+}
 </script>
 </body>
 </html>
