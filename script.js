@@ -169,6 +169,8 @@ const translations = {
     inputPlaceholder: 'Tap the category and cuisine buttons, choose what you want to eat!', generating: 'Generating your recipe...', generateFailed: 'Load failed, please try again!',
     trendingVideos: 'Trending Videos', language: 'Language', more: 'More', recipeShort: 'Recipes', videoShort: 'Videos', loginSignUp: 'Login / Sign Up', profileMenu: 'Profile', addToHome: 'Share / Add to Home',
     subscribeBtn: 'Subscribe Now', freeTrialStatus: 'Recipes left: {{recipeLeft}}/3, AI questions left: {{aiLeft}}/10',
+    videoAll: 'All', videoCreativeFood: 'Creative Food', videoCookingTutorial: 'Cooking Tutorial', videoDessertDrinks: 'Dessert & Drinks', videoCreatorPicks: 'Creator Picks',
+    videoFooter: 'Original videos by AI Chef. Other videos are from YouTube, TikTok, Ins, Keso, Xiaohongshu. Copyright belongs to original creators.',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -244,6 +246,8 @@ const translations = {
     inputPlaceholder: '点开分类和菜系按钮，选择你想吃的美味!', generating: '正在生成食谱...', generateFailed: '加载失败，请重试！',
     trendingVideos: '热门视频', language: '语言', more: '更多',recipeShort: '食谱',videoShort: '视频',loginSignUp: '登录/注册', profileMenu: '个人账户', addToHome: '分享/加到主屏',
     subscribeBtn: '付费订阅', freeTrialStatus: '食谱剩余：{{recipeLeft}}/3 次，AI问答剩余：{{aiLeft}}/10 次',
+    videoAll: '全部', videoCreativeFood: '创意美食', videoCookingTutorial: '烹饪教程', videoDessertDrinks: '甜品与饮品', videoCreatorPicks: '博主精选',
+    videoFooter: '原创视频由AI Chef制作。其余视频来源：油管、抖音国际版、照片墙、可颂、小红书。版权归原创创作者所有。',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
@@ -327,6 +331,8 @@ const translations = {
     inputPlaceholder: 'Toca los botones de categorías y cocinas, elige lo que quieres comer!', generating: 'Generando tu receta...', generateFailed: 'Error de carga, inténtalo de nuevo!',
     trendingVideos: 'Tendencias', language: 'Idioma', more: 'Más', recipeShort: 'Recetas', videoShort: 'Videos', loginSignUp: 'Ingresar / Registrarse', profileMenu: 'Perfil', addToHome: 'Compartir / Añadir al inicio',
     subscribeBtn: 'Suscríbete Ya', freeTrialStatus: 'Recetas restantes: {{recipeLeft}}/3, Preguntas IA restantes: {{aiLeft}}/10',
+    videoAll: 'Todo', videoCreativeFood: 'Comida creativa', videoCookingTutorial: 'Tutorial de cocina', videoDessertDrinks: 'Postres y bebidas', videoCreatorPicks: 'Selección del creador',
+    videoFooter: 'Videos originales hechos por Chef IA. Los demás videos provienen de YouTube, TikTok, Ins, Keso y Xiaohongshu. Los derechos de autor pertenecen a sus creadores originales.',
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -411,6 +417,8 @@ const translations = {
     inputPlaceholder: 'Cliquez sur les boutons des catégories et cuisines, choisissez ce que vous voulez déguster!', generating: 'Génération de votre recette...', generateFailed: 'Échec du chargement, réessayez!',
     trendingVideos: 'Tendances', language: 'Langue', more: 'Plus', recipeShort: 'Recettes', videoShort: 'Vidéos', loginSignUp: 'Connexion / Inscription', profileMenu: 'Profil', addToHome: "Partager / Ajouter à l'accueil",
     subscribeBtn: "S'abonner Maintenant", freeTrialStatus: 'Recettes restantes : {{recipeLeft}}/3, Questions IA restantes : {{aiLeft}}/10',
+    videoAll: 'Tout', videoCreativeFood: 'Cuisine créative', videoCookingTutorial: 'Tutoriel de cuisine', videoDessertDrinks: 'Desserts et boissons', videoCreatorPicks: 'Choix du créateur',
+    videoFooter: 'Vidéos originales réalisées par Chef IA. Les autres vidéos proviennent de YouTube, TikTok, Ins, Keso et Xiaohongshu. Le droit d’auteur appartient aux créateurs originaux.',
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -496,6 +504,8 @@ const translations = {
     inputPlaceholder: 'Tippe auf Kategorie- und Küchenbuttons, wähle was du essen möchtest!', generating: 'Ihr Rezept wird erstellt...', generateFailed: 'Laden fehlgeschlagen, bitte erneut versuchen!',
     trendingVideos: 'Trends', language: 'Sprache', more: 'Mehr', recipeShort: 'Rezepte', videoShort: 'Videos', loginSignUp: 'Anmelden / Registrieren', profileMenu: 'Profil', addToHome: 'Teilen / Zur Startseite',
     subscribeBtn: 'Jetzt Abonnieren', freeTrialStatus: 'Rezepte übrig: {{recipeLeft}}/3, KI-Fragen übrig: {{aiLeft}}/10',
+    videoAll: 'Alle', videoCreativeFood: 'Kreatives Essen', videoCookingTutorial: 'Kochanleitung', videoDessertDrinks: 'Desserts & Getränke', videoCreatorPicks: 'Ersteller-Auswahl',
+    videoFooter: 'Originalvideos von KI-Koch. Weitere Videos stammen von YouTube, TikTok, Ins, Keso und Xiaohongshu. Das Urheberrecht liegt bei den ursprünglichen Erstellern.',
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -580,6 +590,8 @@ const translations = {
     inputPlaceholder: 'Tocca i pulsanti di categorie e cucine, scegli ciò che vuoi mangiare!', generating: 'Generando la tua ricetta...', generateFailed: 'Caricamento fallito, riprova!',
     trendingVideos: 'Tendenze', language: 'Lingua', more: 'Altro', recipeShort: 'Ricette', videoShort: 'Video', loginSignUp: 'Accedi / Registrati', profileMenu: 'Profilo', addToHome: 'Condividi / Aggiungi alla home',
     subscribeBtn: 'Abbonati Subito', freeTrialStatus: 'Ricette rimanenti: {{recipeLeft}}/3, Domande IA rimanenti: {{aiLeft}}/10',
+    videoAll: 'Tutti', videoCreativeFood: 'Cibo creativo', videoCookingTutorial: 'Tutorial di cucina', videoDessertDrinks: 'Dolci e bevande', videoCreatorPicks: 'Scelta del creatore',
+    videoFooter: 'Video originali realizzati da Chef IA. Gli altri video provengono da YouTube, TikTok, Ins, Keso e Xiaohongshu. I diritti d’autore appartengono ai creatori originali.',
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -665,6 +677,8 @@ const translations = {
     inputPlaceholder: 'Toque os botões de categorias e cozinhas, escolha o que você quer comer!', generating: 'Gerando sua receita...', generateFailed: 'Falha no carregamento, tente novamente!',
     trendingVideos: 'Tendências', language: 'Idioma', more: 'Mais', recipeShort: 'Receitas', videoShort: 'Vídeos', loginSignUp: 'Entrar / Cadastrar', profileMenu: 'Perfil', addToHome: 'Compartilhar / Adicionar à home',
     subscribeBtn: 'Assine Agora', freeTrialStatus: 'Receitas restantes: {{recipeLeft}}/3, Perguntas IA restantes: {{aiLeft}}/10',
+    videoAll: 'Todos', videoCreativeFood: 'Comida criativa', videoCookingTutorial: 'Tutorial de culinária', videoDessertDrinks: 'Sobremesas e bebidas', videoCreatorPicks: 'Escolha do criador',
+    videoFooter: 'Vídeos originais feitos pelo Chef IA. Os demais vídeos são do YouTube, TikTok, Ins, Keso e Xiaohongshu. Os direitos autorais pertencem aos criadores originais.'
   },
 }
 function t(key, params) {
@@ -1704,6 +1718,22 @@ Object.keys(tipMap).forEach(function(id) {
 });
   populateCuisines();
  
+    // ========== 视频页分类标签（新增）==========
+    document.querySelectorAll('.video-cat-btn').forEach(btn => {
+        const cat = btn.dataset.cat;
+        const keyMap = {
+            'All': 'videoAll',
+            'Creative Food': 'videoCreativeFood',
+            'Cooking Tutorial': 'videoCookingTutorial',
+            'Dessert & Drinks': 'videoDessertDrinks',
+            'Creator Picks': 'videoCreatorPicks'
+        };
+        if (keyMap[cat]) btn.textContent = t(keyMap[cat]);
+    });
+    // 视频页底部说明
+    const footerEl = document.getElementById('videoFooter');
+    if (footerEl) footerEl.innerHTML = `<p>${t('videoFooter')}</p>`;
+
 // ========== 整合：更新更多选项、AI独立页文案、模式按钮、菜系 ==========
 const moreSelect = document.getElementById('moreSelect');
 if (moreSelect) {
