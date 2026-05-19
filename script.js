@@ -1813,6 +1813,9 @@ async function showPage(pageId) {
         renderProfile();
         renderLanguage();
     }
+    if (pageId === 'page-video') {
+    initVideoPage();
+  }
     if (pageId === 'page-home') renderLanguage();
     renderLanguage();
 }
