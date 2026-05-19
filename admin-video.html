@@ -7,18 +7,31 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
     body { background: #f5f7fa; padding: 20px; color: #1f2937; }
-    .container { max-width: 960px; margin: 0 auto; }
-    h1 { margin-bottom: 20px; font-size: 24px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { margin-bottom: 20px; }
     .auth-section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .auth-section input { width: 300px; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-right: 10px; }
     button { padding: 8px 16px; border: none; border-radius: 8px; background: #4a90e2; color: #fff; cursor: pointer; font-weight: 500; }
     button:hover { opacity: 0.9; }
     button.danger { background: #ef4444; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    button.warning { background: #f59e0b; }
+    .data-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .data-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .data-card h3 { font-size: 14px; color: #6b7280; margin-bottom: 8px; }
+    .data-card .value { font-size: 28px; font-weight: 600; color: #1f2937; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 16px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
     th { background: #f9fafb; font-weight: 600; }
-    .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-    .form-row input, .form-row select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; }
+    .pagination { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
+    .pagination button { background: #f3f4f6; color: #1f2937; }
+    .pagination button.active { background: #4a90e2; color: #fff; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: #fff; border-radius: 16px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .form-row label { width: 80px; text-align: right; font-size: 14px; color: #6b7280; }
+    .form-row input, .form-row select { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; }
     .msg { color: green; margin: 10px 0; }
     .error { color: red; }
   </style>
@@ -35,61 +48,83 @@
   </div>
 
   <div id="mainSection" style="display:none;">
+    <div class="data-cards" id="dataCards"></div>
+    <div class="charts-row">
+      <div class="chart-box"><canvas id="sourceChart"></canvas></div>
+      <div class="chart-box"><canvas id="categoryChart"></canvas></div>
+    </div>
+
     <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
       <h3 style="margin-bottom:12px;">设置主推视频</h3>
-      <select id="featuredSelect" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;">
+      <select id="featuredSelect" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;width:300px;">
         <option value="">-- 请选择视频 --</option>
       </select>
       <button onclick="setFeatured()" style="margin-left:10px;">设为主推</button>
       <span id="featuredMsg" class="msg"></span>
     </div>
 
+    <button onclick="openAddModal()" style="margin-bottom:16px;">+ 添加视频</button>
+
     <h3>视频列表</h3>
     <div style="overflow-x:auto;">
       <table>
         <thead>
-          <tr><th>标题</th><th>来源</th><th>分类</th><th>权重</th><th>操作</th></tr>
+          <tr><th>展示标题</th><th>原标题</th><th>来源</th><th>作者</th><th>分类</th><th>播放量</th><th>权重</th><th>推荐</th><th>操作</th></tr>
         </thead>
         <tbody id="videoTbody"></tbody>
       </table>
     </div>
 
-    <div style="background:#fff;border-radius:12px;padding:20px;margin-top:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-      <h3 id="formTitle">添加 / 编辑视频</h3>
-      <div class="form-row">
-        <input type="text" id="vId" placeholder="视频 ID（唯一）">
-        <input type="text" id="vTitle" placeholder="标题">
-        <input type="text" id="vUrl" placeholder="视频播放地址">
-        <input type="text" id="vCover" placeholder="封面图片地址">
-      </div>
-      <div class="form-row">
-        <select id="vSource">
-          <option value="Original">原创</option>
-          <option value="YouTube">YouTube</option>
-          <option value="Dailymotion">Dailymotion</option>
-          <option value="Odysee">Odysee</option>
-          <option value="PeerTube">PeerTube</option>
-          <option value="Keso">可颂</option>
-          <option value="Xiaohongshu">小红书</option>
-        </select>
-        <select id="vCategory">
-          <option value="Creative Food">创意美食</option>
-          <option value="Cooking Tutorial">烹饪教程</option>
-          <option value="Dessert & Drinks">甜品饮品</option>
-          <option value="Creator Picks">博主精选</option>
-        </select>
-        <input type="number" id="vWeight" placeholder="权重（数字越大越靠前）" value="0">
-      </div>
-      <button onclick="saveVideo()">保存视频</button>
-      <button onclick="resetForm()" style="background:#6b7280;margin-left:10px;">重置</button>
-      <div id="formMsg" class="msg"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<div class="modal" id="videoModal">
+  <div class="modal-content">
+    <h3 id="modalTitle">编辑视频</h3>
+    <div class="form-row"><label>展示标题</label><input type="text" id="editTitle"></div>
+    <div class="form-row"><label>原标题</label><input type="text" id="editOriginalTitle" disabled></div>
+    <div class="form-row"><label>播放链接</label><input type="text" id="editUrl"></div>
+    <div class="form-row"><label>封面图</label><input type="text" id="editCover"></div>
+    <div class="form-row"><label>来源平台</label>
+      <select id="editSource">
+        <option value="Original">原创</option>
+        <option value="YouTube">YouTube</option>
+        <option value="Dailymotion">Dailymotion</option>
+        <option value="Odysee">Odysee</option>
+        <option value="PeerTube">PeerTube</option>
+        <option value="Keso">可颂</option>
+        <option value="Xiaohongshu">小红书</option>
+      </select>
+    </div>
+    <div class="form-row"><label>作者</label><input type="text" id="editAuthor"></div>
+    <div class="form-row"><label>分类</label>
+      <select id="editCategory">
+        <option value="Creative Food">创意美食</option>
+        <option value="Cooking Tutorial">烹饪教程</option>
+        <option value="Dessert & Drinks">甜品饮品</option>
+        <option value="Creator Picks">博主精选</option>
+      </select>
+    </div>
+    <div class="form-row"><label>权重</label><input type="number" id="editWeight" value="0"></div>
+    <div class="form-row"><label>播放量</label><input type="number" id="editViews" value="0"></div>
+    <div class="form-row"><label>点赞数</label><input type="number" id="editLikes" value="0"></div>
+    <div class="form-row"><label>评论数</label><input type="number" id="editComments" value="0"></div>
+    <div class="form-row"><label>设为推荐</label><input type="checkbox" id="editPromoted"></div>
+    <div style="margin-top:16px; display:flex; gap:10px; justify-content:flex-end;">
+      <button onclick="closeModal()" style="background:#6b7280;">取消</button>
+      <button onclick="saveVideo()">保存</button>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
   const API_BASE = 'https://vid.taropai.com';
   let adminKey = sessionStorage.getItem('adminKey') || '';
+  let currentPage = 1;
+  const pageSize = 20;
+  let allVideosCache = [];
 
   function getHeaders() {
     const h = new Headers();
@@ -102,17 +137,18 @@
     adminKey = document.getElementById('adminKeyInput').value.trim();
     if (!adminKey) return;
     try {
-      const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
+      const res = await fetch(`${API_BASE}/api/admin/videos?page=1&limit=1`, { headers: getHeaders() });
       if (res.ok) {
         sessionStorage.setItem('adminKey', adminKey);
         document.getElementById('authSection').style.display = 'none';
         document.getElementById('mainSection').style.display = 'block';
-        await loadVideos();
+        await loadDashboard();
+        await loadVideos(1);
       } else {
-        document.getElementById('authMsg').innerText = '密钥错误，请重试';
+        document.getElementById('authMsg').innerText = '密钥错误';
       }
     } catch (e) {
-      document.getElementById('authMsg').innerText = '网络连接失败';
+      document.getElementById('authMsg').innerText = '网络错误';
     }
   }
 
@@ -123,74 +159,162 @@
     }
   };
 
-  async function loadVideos() {
-    const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
-    const data = await res.json();
-    const videos = data.videos || [];
-    renderTable(videos);
-    const sel = document.getElementById('featuredSelect');
-    sel.innerHTML = '<option value="">-- 请选择视频 --</option>' +
-      videos.map(v => `<option value="${v.id}">${v.title}</option>`).join('');
+  async function loadDashboard() {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/videos?page=1&limit=9999`, { headers: getHeaders() });
+      const data = await res.json();
+      allVideosCache = data.videos || [];
+      document.getElementById('dataCards').innerHTML = `
+        <div class="data-card"><h3>视频总数</h3><div class="value">${allVideosCache.length}</div></div>
+        <div class="data-card"><h3>已推荐</h3><div class="value">${allVideosCache.filter(v=>v.promoted).length}</div></div>
+        <div class="data-card"><h3>原创视频</h3><div class="value">${allVideosCache.filter(v=>v.source==='Original').length}</div></div>
+        <div class="data-card"><h3>自动采集</h3><div class="value">${allVideosCache.filter(v=>v.source!=='Original').length}</div></div>
+      `;
+
+      const sourceCounts = {};
+      allVideosCache.forEach(v => sourceCounts[v.source] = (sourceCounts[v.source]||0)+1);
+      new Chart(document.getElementById('sourceChart'), {
+        type: 'pie',
+        data: {
+          labels: Object.keys(sourceCounts),
+          datasets: [{ data: Object.values(sourceCounts), backgroundColor: ['#4a90e2','#f59e0b','#10b981','#ef4444','#8b5cf6','#ec4899','#06b6d4'] }]
+        }
+      });
+
+      const catCounts = {};
+      allVideosCache.forEach(v => catCounts[v.category] = (catCounts[v.category]||0)+1);
+      new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+          labels: Object.keys(catCounts),
+          datasets: [{ data: Object.values(catCounts), backgroundColor: ['#4a90e2','#f59e0b','#10b981','#ef4444'] }]
+        }
+      });
+    } catch (e) { console.error(e); }
   }
 
-  function renderTable(videos) {
+  async function loadVideos(page) {
+    currentPage = page;
+    const res = await fetch(`${API_BASE}/api/admin/videos?page=${page}&limit=${pageSize}`, { headers: getHeaders() });
+    const data = await res.json();
+    const videos = data.videos || [];
+    const total = data.total || 0;
+
     const tbody = document.getElementById('videoTbody');
     tbody.innerHTML = videos.map(v => `
       <tr>
-        <td>${v.title}</td>
+        <td>${v.title || ''}</td>
+        <td>${v.originalTitle || ''}</td>
         <td>${v.source}</td>
+        <td>${v.author || '-'}</td>
         <td>${v.category}</td>
+        <td>${(v.stats && v.stats.views) ? v.stats.views.toLocaleString() : 0}</td>
         <td>${v.weight}</td>
         <td>
-          <button onclick="editVideo('${v.id}')">编辑</button>
+          <button class="${v.promoted ? 'warning' : ''}" onclick="togglePromote('${v.id}', ${!v.promoted})">
+            ${v.promoted ? '已推荐' : '未推荐'}
+          </button>
+        </td>
+        <td>
+          <button onclick="openEditModal('${v.id}')">编辑</button>
           <button class="danger" onclick="deleteVideo('${v.id}')">删除</button>
         </td>
       </tr>
     `).join('');
+
+    const totalPages = Math.ceil(total / pageSize);
+    let pagHTML = '';
+    for (let i=1; i<=totalPages; i++) {
+      pagHTML += `<button class="${i===page?'active':''}" onclick="loadVideos(${i})">${i}</button>`;
+    }
+    document.getElementById('pagination').innerHTML = pagHTML;
+
+    const sel = document.getElementById('featuredSelect');
+    sel.innerHTML = '<option value="">-- 请选择视频 --</option>' +
+      videos.map(v => `<option value="${v.id}">${v.title || v.id}</option>`).join('');
   }
 
-  window.editVideo = async function(id) {
+  async function togglePromote(id, setPromoted) {
+    // 获取当前视频完整数据，然后更新 promoted 字段
+    const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, { headers: getHeaders() });
+    const data = await res.json();
+    const v = data.video;
+    if (!v) return alert('未找到视频');
+    v.promoted = setPromoted;
+    v.edited = true; // 标记为手动编辑
+    await fetch(`${API_BASE}/api/admin/videos`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(v)
+    });
+    await loadVideos(currentPage);
+    await loadDashboard();
+  }
+
+  function openAddModal() {
+    document.getElementById('modalTitle').innerText = '添加视频';
+    document.getElementById('editOriginalTitle').disabled = false;
+    ['editTitle','editOriginalTitle','editUrl','editCover','editAuthor','editWeight','editViews','editLikes','editComments'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('editSource').value = 'Original';
+    document.getElementById('editCategory').value = 'Creative Food';
+    document.getElementById('editPromoted').checked = false;
+    document.getElementById('videoModal').style.display = 'flex';
+  }
+
+  window.openEditModal = async function(id) {
     try {
-      const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
+      const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, { headers: getHeaders() });
       const data = await res.json();
-      const videos = data.videos || [];
-      const v = videos.find(v => v.id === id);
-      if (!v) {
-        alert('未找到该视频');
-        return;
-      }
-      document.getElementById('vId').value = v.id;
-      document.getElementById('vTitle').value = v.title;
-      document.getElementById('vUrl').value = v.url;
-      document.getElementById('vCover').value = v.cover || '';
-      document.getElementById('vSource').value = v.source;
-      document.getElementById('vCategory').value = v.category;
-      document.getElementById('vWeight').value = v.weight;
-      document.getElementById('vId').disabled = true;
-      document.getElementById('formTitle').innerText = '编辑视频';
-      window.scrollTo({ top: document.getElementById('vId').offsetTop - 100, behavior: 'smooth' });
-    } catch (e) {
-      alert('获取视频失败：' + e.message);
-    }
+      const v = data.video;
+      if (!v) { alert('未找到该视频'); return; }
+      document.getElementById('modalTitle').innerText = '编辑视频';
+      document.getElementById('editOriginalTitle').disabled = true;
+      document.getElementById('editTitle').value = v.title || '';
+      document.getElementById('editOriginalTitle').value = v.originalTitle || '';
+      document.getElementById('editUrl').value = v.url || '';
+      document.getElementById('editCover').value = v.cover || '';
+      document.getElementById('editSource').value = v.source || 'Original';
+      document.getElementById('editAuthor').value = v.author || '';
+      document.getElementById('editCategory').value = v.category || 'All';
+      document.getElementById('editWeight').value = v.weight || 0;
+      document.getElementById('editViews').value = v.stats?.views || 0;
+      document.getElementById('editLikes').value = v.stats?.likes || 0;
+      document.getElementById('editComments').value = v.stats?.comments || 0;
+      document.getElementById('editPromoted').checked = v.promoted === true;
+      document.getElementById('videoModal').style.display = 'flex';
+    } catch (e) { alert('获取视频信息失败'); }
   };
 
+  function closeModal() {
+    document.getElementById('videoModal').style.display = 'none';
+  }
+
   window.saveVideo = async function() {
-    const id = document.getElementById('vId').value.trim();
-    const title = document.getElementById('vTitle').value.trim();
-    const url = document.getElementById('vUrl').value.trim();
-    if (!id || !title || !url) {
-      document.getElementById('formMsg').innerText = '请填写 ID、标题和播放地址';
-      return;
-    }
+    const title = document.getElementById('editTitle').value.trim();
+    const url = document.getElementById('editUrl').value.trim();
+    if (!title || !url) { alert('标题和播放链接必填'); return; }
+
+    const id = document.getElementById('modalTitle').innerText.includes('添加') ? 'vid_' + Date.now() : document.getElementById('editTitle').dataset.id || document.getElementById('editOriginalTitle').value;
+
     const video = {
       id: id,
       title: title,
+      originalTitle: document.getElementById('editOriginalTitle').value.trim(),
       url: url,
-      cover: document.getElementById('vCover').value.trim(),
-      source: document.getElementById('vSource').value,
-      category: document.getElementById('vCategory').value,
-      weight: parseInt(document.getElementById('vWeight').value) || 0
+      cover: document.getElementById('editCover').value.trim(),
+      source: document.getElementById('editSource').value,
+      author: document.getElementById('editAuthor').value.trim(),
+      category: document.getElementById('editCategory').value,
+      weight: parseInt(document.getElementById('editWeight').value) || 0,
+      stats: {
+        views: parseInt(document.getElementById('editViews').value) || 0,
+        likes: parseInt(document.getElementById('editLikes').value) || 0,
+        comments: parseInt(document.getElementById('editComments').value) || 0
+      },
+      promoted: document.getElementById('editPromoted').checked,
+      edited: true
     };
+
     try {
       const res = await fetch(`${API_BASE}/api/admin/videos`, {
         method: 'POST',
@@ -199,44 +323,29 @@
       });
       const data = await res.json();
       if (data.success) {
-        document.getElementById('formMsg').innerText = '保存成功！';
-        resetForm();
-        await loadVideos();
+        alert('保存成功');
+        closeModal();
+        await loadVideos(currentPage);
+        await loadDashboard();
       } else {
-        document.getElementById('formMsg').innerText = data.error || '保存失败';
+        alert('保存失败: ' + data.error);
       }
-    } catch (e) {
-      document.getElementById('formMsg').innerText = '网络错误，请稍后重试';
-    }
-  };
-
-  window.resetForm = function() {
-    document.getElementById('vId').disabled = false;
-    document.getElementById('vId').value = '';
-    document.getElementById('vTitle').value = '';
-    document.getElementById('vUrl').value = '';
-    document.getElementById('vCover').value = '';
-    document.getElementById('vWeight').value = '0';
-    document.getElementById('formTitle').innerText = '添加 / 编辑视频';
-    document.getElementById('formMsg').innerText = '';
+    } catch (e) { alert('网络错误'); }
   };
 
   window.deleteVideo = async function(id) {
-    if (!confirm('确定要删除这个视频吗？')) return;
+    if (!confirm('确定删除？')) return;
     try {
-      const res = await fetch(`${API_BASE}/api/admin/videos?id=${encodeURIComponent(id)}`, {
+      const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, {
         method: 'DELETE',
         headers: getHeaders()
       });
       const data = await res.json();
       if (data.success) {
-        await loadVideos();
-      } else {
-        alert('删除失败');
-      }
-    } catch (e) {
-      alert('网络错误，删除失败');
-    }
+        await loadVideos(currentPage);
+        await loadDashboard();
+      } else { alert('删除失败'); }
+    } catch (e) { alert('网络错误'); }
   };
 
   window.setFeatured = async function() {
@@ -247,17 +356,11 @@
       const res = await fetch(`${API_BASE}/api/admin/videos/featured`, {
         method: 'PUT',
         headers: getHeaders(),
-        body: JSON.stringify({ id: id })
+        body: JSON.stringify({ id })
       });
       const data = await res.json();
-      if (data.success) {
-        document.getElementById('featuredMsg').innerText = '主推视频已更新！';
-      } else {
-        document.getElementById('featuredMsg').innerText = '操作失败：' + (data.error || '');
-      }
-    } catch (e) {
-      document.getElementById('featuredMsg').innerText = '网络错误，请稍后重试';
-    }
+      document.getElementById('featuredMsg').innerText = data.success ? '主推视频已更新' : '操作失败';
+    } catch (e) { document.getElementById('featuredMsg').innerText = '网络错误'; }
   };
 </script>
 </body>
