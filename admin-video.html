@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    body { background: #f5f7fa; padding: 20px; color: #1f2937; }
+    .container { max-width: 960px; margin: 0 auto; }
+    h1 { margin-bottom: 20px; font-size: 24px; }
+    .auth-section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .auth-section input { width: 300px; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-right: 10px; }
+    button { padding: 8px 16px; border: none; border-radius: 8px; background: #4a90e2; color: #fff; cursor: pointer; font-weight: 500; }
+    button:hover { opacity: 0.9; }
+    button.danger { background: #ef4444; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+    .form-row input, .form-row select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; }
+    .msg { color: green; margin: 10px 0; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Video Management</h1>
+
+  <div class="auth-section" id="authSection">
+    <label>Admin Key: </label>
+    <input type="password" id="adminKeyInput" placeholder="Enter Admin Key">
+    <button onclick="login()">Login</button>
+    <div id="authMsg" class="error" style="margin-top:8px;"></div>
+  </div>
+
+  <div id="mainSection" style="display:none;">
+    <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      <h3 style="margin-bottom:12px;">Set Featured Video</h3>
+      <select id="featuredSelect" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;">
+        <option value="">-- Select a video --</option>
+      </select>
+      <button onclick="setFeatured()" style="margin-left:10px;">Set as Featured</button>
+      <span id="featuredMsg" class="msg"></span>
+    </div>
+
+    <h3>Video List</h3>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>Title</th><th>Source</th><th>Category</th><th>Weight</th><th>Action</th></tr>
+        </thead>
+        <tbody id="videoTbody"></tbody>
+      </table>
+    </div>
+
+    <div style="background:#fff;border-radius:12px;padding:20px;margin-top:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      <h3 id="formTitle">Add / Edit Video</h3>
+      <div class="form-row">
+        <input type="text" id="vId" placeholder="Video ID (unique)">
+        <input type="text" id="vTitle" placeholder="Title">
+        <input type="text" id="vUrl" placeholder="Video URL">
+        <input type="text" id="vCover" placeholder="Cover Image URL">
+      </div>
+      <div class="form-row">
+        <select id="vSource">
+          <option value="Original">Original</option>
+          <option value="YouTube">YouTube</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Ins">Ins</option>
+          <option value="Keso">Keso</option>
+          <option value="Xiaohongshu">Xiaohongshu</option>
+        </select>
+        <select id="vCategory">
+          <option value="Creative Food">Creative Food</option>
+          <option value="Cooking Tutorial">Cooking Tutorial</option>
+          <option value="Dessert & Drinks">Dessert & Drinks</option>
+          <option value="Creator Picks">Creator Picks</option>
+        </select>
+        <input type="number" id="vWeight" placeholder="Weight (higher = first)" value="0">
+      </div>
+      <button onclick="saveVideo()">Save Video</button>
+      <button onclick="resetForm()" style="background:#6b7280;margin-left:10px;">Reset</button>
+      <div id="formMsg" class="msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'https://vid.taropai.com';
+  let adminKey = sessionStorage.getItem('adminKey') || '';
+
+  function getHeaders() {
+    const h = new Headers();
+    h.append('Content-Type', 'application/json');
+    if (adminKey) h.append('X-Admin-Key', adminKey);
+    return h;
+  }
+
+  async function login() {
+    adminKey = document.getElementById('adminKeyInput').value.trim();
+    if (!adminKey) return;
+    // 简单验证：尝试获取视频列表
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
+      if (res.ok) {
+        sessionStorage.setItem('adminKey', adminKey);
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('mainSection').style.display = 'block';
+        await loadVideos();
+      } else {
+        document.getElementById('authMsg').innerText = 'Invalid Admin Key';
+      }
+    } catch (e) {
+      document.getElementById('authMsg').innerText = 'Connection error';
+    }
+  }
+
+  // 页面加载时如果已有 session，自动登录
+  window.onload = () => {
+    if (adminKey) {
+      document.getElementById('adminKeyInput').value = adminKey;
+      login();
+    }
+  };
+
+  async function loadVideos() {
+    const res = await fetch(`${API_BASE}/api/admin/videos`, { headers: getHeaders() });
+    const data = await res.json();
+    const videos = data.videos || [];
+    renderTable(videos);
+    // 填充主推选择框
+    const sel = document.getElementById('featuredSelect');
+    sel.innerHTML = '<option value="">-- Select a video --</option>' +
+      videos.map(v => `<option value="${v.id}">${v.title}</option>`).join('');
+  }
+
+  function renderTable(videos) {
+    const tbody = document.getElementById('videoTbody');
+    tbody.innerHTML = videos.map(v => `
+      <tr>
+        <td>${v.title}</td>
+        <td>${v.source}</td>
+        <td>${v.category}</td>
+        <td>${v.weight}</td>
+        <td>
+          <button onclick="editVideo('${v.id}')">Edit</button>
+          <button class="danger" onclick="deleteVideo('${v.id}')">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function editVideo(id) {
+    const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, { headers: getHeaders() });
+    const data = await res.json();
+    const v = data.videos ? data.videos.find(v => v.id === id) : null;
+    if (!v) return alert('Video not found');
+    document.getElementById('vId').value = v.id;
+    document.getElementById('vTitle').value = v.title;
+    document.getElementById('vUrl').value = v.url;
+    document.getElementById('vCover').value = v.cover || '';
+    document.getElementById('vSource').value = v.source;
+    document.getElementById('vCategory').value = v.category;
+    document.getElementById('vWeight').value = v.weight;
+    document.getElementById('vId').disabled = true;
+    document.getElementById('formTitle').innerText = 'Edit Video';
+    window.scrollTo({ top: document.getElementById('vId').offsetTop - 100, behavior: 'smooth' });
+  }
+
+  async function saveVideo() {
+    const id = document.getElementById('vId').value.trim();
+    const title = document.getElementById('vTitle').value.trim();
+    const url = document.getElementById('vUrl').value.trim();
+    if (!id || !title || !url) {
+      document.getElementById('formMsg').innerText = 'Please fill in ID, Title, URL';
+      return;
+    }
+    const video = {
+      id,
+      title,
+      url,
+      cover: document.getElementById('vCover').value.trim(),
+      source: document.getElementById('vSource').value,
+      category: document.getElementById('vCategory').value,
+      weight: parseInt(document.getElementById('vWeight').value) || 0,
+    };
+    const res = await fetch(`${API_BASE}/api/admin/videos`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(video)
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('formMsg').innerText = 'Saved!';
+      resetForm();
+      await loadVideos();
+    } else {
+      document.getElementById('formMsg').innerText = data.error || 'Error';
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('vId').disabled = false;
+    document.getElementById('vId').value = '';
+    document.getElementById('vTitle').value = '';
+    document.getElementById('vUrl').value = '';
+    document.getElementById('vCover').value = '';
+    document.getElementById('vWeight').value = '0';
+    document.getElementById('formTitle').innerText = 'Add / Edit Video';
+    document.getElementById('formMsg').innerText = '';
+  }
+
+  async function deleteVideo(id) {
+    if (!confirm('Delete this video?')) return;
+    const res = await fetch(`${API_BASE}/api/admin/videos?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const data = await res.json();
+    if (data.success) {
+      await loadVideos();
+    } else {
+      alert('Delete failed');
+    }
+  }
+
+  async function setFeatured() {
+    const sel = document.getElementById('featuredSelect');
+    const id = sel.value;
+    if (!id) return;
+    const res = await fetch(`${API_BASE}/api/admin/videos/featured`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('featuredMsg').innerText = 'Featured video updated!';
+    } else {
+      document.getElementById('featuredMsg').innerText = 'Error: ' + (data.error || '');
+    }
+  }
+</script>
+</body>
+</html>
