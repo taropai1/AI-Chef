@@ -1254,78 +1254,82 @@ if (qaLimitNote && userData) {
 }
 }
 
-// ==================== 视频模块 ====================
-const VIDEO_API = "https://vid.taropai.com";
-
-async function showVideo() {
-  const dishNameEl = document.getElementById('recipeNameDisplay');
-  let dish = dishNameEl ? dishNameEl.innerText.trim() : '';
-  if (!dish || dish === 'Please generate a recipe first' || dish.startsWith('生成失败')) {
-    dish = document.getElementById('dishName').value.trim() || 'cooking';
-  }
-  try {
-    const res = await fetch(`${VIDEO_API}?dish=${encodeURIComponent(dish)}`);
-    const data = await res.json();
-    renderVideoGrid(data.videos || []);
-  } catch (e) {
-    renderVideoGrid([]);
-  }
-  document.getElementById('videoModal').classList.add('show');
-}
-
-function renderVideoGrid(videos) {
+// ==================== 视频页面初始化 ====================
+async function initVideoPage() {
   const grid = document.getElementById('videoGrid');
-  if (!videos.length) {
-    grid.innerHTML = '<div style="padding:20px;text-align:center;color:#6b7280;">暂无相关视频</div>';
+  const player = document.getElementById('mainVideoPlayer');
+  const titleEl = document.getElementById('currentVideoTitle');
+  const sourceEl = document.getElementById('currentVideoSource');
+  const catBtns = document.querySelectorAll('#videoCategories .video-cat-btn');
+
+  let allVideos = [];
+  let featured = null;
+
+  // 获取视频数据
+  try {
+    const res = await fetch('https://vid.taropai.com/api/videos');
+    const data = await res.json();
+    featured = data.featured;
+    allVideos = data.list;
+  } catch (err) {
+    console.error('Failed to fetch videos:', err);
+    grid.innerHTML = '<p style="text-align:center;color:#6b7280;">Failed to load videos.</p>';
     return;
   }
+
+  // 渲染分类筛选事件
+  catBtns.forEach(btn => {
+    btn.onclick = async function() {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
+      const data = await res.json();
+      allVideos = data.list;
+      renderVideoGrid(allVideos, player, titleEl, sourceEl);
+    };
+  });
+
+  // 播放主推视频
+  if (featured) {
+    player.src = featured.url;
+    titleEl.textContent = featured.title;
+    sourceEl.textContent = featured.source === 'Original' ? 'Original' : `From ${featured.source}`;
+    player.play().catch(() => {});
+  }
+
+  // 渲染卡片
+  renderVideoGrid(allVideos, player, titleEl, sourceEl);
+}
+
+function renderVideoGrid(videos, player, titleEl, sourceEl) {
+  const grid = document.getElementById('videoGrid');
+  if (!grid) return;
+
   grid.innerHTML = videos.map(v => `
-    <div class="video-card" onclick="playVideoFromGrid('${v.platform}','${v.id}','${v.title.replace(/'/g, "\\'")}')">
-      <img class="video-card-img" src="${v.cover}" alt="${v.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 160 90\\'%3E%3Crect width=\\'160\\' height=\\'90\\' fill=\\'%23e5e7eb\\'/%3E%3Ctext x=\\'10\\' y=\\'50\\' font-size=\\'12\\' fill=\\'%236b7280\\'%3EPreview%3C/text%3E%3C/svg%3E'">
-      <div class="video-card-text">
-        <div class="video-card-name">${v.title}</div>
-        <div class="video-card-meta">${v.views || 0} 次播放 • ${v.platform}</div>
+    <div class="video-card" data-url="${v.url}" data-title="${v.title}" data-source="${v.source}">
+      <img class="video-card-img" src="${v.cover}" alt="${v.title}" loading="lazy" onerror="this.src='data:image/svg+xml,...'">
+      <div class="video-card-info">
+        <div class="video-card-title">${v.title}</div>
+        <div class="video-card-meta">${v.source === 'Original' ? 'Original' : 'From ' + v.source}</div>
       </div>
     </div>
   `).join('');
-}
 
-window.playVideoFromGrid = function(platform, videoId, title) {
-  document.getElementById('videoModal').classList.remove('show');
-  document.getElementById('bottomVideoTitle').innerText = title;
-  const player = document.getElementById('videoPlayer');
-  const frameContainer = document.getElementById('videoFrameContainer');
-  if (platform === 'bilibili') {
-    frameContainer.innerHTML = `<iframe width="100%" height="100%" src="https://player.bilibili.com/player.html?bvid=${videoId}&autoplay=1" frameborder="0" allowfullscreen></iframe>`;
-  } else if (platform === 'youtube') {
-    frameContainer.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>`;
-  } else if (platform === 'tiktok') {
-    window.open(`https://www.tiktok.com/video/${videoId}`, '_blank');
-    return;
-  } else if (platform === 'promo') {
-    frameContainer.innerHTML = `<video width="100%" height="100%" controls autoplay src="${videoId}"></video>`;
-  }
-  player.classList.add('show', 'expanded');
-  player.classList.remove('mini');
-};
-
-function initVideoPlayerControls() {
-  document.getElementById('closeVideoModal').addEventListener('click', () => document.getElementById('videoModal').classList.remove('show'));
-  document.getElementById('togglePlayer').addEventListener('click', () => {
-    const player = document.getElementById('videoPlayer');
-    player.classList.toggle('expanded');
-    player.classList.toggle('mini');
-  });
-  document.getElementById('closePlayer').addEventListener('click', () => {
-    const player = document.getElementById('videoPlayer');
-    player.classList.remove('show', 'expanded', 'mini');
-    document.getElementById('videoFrameContainer').innerHTML = '';
-  });
-  document.getElementById('videoModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('videoModal')) document.getElementById('videoModal').classList.remove('show');
+  // 绑定点击事件
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', function() {
+      const url = this.dataset.url;
+      const title = this.dataset.title;
+      const source = this.dataset.source;
+      player.src = url;
+      player.muted = false;
+      player.play();
+      titleEl.textContent = title;
+      sourceEl.textContent = source === 'Original' ? 'Original' : `From ${source}`;
+    });
   });
 }
-
 // ==================== 登录/注册 ====================
 function switchAuthTab(tab) {
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
