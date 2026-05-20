@@ -1294,14 +1294,13 @@ async function initVideoPage() {
 
   const safeT = (key, fallback) => (typeof t === 'function' ? t(key) : null) || fallback;
 
-  // 轮播配置
   const SLIDE_DURATION = 60;
   let slideTimer = null;
   let currentPlaylist = [];
   let currentIndex = 0;
   const MAX_VISIBLE_DOTS = 10;
 
-  // 创建弹窗播放器
+  // 弹窗播放器
   const videoOverlay = document.createElement('div');
   videoOverlay.className = 'video-player-overlay';
   videoOverlay.innerHTML = `
@@ -1316,37 +1315,38 @@ async function initVideoPage() {
   const overlayClose = document.getElementById('videoOverlayClose');
   const overlayFullscreen = document.getElementById('videoOverlayFullscreen');
 
-  // 弹窗关闭：暂停弹窗视频，恢复主播放器轮播
   overlayClose.addEventListener('click', () => {
     overlayPlayer.pause();
     videoOverlay.classList.remove('active', 'fullscreen');
-    // 恢复主播放器（从暂停位置继续播放）
     player.play().catch(() => {});
   });
 
-  // 弹窗全屏切换
   overlayFullscreen.addEventListener('click', () => {
     videoOverlay.classList.toggle('fullscreen');
   });
 
-  // 根据设备设置弹窗基础样式（桌面端右下角、移动端底部半屏）
   function applyDeviceClass() {
-    if (window.innerWidth >= 768) {
+    const isLandscape = window.innerWidth > window.innerHeight;
+    if (isLandscape) {
+      videoOverlay.classList.add('fullscreen');
+      videoOverlay.classList.remove('desktop');
+    } else if (window.innerWidth >= 768) {
       videoOverlay.classList.add('desktop');
+      videoOverlay.classList.remove('fullscreen');
     } else {
       videoOverlay.classList.remove('desktop');
+      videoOverlay.classList.remove('fullscreen');
     }
   }
   window.addEventListener('resize', applyDeviceClass);
+  window.addEventListener('orientationchange', applyDeviceClass);
   applyDeviceClass();
 
   let allVideos = [];
-  let featured = null;
 
   try {
     const res = await fetch('https://vid.taropai.com/api/videos');
     const data = await res.json();
-    featured = data.featured;
     allVideos = data.list || [];
   } catch (err) {
     console.error('[视频] 加载失败:', err);
@@ -1354,17 +1354,13 @@ async function initVideoPage() {
     return;
   }
 
-  // ========== 轮播列表：仅使用管理员推荐的视频 ==========
-  const buildPlaylist = () => {
-    const promoted = allVideos.filter(v => v.promoted);
-    if (promoted.length > 0) {
-      currentPlaylist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
-    } else {
-      // 若无推荐视频，则回退到前20条热门视频（保证不为空）
-      currentPlaylist = allVideos.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
-    }
-  };
-  buildPlaylist();
+  // 构建轮播列表：仅使用推荐视频
+  const promoted = allVideos.filter(v => v.promoted);
+  if (promoted.length > 0) {
+    currentPlaylist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+  } else {
+    currentPlaylist = allVideos.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
+  }
 
   // 轮播线构建
   function buildTimeline() {
@@ -1378,7 +1374,6 @@ async function initVideoPage() {
   }
   buildTimeline();
 
-  // 更新轮播线视觉（渐变效果）
   function updateTimeline(index, total) {
     if (!timelineTrack || total === 0) return;
     const dots = timelineTrack.querySelectorAll('.video-timeline-dot');
@@ -1407,7 +1402,6 @@ async function initVideoPage() {
     });
   }
 
-  // 播放指定索引视频（仅用于主播放器轮播）
   function playVideoAtIndex(index) {
     if (!currentPlaylist.length) return;
     const v = currentPlaylist[index];
@@ -1428,12 +1422,11 @@ async function initVideoPage() {
     }, SLIDE_DURATION * 1000);
   }
 
-  // 初始播放
   if (currentPlaylist.length) {
     playVideoAtIndex(0);
   }
 
-  // 轮播线交互：点击/滑动跳转
+  // 轮播线交互
   if (timelineContainer) {
     timelineContainer.addEventListener('click', (e) => {
       const rect = timelineTrack.getBoundingClientRect();
@@ -1459,7 +1452,7 @@ async function initVideoPage() {
     });
   }
 
-  // 分类按钮事件
+  // 分类按钮事件：仅更新卡片区，不改变轮播
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
@@ -1469,10 +1462,6 @@ async function initVideoPage() {
         const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
         const data = await res.json();
         allVideos = data.list || [];
-        buildPlaylist();
-        currentIndex = 0;
-        updateTimeline(currentIndex, currentPlaylist.length);
-        if (currentPlaylist.length) playVideoAtIndex(0);
         renderVideoGrid(allVideos, safeT, overlayPlayer, videoOverlay, player);
       } catch (e) {
         console.error('[视频] 分类加载失败:', e);
@@ -1510,7 +1499,6 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
       ? (safeT('original', 'Original'))
       : (safeT('fromSource', 'From') + ' ' + source);
 
-    // 移动端元数据行
     const metaParts = [];
     metaParts.push(`<span>${sourceLabel}</span>`);
     if (author) metaParts.push(`<span>${author}</span>`);
@@ -1527,14 +1515,25 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
   }
   grid.innerHTML = html;
 
-  // 卡片点击：弹窗播放，暂停主播放器
   grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
       const videoUrl = card.dataset.url;
       if (!videoUrl) return;
       overlayPlayer.src = videoUrl;
       overlayPlayer.play().catch(() => {});
-      mainPlayer.pause(); // 暂停顶部轮播
+      mainPlayer.pause();
+      // 打开前根据当前屏幕状态设置弹窗类
+      const isLandscape = window.innerWidth > window.innerHeight;
+      if (isLandscape) {
+        videoOverlay.classList.add('fullscreen');
+        videoOverlay.classList.remove('desktop');
+      } else if (window.innerWidth >= 768) {
+        videoOverlay.classList.add('desktop');
+        videoOverlay.classList.remove('fullscreen');
+      } else {
+        videoOverlay.classList.remove('desktop');
+        videoOverlay.classList.remove('fullscreen');
+      }
       videoOverlay.classList.add('active');
     });
   });
