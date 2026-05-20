@@ -1300,12 +1300,14 @@ async function initVideoPage() {
   let currentIndex = 0;
   const MAX_VISIBLE_DOTS = 10;
 
-  // 创建底部半屏弹窗播放器（无全屏按钮）
+  // 创建弹窗播放器：无全屏按钮，原生全屏禁用，横屏自动全屏
   const videoOverlay = document.createElement('div');
   videoOverlay.className = 'video-player-overlay';
   videoOverlay.innerHTML = `
     <div class="overlay-close" id="videoOverlayClose">✕</div>
-    <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload" oncontextmenu="return false;"></video>
+    <div class="overlay-video-wrapper">
+      <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
+    </div>
   `;
   document.body.appendChild(videoOverlay);
   const overlayPlayer = document.getElementById('overlayVideoPlayer');
@@ -1374,7 +1376,6 @@ async function initVideoPage() {
         }
         dot.style.width = width + 'px';
         dot.style.borderRadius = width > 6 ? '2px' : '50%';
-        // 确保未激活点保持白色背景（兼容深色背景）
         if (!dot.classList.contains('active')) {
           dot.style.background = '#fff';
         }
@@ -1408,7 +1409,7 @@ async function initVideoPage() {
     playVideoAtIndex(0);
   }
 
-  // 轮播线交互：点击/滑动跳转
+  // 轮播线交互
   if (timelineContainer) {
     timelineContainer.addEventListener('click', (e) => {
       const rect = timelineTrack.getBoundingClientRect();
@@ -1434,7 +1435,7 @@ async function initVideoPage() {
     });
   }
 
-  // 分类按钮事件：只更新卡片区，不动轮播
+  // 分类按钮：仅更新卡片区，不动轮播
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
@@ -1496,7 +1497,7 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
   }
   grid.innerHTML = html;
 
-  // 卡片点击：底部半屏弹窗播放，暂停主播放器
+  // 卡片点击：弹窗播放，暂停主播放器，横屏自动全屏
   grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
       const videoUrl = card.dataset.url;
@@ -1504,6 +1505,23 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
       overlayPlayer.src = videoUrl;
       overlayPlayer.play().catch(() => {});
       mainPlayer.pause();
+      // 移动端横屏时自动全屏弹窗
+      if (window.innerWidth <= 767 && window.innerWidth > window.innerHeight) {
+        videoOverlay.style.width = '100%';
+        videoOverlay.style.height = '100%';
+        videoOverlay.style.maxHeight = '100vh';
+        videoOverlay.style.borderRadius = '0';
+        videoOverlay.style.bottom = '0';
+        videoOverlay.style.right = '0';
+      } else {
+        // 竖屏或桌面端恢复默认样式
+        videoOverlay.style.width = '';
+        videoOverlay.style.height = '';
+        videoOverlay.style.maxHeight = '';
+        videoOverlay.style.borderRadius = '';
+        videoOverlay.style.bottom = '';
+        videoOverlay.style.right = '';
+      }
       videoOverlay.classList.add('active');
     });
   });
