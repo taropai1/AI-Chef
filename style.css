@@ -426,6 +426,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   z-index: 20;
+  background: transparent;
 }
 
 .video-timeline-track {
@@ -473,12 +474,13 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   font-weight: 400;
   color: #6b7280;
   background: #e3f2fd;
-  padding: 1px 8px;
+  padding: 2px 10px;
   border-radius: 10px;
   display: inline-block;
   text-align: center;
   white-space: nowrap;
   line-height: 1.4;
+  letter-spacing: 0.2px;
 }
 
 /* 分类标签 */
@@ -517,7 +519,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   border-color: #4a90e2;
 }
 
-/* 视频网格（平板/电脑端默认） */
+/* 视频网格（平板/电脑默认） */
 .video-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -538,7 +540,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   }
 }
 
-/* 卡片（平板/电脑端图文卡片） */
+/* 卡片（平板/电脑图文卡片） */
 .video-card {
   background: #fff;
   border-radius: 12px;
@@ -582,7 +584,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   color: #9ca3af;
 }
 
-/* 移动端：单列、无图、左边框高亮 */
+/* 移动端：单列、无图、极细蓝色边框悬停 */
 @media (max-width: 767px) {
   .video-grid {
     grid-template-columns: 1fr;
@@ -591,17 +593,16 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   .video-card {
     box-shadow: none;
     border: 1px solid transparent;
-    border-left: 4px solid transparent;
     padding: 12px 16px;
     display: flex;
     flex-direction: column;
+    border-radius: 12px;
   }
 
   .video-card:active,
   .video-card:hover {
-    box-shadow: none;
+    box-shadow: 0 0 0 1px rgba(100,181,246,0.35);
     transform: none;
-    border-left-color: #4a90e2;
   }
 
   .video-card-img {
@@ -644,7 +645,8 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 }
 
 .overlay-container {
-  max-height: 45vh;
+  width: 100%;
+  max-height: 50vh;
   background: #000;
   border-radius: 16px 16px 0 0;
   overflow: hidden;
