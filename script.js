@@ -1300,7 +1300,7 @@ async function initVideoPage() {
   let currentIndex = 0;
   const MAX_VISIBLE_DOTS = 10;
 
-  // 弹窗播放器
+  // 创建弹窗播放器
   const videoOverlay = document.createElement('div');
   videoOverlay.className = 'video-player-overlay';
   videoOverlay.innerHTML = `
@@ -1354,7 +1354,7 @@ async function initVideoPage() {
     return;
   }
 
-  // 构建轮播列表：仅使用推荐视频
+  // 构建轮播列表：仅推荐视频
   const promoted = allVideos.filter(v => v.promoted);
   if (promoted.length > 0) {
     currentPlaylist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
@@ -1452,7 +1452,7 @@ async function initVideoPage() {
     });
   }
 
-  // 分类按钮事件：仅更新卡片区，不改变轮播
+  // 分类按钮事件：只更新卡片区，不动轮播
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
@@ -1469,7 +1469,6 @@ async function initVideoPage() {
     };
   });
 
-  // 初始渲染卡片
   renderVideoGrid(allVideos, safeT, overlayPlayer, videoOverlay, player);
 }
 
@@ -1515,6 +1514,7 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
   }
   grid.innerHTML = html;
 
+  // 卡片点击：弹窗播放，暂停主播放器
   grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
       const videoUrl = card.dataset.url;
@@ -1522,7 +1522,7 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
       overlayPlayer.src = videoUrl;
       overlayPlayer.play().catch(() => {});
       mainPlayer.pause();
-      // 打开前根据当前屏幕状态设置弹窗类
+      // 打开前应用设备样式
       const isLandscape = window.innerWidth > window.innerHeight;
       if (isLandscape) {
         videoOverlay.classList.add('fullscreen');
