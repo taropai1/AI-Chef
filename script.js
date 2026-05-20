@@ -1290,29 +1290,25 @@ async function initVideoPage() {
   const sourceEl = document.getElementById('currentVideoSource');
   const catBtns = document.querySelectorAll('#videoCategories .video-cat-btn');
 
+  // 防止 t 函数不存在时报错
+  const safeT = (key, fallback) => (typeof t === 'function' ? t(key) : null) || fallback;
+
   let allVideos = [];
   let featured = null;
 
-  // 获取视频数据
   try {
     const res = await fetch('https://vid.taropai.com/api/videos');
     const data = await res.json();
-    console.log('[视频] API 返回视频数:', data.list?.length);
-    if (data.featured) {
-      player.src = data.featured.url;
-      titleEl.textContent = data.featured.title;
-      sourceEl.textContent = data.featured.source === 'Original'
-        ? (t('original') || 'Original')
-        : (t('fromSource') || 'From') + ' ' + data.featured.source;
-    }
-    // 立即渲染
-    renderVideoGrid(data.list, player, titleEl, sourceEl);
+    featured = data.featured;
+    allVideos = data.list || [];
+    console.log('[视频] API 返回视频数:', allVideos.length);
   } catch (err) {
     console.error('[视频] 加载失败:', err);
-    if (grid) grid.innerHTML = `<p style="text-align:center;color:#ef4444;">${t('loadError') || 'Failed to load videos'}</p>`;
+    if (grid) grid.innerHTML = '<p style="text-align:center;color:#ef4444;">Failed to load videos</p>';
+    return;
   }
- 
-  // 渲染分类筛选事件
+
+  // 渲染分类按钮事件
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
@@ -1321,21 +1317,99 @@ async function initVideoPage() {
       try {
         const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
         const data = await res.json();
-        allVideos = data.list;
+        allVideos = data.list || [];
         featured = data.featured;
-        playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl);
-        renderVideoGrid(allVideos, player, titleEl, sourceEl);
+        playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl, safeT);
+        renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
       } catch (e) {
-        console.error('分类加载失败:', e);
+        console.error('[视频] 分类加载失败:', e);
       }
     };
   });
 
-  // 动态选择主推视频并播放
-  playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl);
+  // 播放主推视频
+  playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl, safeT);
+  // 渲染卡片列表
+  renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
+}
 
-  // 渲染卡片
-  renderVideoGrid(allVideos, player, titleEl, sourceEl);
+// 辅助：播放主推视频
+function playFeaturedVideo(featured, videos, player, titleEl, sourceEl, safeT) {
+  let selected = null;
+  if (featured && videos.some(v => v.id === featured.id)) {
+    selected = featured;
+  } else {
+    const promoted = videos.filter(v => v.promoted);
+    if (promoted.length > 0) {
+      selected = promoted[Math.floor(Math.random() * promoted.length)];
+    } else if (videos.length > 0) {
+      const pool = videos.slice(0, 20);
+      selected = pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+  if (selected) {
+    player.src = selected.url;
+    titleEl.textContent = selected.title;
+    const src = selected.source || 'Original';
+    sourceEl.textContent = src === 'Original'
+      ? (safeT('original', 'Original'))
+      : (safeT('fromSource', 'From') + ' ' + src);
+    player.play().catch(() => {});
+  }
+}
+
+// 渲染视频网格（自带 t 函数保护）
+function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
+  const grid = document.getElementById('videoGrid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+  grid.style.minHeight = '200px';
+
+  if (!videos || videos.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px 0;">' +
+      (safeT ? safeT('noVideo', 'No videos available') : 'No videos available') + '</p>';
+    return;
+  }
+
+  console.log('[视频] 开始渲染', videos.length, '个卡片');
+  let html = '';
+  for (const v of videos) {
+    const title = v.title || 'Untitled';
+    const source = v.source || 'Original';
+    const url = v.url || '';
+    const cover = v.cover || '';
+    const sourceLabel = source === 'Original'
+      ? (safeT('original', 'Original'))
+      : (safeT('fromSource', 'From') + ' ' + source);
+
+    html += '<div class="video-card" data-url="' + url + '" data-title="' + title + '" data-source="' + source + '">' +
+      '<img class="video-card-img" src="' + cover + '" alt="' + title + '" loading="lazy" onerror="this.style.display=\'none\'">' +
+      '<div class="video-card-info">' +
+        '<div class="video-card-title">' + title + '</div>' +
+        '<div class="video-card-meta">' + sourceLabel + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  grid.innerHTML = html;
+  console.log('[视频] 容器内子元素数:', grid.children.length);
+
+  // 绑定点击事件
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const videoUrl = card.dataset.url;
+      const videoTitle = card.dataset.title;
+      const videoSource = card.dataset.source;
+      if (!videoUrl) return;
+      player.src = videoUrl;
+      player.muted = false;
+      player.play().catch(() => {});
+      titleEl.textContent = videoTitle;
+      sourceEl.textContent = videoSource === 'Original'
+        ? (safeT('original', 'Original'))
+        : (safeT('fromSource', 'From') + ' ' + videoSource);
+    });
+  });
 }
 
 // 新增辅助函数：动态选择并播放主推视频
@@ -1364,69 +1438,6 @@ function playFeaturedVideo(featured, videos, player, titleEl, sourceEl) {
     // 尝试自动播放
     player.play().catch(() => {});
   }
-}
-
-function renderVideoGrid(videos, player, titleEl, sourceEl) {
-  const grid = document.getElementById('videoGrid');
-  if (!grid) {
-    console.error('[视频] videoGrid 容器不存在');
-    return;
-  }
-
-  // 清空内容，确保容器可见且有最小高度
-  grid.innerHTML = '';
-  grid.style.display = 'grid';        // 强制显示网格
-  grid.style.minHeight = '200px';
-
-  if (!videos || videos.length === 0) {
-    grid.innerHTML = `<p style="text-align:center;color:#6b7280;padding:40px 0;">${t('noVideo') || 'No videos available'}</p>`;
-    console.log('[视频] 无数据，显示空提示');
-    return;
-  }
-
-  console.log('[视频] 开始渲染', videos.length, '个卡片');
-
-  let html = '';
-  for (const v of videos) {
-    const coverUrl = v.cover || '';
-    const title = v.title || 'Untitled';
-    const source = v.source || 'Original';
-    const url = v.url || '';
-    const sourceLabel = source === 'Original'
-      ? (t('original') || 'Original')
-      : (t('fromSource') || 'From') + ' ' + source;
-
-    html += `
-      <div class="video-card" style="display:block;" data-url="${url}" data-title="${title}" data-source="${source}">
-        <img class="video-card-img" src="${coverUrl}" alt="${title}" loading="lazy" onerror="this.style.display='none'">
-        <div class="video-card-info">
-          <div class="video-card-title">${title}</div>
-          <div class="video-card-meta">${sourceLabel}</div>
-        </div>
-      </div>
-    `;
-  }
-
-  grid.innerHTML = html;
-  console.log('[视频] 容器内子元素数:', grid.children.length);
-
-  // 绑定点击事件
-  grid.querySelectorAll('.video-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const videoUrl = card.dataset.url;
-      const videoTitle = card.dataset.title;
-      const videoSource = card.dataset.source;
-      if (!videoUrl) return;
-      player.src = videoUrl;
-      player.muted = false;
-      player.play().catch(() => {});
-      titleEl.textContent = videoTitle;
-      sourceEl.textContent = videoSource === 'Original'
-        ? (t('original') || 'Original')
-        : (t('fromSource') || 'From') + ' ' + videoSource;
-    });
-  });
-  console.log('[视频] 事件绑定完成');
 }
 
 // 辅助函数：根据 source 字段返回显示文本
