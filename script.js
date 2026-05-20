@@ -1376,9 +1376,11 @@ async function initVideoPage() {
         }
         dot.style.width = width + 'px';
         dot.style.borderRadius = width > 6 ? '2px' : '50%';
-        if (!dot.classList.contains('active')) {
-          dot.style.background = '#fff';
-        }
+        if (dot.classList.contains('active')) {
+  dot.style.background = '#4a90e2';  // 激活时也直接设置背景，双重保险
+} else {
+  dot.style.background = '#fff';
+}
       } else {
         dot.style.display = 'none';
       }
