@@ -442,13 +442,18 @@
   <div class="video-page-wrapper">
     <!-- 顶部播放器区 -->
     <div class="video-player-section">
-      <video id="mainVideoPlayer" controls muted loop playsinline></video>
+      <video id="mainVideoPlayer" controls muted loop playsinline controlsList="nodownload" oncontextmenu="return false;"></video>
       <div class="video-info-bar">
         <span id="currentVideoTitle" class="video-title"></span>
         <span id="currentVideoSource" class="video-source"></span>
       </div>
     </div>
 
+    <!-- 轮播进度线 -->
+<div class="video-timeline" id="videoTimeline">
+  <div class="video-timeline-track" id="videoTimelineTrack"></div>
+</div>
+    
     <!-- 分类标签栏 -->
     <div class="video-categories" id="videoCategories">
       <button class="video-cat-btn active" data-cat="All">All</button>
