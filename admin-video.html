@@ -110,6 +110,12 @@
 <div class="modal" id="videoModal">
   <div class="modal-content">
     <h3 id="modalTitle">编辑视频</h3>
+        <div class="form-row">
+      <label>分享短链</label>
+      <input type="text" id="parseUrl" placeholder="粘贴可颂、小红书等分享链接">
+      <button type="button" onclick="parseShortLink()" style="background:#f59e0b; padding:8px 16px;">解析</button>
+      <span id="parseStatus" style="font-size:12px; color:#6b7280;"></span>
+    </div>
     <div class="form-row"><label>展示标题</label><input type="text" id="editTitle"></div>
     <div class="form-row"><label>原标题</label><input type="text" id="editOriginalTitle" disabled></div>
     <div class="form-row"><label>播放链接</label><input type="text" id="editUrl"></div>
@@ -355,6 +361,40 @@
     document.getElementById('videoModal').style.display = 'none';
   }
 
+    // 解析第三方平台分享短链
+  async function parseShortLink() {
+    const url = document.getElementById('parseUrl').value.trim();
+    const status = document.getElementById('parseStatus');
+    if (!url) {
+      status.textContent = '请粘贴分享链接';
+      return;
+    }
+    status.textContent = '解析中...';
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/parse-link`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // 自动填充表单
+        if (data.title) document.getElementById('editTitle').value = data.title;
+        if (data.videoUrl) document.getElementById('editUrl').value = data.videoUrl;
+        if (data.cover) document.getElementById('editCover').value = data.cover;
+        if (data.source) document.getElementById('editSource').value = data.source;
+        status.textContent = '解析成功，已自动填充';
+        status.style.color = 'green';
+      } else {
+        status.textContent = '解析失败：' + (data.error || '未知错误');
+        status.style.color = 'red';
+      }
+    } catch (e) {
+      status.textContent = '网络错误，解析失败';
+      status.style.color = 'red';
+    }
+  }
+  
   window.saveVideo = async function() {
     const title = document.getElementById('editTitle').value.trim();
     const url = document.getElementById('editUrl').value.trim();
