@@ -539,6 +539,42 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   padding: 0 16px;
 }
 
+/* 确保视频网格始终有空间 */
+#videoGrid {
+  min-height: 200px;
+  width: 100%;
+}
+
+/* 来源标识精致标签 */
+.video-source {
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  background: #4a90e2;
+  padding: 2px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 播放器信息栏居中布局 */
+.video-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.video-title {
+  font-weight: 600;
+  color: #1f2937;
+  flex: 1;
+  margin-right: 12px;
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
