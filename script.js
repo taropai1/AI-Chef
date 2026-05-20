@@ -1481,56 +1481,49 @@ function playFeaturedVideo(featured, videos, player, titleEl, sourceEl, safeT) {
     }
 }
 
-function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
-    const grid = document.getElementById('videoGrid');
-    if (!grid) return;
+function renderVideoGrid(videos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay) {
+  const grid = document.getElementById('videoGrid');
+  if (!grid) return;
 
-    grid.innerHTML = '';
-    grid.style.minHeight = '200px';
+  grid.innerHTML = '';
+  grid.style.minHeight = '200px';
 
-    if (!videos || videos.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px 0;">' +
-            (safeT ? safeT('noVideo', 'No videos available') : 'No videos available') + '</p>';
-        return;
-    }
+  if (!videos || videos.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px 0;">' +
+      (safeT ? safeT('noVideo', 'No videos available') : 'No videos available') + '</p>';
+    return;
+  }
 
-    console.log('[视频] 开始渲染', videos.length, '个卡片');
-    let html = '';
-    for (const v of videos) {
-        const title = v.title || 'Untitled';
-        const source = v.source || 'Original';
-        const url = v.url || '';
-        const cover = v.cover || '';
-        const sourceLabel = source === 'Original'
-            ? (safeT('original', 'Original'))
-            : (safeT('fromSource', 'From') + ' ' + source);
+  let html = '';
+  for (const v of videos) {
+    const title = v.title || 'Untitled';
+    const source = v.source || 'Original';
+    const url = v.url || '';
+    const cover = v.cover || '';
+    const sourceLabel = source === 'Original'
+      ? (safeT('original', 'Original'))
+      : (safeT('fromSource', 'From') + ' ' + source);
 
-        html += '<div class="video-card" data-url="' + url + '" data-title="' + title + '" data-source="' + source + '">' +
-            '<img class="video-card-img" src="' + cover + '" alt="' + title + '" loading="lazy" onerror="this.style.display=\'none\'">' +
-            '<div class="video-card-info">' +
-            '<div class="video-card-title">' + title + '</div>' +
-            '<div class="video-card-meta">' + sourceLabel + '</div>' +
-            '</div>' +
-            '</div>';
-    }
-    grid.innerHTML = html;
-    console.log('[视频] 容器内子元素数:', grid.children.length);
+    html += '<div class="video-card" data-url="' + url + '" data-title="' + title + '" data-source="' + source + '">' +
+      '<img class="video-card-img" src="' + cover + '" alt="' + title + '" loading="lazy" onerror="this.style.display=\'none\'">' +
+      '<div class="video-card-info">' +
+      '<div class="video-card-title">' + title + '</div>' +
+      '<div class="video-card-meta">' + sourceLabel + '</div>' +
+      '</div>' +
+      '</div>';
+  }
+  grid.innerHTML = html;
 
-    grid.querySelectorAll('.video-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const videoUrl = card.dataset.url;
-            const videoTitle = card.dataset.title;
-            const videoSource = card.dataset.source;
-            if (!videoUrl) return;
-            player.src = videoUrl;
-            player.muted = false;
-            player.play().catch(() => {});
-            titleEl.textContent = videoTitle;
-            sourceEl.textContent = videoSource === 'Original'
-                ? (safeT('original', 'Original'))
-                : (safeT('fromSource', 'From') + ' ' + videoSource);
-        });
+  // 统一弹窗播放
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const videoUrl = card.dataset.url;
+      if (!videoUrl) return;
+      overlayPlayer.src = videoUrl;
+      overlayPlayer.play().catch(() => {});
+      videoOverlay.classList.add('active');
     });
+  });
 }
 
 // ==================== 登录/注册 ====================
