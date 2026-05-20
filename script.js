@@ -171,6 +171,7 @@ const translations = {
     subscribeBtn: 'Subscribe Now', freeTrialStatus: 'Recipes left: {{recipeLeft}}/3, AI questions left: {{aiLeft}}/10',
     videoAll: 'All', videoCreativeFood: 'Creative Food', videoCookingTutorial: 'Cooking Tutorial', videoDessertDrinks: 'Dessert & Drinks', videoCreatorPicks: 'Creator Picks',
     videoFooter: 'Original videos by AI Chef. Other videos are from YouTube, TikTok, Ins, Keso, Xiaohongshu. Copyright belongs to original creators.',
+    noVideo: 'No videos available', original: 'Original', fromSource: 'From',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -248,6 +249,7 @@ const translations = {
     subscribeBtn: '付费订阅', freeTrialStatus: '食谱剩余：{{recipeLeft}}/3 次，AI问答剩余：{{aiLeft}}/10 次',
     videoAll: '全部', videoCreativeFood: '创意美食', videoCookingTutorial: '烹饪教程', videoDessertDrinks: '甜品与饮品', videoCreatorPicks: '博主精选',
     videoFooter: '原创视频由AI Chef制作。其余视频来源：油管、抖音国际版、照片墙、可颂、小红书。版权归原创创作者所有。',
+    noVideo: '暂无视频', original: '原创', fromSource: '来源',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
@@ -333,6 +335,7 @@ const translations = {
     subscribeBtn: 'Suscríbete Ya', freeTrialStatus: 'Recetas restantes: {{recipeLeft}}/3, Preguntas IA restantes: {{aiLeft}}/10',
     videoAll: 'Todo', videoCreativeFood: 'Comida creativa', videoCookingTutorial: 'Tutorial de cocina', videoDessertDrinks: 'Postres y bebidas', videoCreatorPicks: 'Selección del creador',
     videoFooter: 'Videos originales hechos por Chef IA. Los demás videos provienen de YouTube, TikTok, Ins, Keso y Xiaohongshu. Los derechos de autor pertenecen a sus creadores originales.',
+    noVideo: 'No hay videos disponibles', original: 'Original', fromSource: 'De',
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -419,6 +422,7 @@ const translations = {
     subscribeBtn: "S'abonner Maintenant", freeTrialStatus: 'Recettes restantes : {{recipeLeft}}/3, Questions IA restantes : {{aiLeft}}/10',
     videoAll: 'Tout', videoCreativeFood: 'Cuisine créative', videoCookingTutorial: 'Tutoriel de cuisine', videoDessertDrinks: 'Desserts et boissons', videoCreatorPicks: 'Choix du créateur',
     videoFooter: 'Vidéos originales réalisées par Chef IA. Les autres vidéos proviennent de YouTube, TikTok, Ins, Keso et Xiaohongshu. Le droit d’auteur appartient aux créateurs originaux.',
+    noVideo: 'Aucune vidéo disponible', original: 'Original', fromSource: 'De',
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -506,6 +510,7 @@ const translations = {
     subscribeBtn: 'Jetzt Abonnieren', freeTrialStatus: 'Rezepte übrig: {{recipeLeft}}/3, KI-Fragen übrig: {{aiLeft}}/10',
     videoAll: 'Alle', videoCreativeFood: 'Kreatives Essen', videoCookingTutorial: 'Kochanleitung', videoDessertDrinks: 'Desserts & Getränke', videoCreatorPicks: 'Ersteller-Auswahl',
     videoFooter: 'Originalvideos von KI-Koch. Weitere Videos stammen von YouTube, TikTok, Ins, Keso und Xiaohongshu. Das Urheberrecht liegt bei den ursprünglichen Erstellern.',
+    noVideo: 'Keine Videos verfügbar', original: 'Original', fromSource: 'Von',
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -592,6 +597,7 @@ const translations = {
     subscribeBtn: 'Abbonati Subito', freeTrialStatus: 'Ricette rimanenti: {{recipeLeft}}/3, Domande IA rimanenti: {{aiLeft}}/10',
     videoAll: 'Tutti', videoCreativeFood: 'Cibo creativo', videoCookingTutorial: 'Tutorial di cucina', videoDessertDrinks: 'Dolci e bevande', videoCreatorPicks: 'Scelta del creatore',
     videoFooter: 'Video originali realizzati da Chef IA. Gli altri video provengono da YouTube, TikTok, Ins, Keso e Xiaohongshu. I diritti d’autore appartengono ai creatori originali.',
+    noVideo: 'Nessun video disponibile', original: 'Originale', fromSource: 'Da',
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -678,7 +684,8 @@ const translations = {
     trendingVideos: 'Tendências', language: 'Idioma', more: 'Mais', recipeShort: 'Receitas', videoShort: 'Vídeos', loginSignUp: 'Entrar / Cadastrar', profileMenu: 'Perfil', addToHome: 'Compartilhar / Adicionar à home',
     subscribeBtn: 'Assine Agora', freeTrialStatus: 'Receitas restantes: {{recipeLeft}}/3, Perguntas IA restantes: {{aiLeft}}/10',
     videoAll: 'Todos', videoCreativeFood: 'Comida criativa', videoCookingTutorial: 'Tutorial de culinária', videoDessertDrinks: 'Sobremesas e bebidas', videoCreatorPicks: 'Escolha do criador',
-    videoFooter: 'Vídeos originais feitos pelo Chef IA. Os demais vídeos são do YouTube, TikTok, Ins, Keso e Xiaohongshu. Os direitos autorais pertencem aos criadores originais.'
+    videoFooter: 'Vídeos originais feitos pelo Chef IA. Os demais vídeos são do YouTube, TikTok, Ins, Keso e Xiaohongshu. Os direitos autorais pertencem aos criadores originais.',
+    noVideo: 'Nenhum vídeo disponível', original: 'Original', fromSource: 'De',
   },
 }
 function t(key, params) {
@@ -1354,42 +1361,40 @@ function playFeaturedVideo(featured, videos, player, titleEl, sourceEl) {
 
 function renderVideoGrid(videos, player, titleEl, sourceEl) {
   const grid = document.getElementById('videoGrid');
-  if (!grid) {
-    console.error('videoGrid 容器不存在');
-    return;
-  }
-  grid.innerHTML = '';
+  if (!grid) return;
+
+  // 确保网格容器可见且有最小高度
+  grid.style.minHeight = '200px';
 
   if (!videos || videos.length === 0) {
-    grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px;">暂无视频，请稍后刷新</p>';
+    grid.innerHTML = `<p style="text-align:center;color:#6b7280;padding:40px 0;">${t('noVideo') || 'No videos available'}</p>`;
     return;
   }
 
   let html = '';
   for (const v of videos) {
-    try {
-      const coverUrl = v.cover || '';
-      const title = v.title || '无标题';
-      const source = v.source || 'Original';
-      const url = v.url || '';
-      html += `
-        <div class="video-card" data-url="${url}" data-title="${title}" data-source="${source}">
-          <img class="video-card-img" src="${coverUrl}" alt="${title}" loading="lazy" onerror="this.style.display='none'">
-          <div class="video-card-info">
-            <div class="video-card-title">${title}</div>
-            <div class="video-card-meta">${source === 'Original' ? '原创' : '来自 ' + source}</div>
-          </div>
+    const coverUrl = v.cover || '';
+    const title = v.title || '';
+    const source = v.source || 'Original';
+    const url = v.url || '';
+    const sourceLabel = source === 'Original'
+      ? (t('original') || 'Original')
+      : (t('fromSource') || 'From') + ' ' + source;
+
+    html += `
+      <div class="video-card" data-url="${url}" data-title="${title}" data-source="${source}">
+        <img class="video-card-img" src="${coverUrl}" alt="${title}" loading="lazy" onerror="this.style.display='none'">
+        <div class="video-card-info">
+          <div class="video-card-title">${title}</div>
+          <div class="video-card-meta">${sourceLabel}</div>
         </div>
-      `;
-    } catch (e) {
-      console.error('构建卡片出错:', v, e);
-    }
+      </div>
+    `;
   }
 
   grid.innerHTML = html;
 
-  const cards = grid.querySelectorAll('.video-card');
-  cards.forEach(card => {
+  grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
       const videoUrl = card.dataset.url;
       const videoTitle = card.dataset.title;
@@ -1397,11 +1402,17 @@ function renderVideoGrid(videos, player, titleEl, sourceEl) {
       if (!videoUrl) return;
       player.src = videoUrl;
       player.muted = false;
-      player.play().catch(err => console.warn('自动播放失败:', err));
+      player.play().catch(() => {});
       titleEl.textContent = videoTitle;
-      sourceEl.textContent = videoSource === 'Original' ? '原创' : '来自 ' + videoSource;
+      sourceEl.textContent = sourceLabelForDisplay(videoSource);
     });
   });
+}
+
+// 辅助函数：根据 source 字段返回显示文本
+function sourceLabelForDisplay(source) {
+  if (source === 'Original') return t('original') || 'Original';
+  return (t('fromSource') || 'From') + ' ' + source;
 }
 
 // ==================== 登录/注册 ====================
