@@ -1283,50 +1283,178 @@ if (qaLimitNote && userData) {
 }
 
 // ==================== 视频页面初始化 ====================
-async function initVideoPage() {
-    const grid = document.getElementById('videoGrid');
-    const player = document.getElementById('mainVideoPlayer');
-    const titleEl = document.getElementById('currentVideoTitle');
-    const sourceEl = document.getElementById('currentVideoSource');
-    const catBtns = document.querySelectorAll('#videoCategories .video-cat-btn');
+ async function initVideoPage() {
+  const grid = document.getElementById('videoGrid');
+  const player = document.getElementById('mainVideoPlayer');
+  const titleEl = document.getElementById('currentVideoTitle');
+  const sourceEl = document.getElementById('currentVideoSource');
+  const catBtns = document.querySelectorAll('#videoCategories .video-cat-btn');
+  const timelineTrack = document.getElementById('videoTimelineTrack');
+  const timelineContainer = document.getElementById('videoTimeline');
 
-    const safeT = (key, fallback) => (typeof t === 'function' ? t(key) : null) || fallback;
+  const safeT = (key, fallback) => (typeof t === 'function' ? t(key) : null) || fallback;
 
-    let allVideos = [];
-    let featured = null;
+  // 轮播配置
+  const SLIDE_DURATION = 60; // 每个视频展示秒数
+  let slideTimer = null;
+  let currentPlaylist = [];
+  let currentIndex = 0;
+  const MAX_VISIBLE_DOTS = 10;
 
-    try {
-        const res = await fetch('https://vid.taropai.com/api/videos');
-        const data = await res.json();
-        featured = data.featured;
-        allVideos = data.list || [];
-        console.log('[视频] API 返回视频数:', allVideos.length);
-    } catch (err) {
-        console.error('[视频] 加载失败:', err);
-        if (grid) grid.innerHTML = '<p style="text-align:center;color:#ef4444;">Failed to load videos</p>';
-        return;
+  // 通用弹窗播放器
+  const videoOverlay = document.createElement('div');
+  videoOverlay.className = 'video-player-overlay';
+  videoOverlay.innerHTML = `
+    <div class="video-player-overlay-close" id="videoOverlayClose">✕</div>
+    <video id="overlayVideoPlayer" controls playsinline controlsList="nodownload" oncontextmenu="return false;"></video>
+  `;
+  document.body.appendChild(videoOverlay);
+  const overlayPlayer = document.getElementById('overlayVideoPlayer');
+  document.getElementById('videoOverlayClose').addEventListener('click', () => {
+    overlayPlayer.pause();
+    videoOverlay.classList.remove('active');
+  });
+
+  let allVideos = [];
+  let featured = null;
+
+  try {
+    const res = await fetch('https://vid.taropai.com/api/videos');
+    const data = await res.json();
+    featured = data.featured;
+    allVideos = data.list || [];
+  } catch (err) {
+    console.error('[视频] 加载失败:', err);
+    if (grid) grid.innerHTML = '<p style="text-align:center;color:#ef4444;">Failed to load videos</p>';
+    return;
+  }
+
+  // 构建轮播列表
+  const buildPlaylist = () => {
+    const promoted = allVideos.filter(v => v.promoted);
+    if (promoted.length > 0) {
+      currentPlaylist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+    } else {
+      currentPlaylist = allVideos.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
     }
+  };
+  buildPlaylist();
 
-    catBtns.forEach(btn => {
-        btn.onclick = async function() {
-            catBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const cat = btn.dataset.cat;
-            try {
-                const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
-                const data = await res.json();
-                allVideos = data.list || [];
-                featured = data.featured;
-                playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl, safeT);
-                renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
-            } catch (e) {
-                console.error('[视频] 分类加载失败:', e);
-            }
-        };
+  // 轮播线初始化
+  const buildTimeline = () => {
+    if (!timelineTrack) return;
+    timelineTrack.innerHTML = '';
+    for (let i = 0; i < MAX_VISIBLE_DOTS; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'video-timeline-dot';
+      timelineTrack.appendChild(dot);
+    }
+  };
+  buildTimeline();
+
+  const updateTimeline = (index, total) => {
+    if (!timelineTrack || total === 0) return;
+    const dots = timelineTrack.querySelectorAll('.video-timeline-dot');
+    let windowStart = 0;
+    if (total > MAX_VISIBLE_DOTS) {
+      windowStart = Math.max(0, Math.min(index - Math.floor(MAX_VISIBLE_DOTS / 2), total - MAX_VISIBLE_DOTS));
+    }
+    dots.forEach((dot, i) => {
+      const videoIndex = windowStart + i;
+      if (videoIndex < total) {
+        dot.style.display = 'block';
+        const distance = Math.abs(videoIndex - index);
+        let width = 4;
+        if (distance === 0) {
+          width = 24;
+          dot.classList.add('active');
+        } else {
+          width = Math.max(4, Math.floor(24 * Math.pow(0.55, distance)));
+          dot.classList.remove('active');
+        }
+        dot.style.width = width + 'px';
+        dot.style.borderRadius = width > 6 ? '2px' : '50%';
+      } else {
+        dot.style.display = 'none';
+      }
+    });
+  };
+
+  const playVideoAtIndex = (index) => {
+    if (!currentPlaylist.length) return;
+    const v = currentPlaylist[index];
+    player.src = v.url;
+    titleEl.textContent = v.title;
+    const src = v.source || 'Original';
+    sourceEl.textContent = src === 'Original'
+      ? (safeT('original', 'Original'))
+      : (safeT('fromSource', 'From') + ' ' + src);
+    player.play().catch(() => {});
+    currentIndex = index;
+    updateTimeline(index, currentPlaylist.length);
+
+    clearTimeout(slideTimer);
+    slideTimer = setTimeout(() => {
+      const next = (currentIndex + 1) % currentPlaylist.length;
+      playVideoAtIndex(next);
+    }, SLIDE_DURATION * 1000);
+  };
+
+  // 初始播放
+  if (currentPlaylist.length) {
+    playVideoAtIndex(0);
+  }
+
+  // 轮播线交互
+  if (timelineContainer) {
+    timelineContainer.addEventListener('click', (e) => {
+      const rect = timelineTrack.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = clickX / rect.width;
+      const index = Math.min(currentPlaylist.length - 1, Math.floor(ratio * currentPlaylist.length));
+      playVideoAtIndex(index);
     });
 
-    playFeaturedVideo(featured, allVideos, player, titleEl, sourceEl, safeT);
-    renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
+    let touchStartX = 0;
+    timelineContainer.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+    timelineContainer.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const diff = touchEndX - touchStartX;
+      if (Math.abs(diff) > 30) {
+        const rect = timelineTrack.getBoundingClientRect();
+        const ratio = (touchEndX - rect.left) / rect.width;
+        const index = Math.min(currentPlaylist.length - 1, Math.max(0, Math.floor(ratio * currentPlaylist.length)));
+        playVideoAtIndex(index);
+      }
+    });
+  }
+
+  // 分类按钮事件
+  catBtns.forEach(btn => {
+    btn.onclick = async function() {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      try {
+        const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
+        const data = await res.json();
+        allVideos = data.list || [];
+        featured = data.featured;
+        buildPlaylist();
+        currentIndex = 0;
+        updateTimeline(currentIndex, currentPlaylist.length);
+        if (currentPlaylist.length) playVideoAtIndex(0);
+        renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
+      } catch (e) {
+        console.error('[视频] 分类加载失败:', e);
+      }
+    };
+  });
+
+  // 初始渲染卡片
+  renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
 }
 
 function playFeaturedVideo(featured, videos, player, titleEl, sourceEl, safeT) {
