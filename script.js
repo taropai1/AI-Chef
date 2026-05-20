@@ -1297,14 +1297,21 @@ async function initVideoPage() {
   try {
     const res = await fetch('https://vid.taropai.com/api/videos');
     const data = await res.json();
-    featured = data.featured;
-    allVideos = data.list;
+    console.log('[视频] API 返回视频数:', data.list?.length);
+    if (data.featured) {
+      player.src = data.featured.url;
+      titleEl.textContent = data.featured.title;
+      sourceEl.textContent = data.featured.source === 'Original'
+        ? (t('original') || 'Original')
+        : (t('fromSource') || 'From') + ' ' + data.featured.source;
+    }
+    // 立即渲染
+    renderVideoGrid(data.list, player, titleEl, sourceEl);
   } catch (err) {
-    console.error('获取视频失败:', err);
-    if (grid) grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px;">加载视频失败，请检查网络</p>';
-    return;
+    console.error('[视频] 加载失败:', err);
+    if (grid) grid.innerHTML = `<p style="text-align:center;color:#ef4444;">${t('loadError') || 'Failed to load videos'}</p>`;
   }
-
+ 
   // 渲染分类筛选事件
   catBtns.forEach(btn => {
     btn.onclick = async function() {
