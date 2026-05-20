@@ -1361,20 +1361,28 @@ function playFeaturedVideo(featured, videos, player, titleEl, sourceEl) {
 
 function renderVideoGrid(videos, player, titleEl, sourceEl) {
   const grid = document.getElementById('videoGrid');
-  if (!grid) return;
+  if (!grid) {
+    console.error('[视频] videoGrid 容器不存在');
+    return;
+  }
 
-  // 确保网格容器可见且有最小高度
+  // 清空内容，确保容器可见且有最小高度
+  grid.innerHTML = '';
+  grid.style.display = 'grid';        // 强制显示网格
   grid.style.minHeight = '200px';
 
   if (!videos || videos.length === 0) {
     grid.innerHTML = `<p style="text-align:center;color:#6b7280;padding:40px 0;">${t('noVideo') || 'No videos available'}</p>`;
+    console.log('[视频] 无数据，显示空提示');
     return;
   }
+
+  console.log('[视频] 开始渲染', videos.length, '个卡片');
 
   let html = '';
   for (const v of videos) {
     const coverUrl = v.cover || '';
-    const title = v.title || '';
+    const title = v.title || 'Untitled';
     const source = v.source || 'Original';
     const url = v.url || '';
     const sourceLabel = source === 'Original'
@@ -1382,7 +1390,7 @@ function renderVideoGrid(videos, player, titleEl, sourceEl) {
       : (t('fromSource') || 'From') + ' ' + source;
 
     html += `
-      <div class="video-card" data-url="${url}" data-title="${title}" data-source="${source}">
+      <div class="video-card" style="display:block;" data-url="${url}" data-title="${title}" data-source="${source}">
         <img class="video-card-img" src="${coverUrl}" alt="${title}" loading="lazy" onerror="this.style.display='none'">
         <div class="video-card-info">
           <div class="video-card-title">${title}</div>
@@ -1393,7 +1401,9 @@ function renderVideoGrid(videos, player, titleEl, sourceEl) {
   }
 
   grid.innerHTML = html;
+  console.log('[视频] 容器内子元素数:', grid.children.length);
 
+  // 绑定点击事件
   grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
       const videoUrl = card.dataset.url;
@@ -1404,9 +1414,12 @@ function renderVideoGrid(videos, player, titleEl, sourceEl) {
       player.muted = false;
       player.play().catch(() => {});
       titleEl.textContent = videoTitle;
-      sourceEl.textContent = sourceLabelForDisplay(videoSource);
+      sourceEl.textContent = videoSource === 'Original'
+        ? (t('original') || 'Original')
+        : (t('fromSource') || 'From') + ' ' + videoSource;
     });
   });
+  console.log('[视频] 事件绑定完成');
 }
 
 // 辅助函数：根据 source 字段返回显示文本
