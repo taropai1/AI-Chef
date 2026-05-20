@@ -415,7 +415,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   background: #000;
 }
 
-/* 轮播线：浮动在播放器内部右下角 */
+/* 轮播线：浮动在播放器内部右下角，深色背景上白色点+蓝色当前段 */
 .video-timeline {
   position: absolute;
   bottom: 10px;
@@ -442,13 +442,13 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #d1d5db;
+  background: #fff;                /* 白色点，适配深色背景 */
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
 .video-timeline-dot.active {
-  background: #4a90e2;
+  background: #4a90e2;            /* 品牌蓝色当前段 */
   width: 20px;
   border-radius: 2px;
 }
@@ -540,20 +540,21 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   }
 }
 
-/* 卡片（平板/电脑图文卡片） */
+/* 桌面端卡片：悬停仅上浮+阴影，无边框 */
 .video-card {
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   cursor: pointer;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
   border: 1px solid transparent;
 }
 
 .video-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 0 1px rgba(100,181,246,0.35), 0 2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  /* 无任何蓝色边框 */
 }
 
 .video-card-img {
@@ -601,7 +602,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 
   .video-card:active,
   .video-card:hover {
-    box-shadow: 0 0 0 1px rgba(100,181,246,0.35);
+    box-shadow: 0 0 0 1px rgba(100,181,246,0.35); /* 极细蓝框 */
     transform: none;
   }
 
@@ -629,33 +630,22 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   }
 }
 
-/* 弹窗播放器 */
+/* 弹窗播放器：底部半屏卡片，无全屏遮罩 */
 .video-player-overlay {
   display: none;
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 10000;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.video-player-overlay.active {
-  display: flex;
-}
-
-.overlay-container {
+  bottom: 0;
+  left: 0;
   width: 100%;
-  max-height: 50vh;
+  height: 50vh;
+  z-index: 10000;
   background: #000;
   border-radius: 16px 16px 0 0;
   overflow: hidden;
-  position: relative;
 }
 
-.video-player-overlay.fullscreen .overlay-container {
-  max-height: 100vh;
-  border-radius: 0;
+.video-player-overlay.active {
+  display: block;
 }
 
 .overlay-video {
@@ -664,6 +654,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   display: block;
 }
 
+/* 关闭按钮 */
 .overlay-close {
   position: absolute;
   top: 12px;
@@ -681,49 +672,15 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   cursor: pointer;
 }
 
-.overlay-fullscreen {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  z-index: 10;
-  width: 32px;
-  height: 32px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 /* 电脑端：右下角小窗 */
 @media (min-width: 768px) {
   .video-player-overlay {
-    background: transparent;
-    pointer-events: none;
-    align-items: flex-end;
-    justify-content: flex-end;
-  }
-
-  .video-player-overlay .overlay-container {
+    bottom: 16px;
+    left: auto;
+    right: 16px;
     width: 400px;
-    max-height: 300px;
+    height: 300px;
     border-radius: 12px;
-    margin: 16px;
-    pointer-events: auto;
-  }
-
-  .video-player-overlay.fullscreen {
-    background: rgba(0,0,0,0.9);
-    align-items: center;
-    justify-content: center;
-  }
-
-  .video-player-overlay.fullscreen .overlay-container {
-    width: 90%;
-    max-height: 90vh;
   }
 }
 
