@@ -1300,47 +1300,25 @@ async function initVideoPage() {
   let currentIndex = 0;
   const MAX_VISIBLE_DOTS = 10;
 
-  // 创建弹窗播放器
+  // 创建底部半屏弹窗播放器（无全屏按钮）
   const videoOverlay = document.createElement('div');
   videoOverlay.className = 'video-player-overlay';
   videoOverlay.innerHTML = `
-    <div class="overlay-container">
-      <div class="overlay-close" id="videoOverlayClose">✕</div>
-      <div class="overlay-fullscreen" id="videoOverlayFullscreen">⛶</div>
-      <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload" oncontextmenu="return false;"></video>
-    </div>
+    <div class="overlay-close" id="videoOverlayClose">✕</div>
+    <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload" oncontextmenu="return false;"></video>
   `;
   document.body.appendChild(videoOverlay);
   const overlayPlayer = document.getElementById('overlayVideoPlayer');
   const overlayClose = document.getElementById('videoOverlayClose');
-  const overlayFullscreen = document.getElementById('videoOverlayFullscreen');
 
   overlayClose.addEventListener('click', () => {
     overlayPlayer.pause();
-    videoOverlay.classList.remove('active', 'fullscreen');
-    player.play().catch(() => {});
-  });
-
-  overlayFullscreen.addEventListener('click', () => {
-    videoOverlay.classList.toggle('fullscreen');
-  });
-
-  function applyDeviceClass() {
-    const isLandscape = window.innerWidth > window.innerHeight;
-    if (isLandscape) {
-      videoOverlay.classList.add('fullscreen');
-      videoOverlay.classList.remove('desktop');
-    } else if (window.innerWidth >= 768) {
-      videoOverlay.classList.add('desktop');
-      videoOverlay.classList.remove('fullscreen');
-    } else {
-      videoOverlay.classList.remove('desktop');
-      videoOverlay.classList.remove('fullscreen');
+    videoOverlay.classList.remove('active');
+    // 恢复主播放器轮播
+    if (currentPlaylist.length) {
+      player.play().catch(() => {});
     }
-  }
-  window.addEventListener('resize', applyDeviceClass);
-  window.addEventListener('orientationchange', applyDeviceClass);
-  applyDeviceClass();
+  });
 
   let allVideos = [];
 
@@ -1396,6 +1374,10 @@ async function initVideoPage() {
         }
         dot.style.width = width + 'px';
         dot.style.borderRadius = width > 6 ? '2px' : '50%';
+        // 确保未激活点保持白色背景（兼容深色背景）
+        if (!dot.classList.contains('active')) {
+          dot.style.background = '#fff';
+        }
       } else {
         dot.style.display = 'none';
       }
@@ -1426,7 +1408,7 @@ async function initVideoPage() {
     playVideoAtIndex(0);
   }
 
-  // 轮播线交互
+  // 轮播线交互：点击/滑动跳转
   if (timelineContainer) {
     timelineContainer.addEventListener('click', (e) => {
       const rect = timelineTrack.getBoundingClientRect();
@@ -1514,7 +1496,7 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
   }
   grid.innerHTML = html;
 
-  // 卡片点击：弹窗播放，暂停主播放器
+  // 卡片点击：底部半屏弹窗播放，暂停主播放器
   grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
       const videoUrl = card.dataset.url;
@@ -1522,18 +1504,6 @@ function renderVideoGrid(videos, safeT, overlayPlayer, videoOverlay, mainPlayer)
       overlayPlayer.src = videoUrl;
       overlayPlayer.play().catch(() => {});
       mainPlayer.pause();
-      // 打开前应用设备样式
-      const isLandscape = window.innerWidth > window.innerHeight;
-      if (isLandscape) {
-        videoOverlay.classList.add('fullscreen');
-        videoOverlay.classList.remove('desktop');
-      } else if (window.innerWidth >= 768) {
-        videoOverlay.classList.add('desktop');
-        videoOverlay.classList.remove('fullscreen');
-      } else {
-        videoOverlay.classList.remove('desktop');
-        videoOverlay.classList.remove('fullscreen');
-      }
       videoOverlay.classList.add('active');
     });
   });
