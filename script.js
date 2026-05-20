@@ -1437,7 +1437,29 @@ async function initVideoPage() {
     });
   }
 
-  // 分类按钮：仅更新卡片区，不动轮播
+  // 移动端/平板端：视频区域左右滑动切换视频
+const playerSection = document.querySelector('.video-player-section');
+if (playerSection) {
+  let touchStartX = 0;
+  playerSection.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+  playerSection.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchEndX - touchStartX;
+    // 滑动距离超过 50px 触发切换
+    if (Math.abs(diff) > 50) {
+      e.preventDefault(); // 阻止页面滚动
+      if (diff > 0 && currentIndex > 0) {
+        playVideoAtIndex(currentIndex - 1);
+      } else if (diff < 0 && currentIndex < currentPlaylist.length - 1) {
+        playVideoAtIndex(currentIndex + 1);
+      }
+    }
+  });
+}
+  
+   // 分类按钮：仅更新卡片区，不动轮播
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
