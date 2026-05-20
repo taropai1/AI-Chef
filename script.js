@@ -1457,30 +1457,6 @@ if (qaLimitNote && userData) {
   renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
 }
 
-function playFeaturedVideo(featured, videos, player, titleEl, sourceEl, safeT) {
-    let selected = null;
-    if (featured && videos.some(v => v.id === featured.id)) {
-        selected = featured;
-    } else {
-        const promoted = videos.filter(v => v.promoted);
-        if (promoted.length > 0) {
-            selected = promoted[Math.floor(Math.random() * promoted.length)];
-        } else if (videos.length > 0) {
-            const pool = videos.slice(0, 20);
-            selected = pool[Math.floor(Math.random() * pool.length)];
-        }
-    }
-    if (selected) {
-        player.src = selected.url;
-        titleEl.textContent = selected.title;
-        const src = selected.source || 'Original';
-        sourceEl.textContent = src === 'Original'
-            ? (safeT('original', 'Original'))
-            : (safeT('fromSource', 'From') + ' ' + src);
-        player.play().catch(() => {});
-    }
-}
-
 function renderVideoGrid(videos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay) {
   const grid = document.getElementById('videoGrid');
   if (!grid) return;
