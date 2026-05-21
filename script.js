@@ -1261,11 +1261,6 @@ function initAiPage() {
 if (videoBtn) {
     videoBtn.textContent = t('videoShort') || 'Videos';
     videoBtn.onclick = function() {
-        if (!userData) {
-            alert(t('pleaseLogin'));
-            showPage('page-login-register');
-            return;
-        }
         showPage('page-video');
     };
 }
