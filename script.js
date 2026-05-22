@@ -1464,14 +1464,14 @@ if (playerSection) {
         const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
         const data = await res.json();
         allVideos = data.list || [];
-        renderVideoGrid(allVideos, safeT, overlayPlayer, videoOverlay, player);
+        renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
       } catch (e) {
         console.error('[视频] 分类加载失败:', e);
       }
     };
   });
 
-  renderVideoGrid(allVideos, safeT, overlayPlayer, videoOverlay, player);
+  renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
 }
 
 // ==================== 渲染视频网格 ====================
