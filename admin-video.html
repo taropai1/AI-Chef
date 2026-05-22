@@ -19,17 +19,8 @@
     .data-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .data-card h3 { font-size: 13px; color: #6b7280; margin-bottom: 8px; font-weight: 500; }
     .data-card .value { font-size: 28px; font-weight: 600; color: #1f2937; }
-    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .chart-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1f2937; }
-    .top-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .top-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .top-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 24px; }
     .top-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1f2937; }
-    .top-box table { width: 100%; border-collapse: collapse; }
-    .top-box th, .top-box td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
-    .top-box th { color: #6b7280; font-weight: 500; }
-    .main-table { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 16px; }
-    .main-table h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1f2937; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
     th { background: #f9fafb; font-weight: 600; color: #1f2937; }
@@ -63,36 +54,69 @@
       <span id="collectStatus" style="font-size:14px;color:#6b7280;"></span>
     </div>
 
-    <!-- 数据看板 -->
-    <div class="data-cards" id="dataCards"></div>
-
-    <!-- 来源和分类图表 -->
-    <div class="charts-row">
-      <div class="chart-box"><h3>视频来源分布</h3><canvas id="sourceChart"></canvas></div>
-      <div class="chart-box"><h3>分类分布</h3><canvas id="categoryChart"></canvas></div>
+    <!-- 数据看板卡片 -->
+    <div class="data-cards" id="dataCards">
+      <div class="data-card"><h3>视频总数</h3><div class="value" id="totalVideos">-</div></div>
+      <div class="data-card"><h3>已推荐</h3><div class="value" id="promotedCount">-</div></div>
+      <div class="data-card"><h3>原创视频</h3><div class="value" id="originalCount">-</div></div>
+      <div class="data-card"><h3>注册用户</h3><div class="value" id="userCount">-</div></div>
+      <div class="data-card"><h3>订阅用户</h3><div class="value" id="subCount">-</div></div>
+      <div class="data-card"><h3>站点浏览量</h3><div class="value" id="sitePV">-</div></div>
     </div>
 
-    <!-- 热度前20 与 博主前20 对比 -->
-    <div class="top-list">
-      <div class="top-box">
-        <h3>热门视频 Top 20（本站播放量 vs 外网热度）</h3>
-        <table id="topVideosTable"></table>
-      </div>
-      <div class="top-box">
-        <h3>知名博主 Top 20（本站播放量 vs 外网热度）</h3>
-        <table id="topAuthorsTable"></table>
+    <!-- 站点分析模块 -->
+    <div class="top-box">
+      <h3>站点访问分析</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div>
+          <h4>国家/地区</h4>
+          <table id="countryTable"><thead><tr><th>地区</th><th>浏览量</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div>
+          <h4>设备类型</h4>
+          <table id="deviceTable"><thead><tr><th>设备</th><th>浏览量</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div>
+          <h4>浏览器</h4>
+          <table id="browserTable"><thead><tr><th>浏览器</th><th>浏览量</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div>
+          <h4>引荐来源</h4>
+          <table id="refererTable"><thead><tr><th>来源</th><th>浏览量</th></tr></thead><tbody></tbody></table>
+        </div>
       </div>
     </div>
 
-    <!-- 原创视频模块 -->
-    <div class="top-box" style="margin-bottom:24px;">
-      <h3>原创热门视频（本站播放量排序）</h3>
-      <table id="originalVideosTable"></table>
+    <!-- 本站热度前20 -->
+    <div class="top-box">
+      <h3>本站播放量 Top 20</h3>
+      <table id="topVideosTable">
+        <thead><tr><th>视频标题</th><th>本站播放</th><th>外站播放</th><th>来源</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 博主排名前20 -->
+    <div class="top-box">
+      <h3>知名博主 Top 20（外站热度排序）</h3>
+      <table id="topAuthorsTable">
+        <thead><tr><th>博主</th><th>视频数</th><th>外站播放</th><th>本站播放</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 原创视频前20 -->
+    <div class="top-box">
+      <h3>原创热门视频（本站播放量）</h3>
+      <table id="originalVideosTable">
+        <thead><tr><th>视频标题</th><th>本站播放</th></tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
 
     <!-- 主推设置 -->
     <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-      <h3 style="margin-bottom:12px;">设置主推视频</h3>
+      <h3>设置主推视频</h3>
       <select id="featuredSelect" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;width:300px;">
         <option value="">-- 请选择视频 --</option>
       </select>
@@ -102,7 +126,6 @@
 
     <button onclick="openAddModal()" style="margin-bottom:16px;">+ 添加视频</button>
 
-    <!-- 视频列表 -->
     <div class="main-table">
       <h3>视频列表</h3>
       <div style="overflow-x:auto;">
@@ -118,18 +141,43 @@
   </div>
 </div>
 
-<!-- 编辑/添加视频弹窗 -->
+<!-- 添加/编辑视频弹窗 -->
 <div class="modal" id="videoModal">
   <div class="modal-content">
     <h3 id="modalTitle">编辑视频</h3>
-    <div class="form-row"><label>分享短链</label><input type="text" id="parseUrl" placeholder="粘贴可颂、小红书等分享链接"><button type="button" onclick="parseShortLink()" style="background:#f59e0b;">解析</button><span id="parseStatus" style="font-size:12px;color:#6b7280;"></span></div>
+    <div class="form-row">
+      <label>分享短链</label>
+      <input type="text" id="parseUrl" placeholder="粘贴可颂、小红书等分享链接">
+      <button type="button" onclick="parseShortLink()" style="background:#f59e0b;">解析</button>
+      <span id="parseStatus" style="font-size:12px;color:#6b7280;"></span>
+    </div>
     <div class="form-row"><label>展示标题</label><input type="text" id="editTitle"></div>
     <div class="form-row"><label>原标题</label><input type="text" id="editOriginalTitle" disabled></div>
     <div class="form-row"><label>播放链接</label><input type="text" id="editUrl"></div>
     <div class="form-row"><label>封面图</label><input type="text" id="editCover"></div>
-    <div class="form-row"><label>来源平台</label><select id="editSource"><option value="Original">原创</option><option value="YouTube">YouTube</option><option value="Dailymotion">Dailymotion</option><option value="Odysee">Odysee</option><option value="PeerTube">PeerTube</option><option value="Keso">可颂</option><option value="Xiaohongshu">小红书</option><option value="Douyin">抖音</option></select></div>
+    <div class="form-row">
+      <label>来源平台</label>
+      <select id="editSource">
+        <option value="Original">原创</option>
+        <option value="YouTube">YouTube</option>
+        <option value="Dailymotion">Dailymotion</option>
+        <option value="Odysee">Odysee</option>
+        <option value="PeerTube">PeerTube</option>
+        <option value="Keso">可颂</option>
+        <option value="Xiaohongshu">小红书</option>
+        <option value="Douyin">抖音</option>
+      </select>
+    </div>
     <div class="form-row"><label>作者</label><input type="text" id="editAuthor"></div>
-    <div class="form-row"><label>分类</label><select id="editCategory"><option value="Creative Food">创意美食</option><option value="Cooking Tutorial">烹饪教程</option><option value="Dessert & Drinks">甜品饮品</option><option value="Creator Picks">博主精选</option></select></div>
+    <div class="form-row">
+      <label>分类</label>
+      <select id="editCategory">
+        <option value="Creative Food">创意美食</option>
+        <option value="Cooking Tutorial">烹饪教程</option>
+        <option value="Dessert & Drinks">甜品饮品</option>
+        <option value="Creator Picks">博主精选</option>
+      </select>
+    </div>
     <div class="form-row"><label>权重</label><input type="number" id="editWeight" value="0"></div>
     <div class="form-row"><label>播放量</label><input type="number" id="editViews" value="0"></div>
     <div class="form-row"><label>点赞数</label><input type="number" id="editLikes" value="0"></div>
@@ -142,13 +190,11 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
   const API_BASE = 'https://vid.taropai.com';
   let adminKey = sessionStorage.getItem('adminKey') || '';
   let currentPage = 1;
   const pageSize = 20;
-  let allVideosCache = [];
 
   function getHeaders() {
     const h = new Headers();
@@ -183,90 +229,46 @@
     }
   };
 
-  function destroyCharts() {
-    const c1 = Chart.getChart('sourceChart');
-    if (c1) c1.destroy();
-    const c2 = Chart.getChart('categoryChart');
-    if (c2) c2.destroy();
-  }
-
   async function loadDashboard() {
     try {
-      const res = await fetch(`${API_BASE}/api/admin/videos?page=1&limit=9999`, { headers: getHeaders() });
-      const data = await res.json();
-      allVideosCache = data.videos || [];
+      const [statsRes, analyticsRes] = await Promise.all([
+        fetch(`${API_BASE}/api/admin/stats/detailed`, { headers: getHeaders() }),
+        fetch(`${API_BASE}/api/admin/analytics`, { headers: getHeaders() })
+      ]);
+      const stats = await statsRes.json();
+      const analytics = analyticsRes.ok ? await analyticsRes.json() : {};
 
-      // 基本卡片
-      const total = allVideosCache.length;
-      const promotedCount = allVideosCache.filter(v => v.promoted).length;
-      const originalCount = allVideosCache.filter(v => v.source === 'Original').length;
-      const autoCount = total - originalCount;
-      document.getElementById('dataCards').innerHTML = `
-        <div class="data-card"><h3>视频总数</h3><div class="value">${total}</div></div>
-        <div class="data-card"><h3>已推荐</h3><div class="value">${promotedCount}</div></div>
-        <div class="data-card"><h3>原创视频</h3><div class="value">${originalCount}</div></div>
-        <div class="data-card"><h3>自动采集</h3><div class="value">${autoCount}</div></div>
-        <div class="data-card"><h3>注册用户</h3><div class="value" id="userCount">…</div></div>
-        <div class="data-card"><h3>订阅用户</h3><div class="value" id="subCount">…</div></div>
-      `;
-      // 注册/订阅用户数据需要主后端API，此处占位，后续可替换为真实数据
+      document.getElementById('totalVideos').innerText = stats.totalVideos || 0;
+      document.getElementById('promotedCount').innerText = stats.promotedCount || 0;
+      document.getElementById('originalCount').innerText = stats.originalCount || 0;
+      document.getElementById('userCount').innerText = stats.userCount || '待接入';
+      document.getElementById('subCount').innerText = stats.subCount || '待接入';
+      document.getElementById('sitePV').innerText = analytics.totalPageViews || '-';
 
-      // 来源分布
-      destroyCharts();
-      const sourceCounts = {};
-      allVideosCache.forEach(v => sourceCounts[v.source] = (sourceCounts[v.source]||0)+1);
-      new Chart(document.getElementById('sourceChart'), {
-        type: 'pie',
-        data: {
-          labels: Object.keys(sourceCounts),
-          datasets: [{ data: Object.values(sourceCounts), backgroundColor: ['#4a90e2','#f59e0b','#10b981','#ef4444','#8b5cf6','#ec4899','#06b6d4'] }]
-        }
-      });
+      const renderTable = (tableId, data) => {
+        const tbody = document.getElementById(tableId).querySelector('tbody');
+        tbody.innerHTML = (data || []).map(([name, count]) => `<tr><td>${name}</td><td>${count.toLocaleString()}</td></tr>`).join('');
+      };
+      renderTable('countryTable', analytics.topCountries);
+      renderTable('deviceTable', analytics.topDevices);
+      renderTable('browserTable', analytics.topBrowsers);
+      renderTable('refererTable', analytics.topReferers);
 
-      const catCounts = {};
-      allVideosCache.forEach(v => catCounts[v.category] = (catCounts[v.category]||0)+1);
-      new Chart(document.getElementById('categoryChart'), {
-        type: 'pie',
-        data: {
-          labels: Object.keys(catCounts),
-          datasets: [{ data: Object.values(catCounts), backgroundColor: ['#4a90e2','#f59e0b','#10b981','#ef4444'] }]
-        }
-      });
+      document.getElementById('topVideosTable').querySelector('tbody').innerHTML = (stats.topInternal || []).map(v =>
+        `<tr><td>${v.title}</td><td>${v.internalViews.toLocaleString()}</td><td>${v.externalViews.toLocaleString()}</td><td>${v.source}</td></tr>`
+      ).join('');
 
-      // 热门视频 Top 20（本站播放量 vs 外网热度）
-      // 本站播放量数据来自 internalViews 字段（需后端统计），此处模拟展示
-      const sortedByInternal = [...allVideosCache].sort((a,b) => (b.internalViews||0) - (a.internalViews||0)).slice(0,20);
-      let topVhtml = '';
-      sortedByInternal.forEach(v => {
-        topVhtml += `<tr><td>${v.title || ''}</td><td>${(v.internalViews||0).toLocaleString()} (本站)</td><td>${(v.stats?.views||0).toLocaleString()} (外站)</td></tr>`;
-      });
-      document.getElementById('topVideosTable').innerHTML = topVhtml || '<tr><td colspan="3">暂无数据</td></tr>';
+      document.getElementById('topAuthorsTable').querySelector('tbody').innerHTML = (stats.topAuthors || []).map(a =>
+        `<tr><td>${a.author}</td><td>${a.videoCount}</td><td>${a.totalExternalViews.toLocaleString()}</td><td>${a.totalInternalViews.toLocaleString()}</td></tr>`
+      ).join('');
 
-      // 知名博主 Top 20（外站热度排序，附带本站播放量）
-      const authorMap = {};
-      allVideosCache.forEach(v => {
-        const a = v.author || '未知博主';
-        if (!authorMap[a]) authorMap[a] = { count: 0, totalViews: 0, internalViews: 0 };
-        authorMap[a].count++;
-        authorMap[a].totalViews += (v.stats?.views||0);
-        authorMap[a].internalViews += (v.internalViews||0);
-      });
-      const authorList = Object.entries(authorMap).sort((a,b) => b[1].totalViews - a[1].totalViews).slice(0,20);
-      let topAhtml = '';
-      authorList.forEach(([name, info]) => {
-        topAhtml += `<tr><td>${name}</td><td>${info.count} 个视频</td><td>${info.totalViews.toLocaleString()} (外站)</td><td>${info.internalViews.toLocaleString()} (本站)</td></tr>`;
-      });
-      document.getElementById('topAuthorsTable').innerHTML = topAhtml || '<tr><td colspan="4">暂无数据</td></tr>';
+      document.getElementById('originalVideosTable').querySelector('tbody').innerHTML = (stats.topOriginals || []).map(v =>
+        `<tr><td>${v.title}</td><td>${v.internalViews.toLocaleString()}</td></tr>`
+      ).join('');
 
-      // 原创视频模块
-      const originals = allVideosCache.filter(v => v.source === 'Original').sort((a,b) => (b.internalViews||0) - (a.internalViews||0)).slice(0,20);
-      let oriHtml = '';
-      originals.forEach(v => {
-        oriHtml += `<tr><td>${v.title || ''}</td><td>${(v.internalViews||0).toLocaleString()} 次播放</td></tr>`;
-      });
-      document.getElementById('originalVideosTable').innerHTML = oriHtml || '<tr><td colspan="2">暂无原创视频数据</td></tr>';
-
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error('加载统计失败', e);
+    }
   }
 
   async function loadVideos(page) {
@@ -283,7 +285,7 @@
         <td>${v.author || '-'}</td>
         <td>${v.source}</td>
         <td>${v.category}</td>
-        <td>${(v.stats?.views||0).toLocaleString()}</td>
+        <td>${(v.stats?.views || 0).toLocaleString()}</td>
         <td>
           <button class="${v.promoted ? 'warning' : ''}" onclick="togglePromote('${v.id}', ${!v.promoted})">
             ${v.promoted ? '已推荐' : '未推荐'}
@@ -298,8 +300,8 @@
 
     const totalPages = Math.ceil(total / pageSize);
     let pagHTML = '';
-    for (let i=1; i<=totalPages; i++) {
-      pagHTML += `<button class="${i===page?'active':''}" onclick="loadVideos(${i})">${i}</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      pagHTML += `<button class="${i === page ? 'active' : ''}" onclick="loadVideos(${i})">${i}</button>`;
     }
     document.getElementById('pagination').innerHTML = pagHTML;
 
@@ -327,14 +329,14 @@
   function openAddModal() {
     document.getElementById('modalTitle').innerText = '添加视频';
     document.getElementById('editOriginalTitle').disabled = false;
-    ['editTitle','editOriginalTitle','editUrl','editCover','editAuthor','editWeight','editViews','editLikes','editComments'].forEach(id => document.getElementById(id).value='');
+    ['editTitle', 'editOriginalTitle', 'editUrl', 'editCover', 'editAuthor', 'editWeight', 'editViews', 'editLikes', 'editComments'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('editSource').value = 'Original';
     document.getElementById('editCategory').value = 'Creative Food';
     document.getElementById('editPromoted').checked = false;
     document.getElementById('videoModal').style.display = 'flex';
   }
 
-  window.openEditModal = async function(id) {
+  async function openEditModal(id) {
     try {
       const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, { headers: getHeaders() });
       const data = await res.json();
@@ -356,51 +358,19 @@
       document.getElementById('editPromoted').checked = v.promoted === true;
       document.getElementById('videoModal').style.display = 'flex';
     } catch (e) { alert('获取视频信息失败'); }
-  };
+  }
 
   function closeModal() {
     document.getElementById('videoModal').style.display = 'none';
   }
 
-    // 解析第三方平台分享短链
-  async function parseShortLink() {
-    const url = document.getElementById('parseUrl').value.trim();
-    const status = document.getElementById('parseStatus');
-    if (!url) {
-      status.textContent = '请粘贴分享链接';
-      return;
-    }
-    status.textContent = '解析中...';
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/parse-link`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ url })
-      });
-      const data = await res.json();
-      if (data.success) {
-        // 自动填充表单
-        if (data.title) document.getElementById('editTitle').value = data.title;
-        if (data.videoUrl) document.getElementById('editUrl').value = data.videoUrl;
-        if (data.cover) document.getElementById('editCover').value = data.cover;
-        if (data.source) document.getElementById('editSource').value = data.source;
-        status.textContent = '解析成功，已自动填充';
-        status.style.color = 'green';
-      } else {
-        status.textContent = '解析失败：' + (data.error || '未知错误');
-        status.style.color = 'red';
-      }
-    } catch (e) {
-      status.textContent = '网络错误，解析失败';
-      status.style.color = 'red';
-    }
-  }
-  
-  window.saveVideo = async function() {
+  async function saveVideo() {
     const title = document.getElementById('editTitle').value.trim();
     const url = document.getElementById('editUrl').value.trim();
     if (!title || !url) { alert('标题和播放链接必填'); return; }
-    const id = document.getElementById('modalTitle').innerText.includes('添加') ? 'vid_' + Date.now() : document.getElementById('editTitle').dataset.id || document.getElementById('editOriginalTitle').value;
+
+    const id = document.getElementById('modalTitle').innerText.includes('添加') ? 'vid_' + Date.now() : document.getElementById('editOriginalTitle').dataset.id || document.getElementById('editOriginalTitle').value;
+
     const video = {
       id: id,
       title: title,
@@ -419,6 +389,7 @@
       promoted: document.getElementById('editPromoted').checked,
       edited: true
     };
+
     try {
       const res = await fetch(`${API_BASE}/api/admin/videos`, {
         method: 'POST',
@@ -435,24 +406,21 @@
         alert('保存失败: ' + data.error);
       }
     } catch (e) { alert('网络错误'); }
-  };
+  }
 
-  window.deleteVideo = async function(id) {
+  async function deleteVideo(id) {
     if (!confirm('确定删除？')) return;
     try {
-      const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, {
-        method: 'DELETE',
-        headers: getHeaders()
-      });
+      const res = await fetch(`${API_BASE}/api/admin/videos?id=${id}`, { method: 'DELETE', headers: getHeaders() });
       const data = await res.json();
       if (data.success) {
         await loadVideos(currentPage);
         await loadDashboard();
       } else { alert('删除失败'); }
     } catch (e) { alert('网络错误'); }
-  };
+  }
 
-  window.setFeatured = async function() {
+  async function setFeatured() {
     const sel = document.getElementById('featuredSelect');
     const id = sel.value;
     if (!id) return;
@@ -465,10 +433,9 @@
       const data = await res.json();
       document.getElementById('featuredMsg').innerText = data.success ? '主推视频已更新' : '操作失败';
     } catch (e) { document.getElementById('featuredMsg').innerText = '网络错误'; }
-  };
+  }
 
-  // 手动采集（优化版，带自动刷新）
-  window.manualCollect = async function() {
+  async function manualCollect() {
     const btn = document.getElementById('manualCollectBtn');
     const status = document.getElementById('collectStatus');
     if (!btn || !status) return;
@@ -492,7 +459,6 @@
       });
       if (res.ok) {
         status.textContent = '采集成功！正在刷新数据...';
-        // 强制刷新页面以显示最新数据
         setTimeout(() => { location.reload(); }, 1500);
       } else if (res.status === 401) {
         status.textContent = '密钥错误，请重新输入';
@@ -506,7 +472,51 @@
       btn.disabled = false;
       btn.textContent = '立即采集视频';
     }
-  };
+  }
+
+  async function parseShortLink() {
+    const url = document.getElementById('parseUrl').value.trim();
+    const status = document.getElementById('parseStatus');
+    if (!url) { status.textContent = '请粘贴分享链接'; return; }
+    status.textContent = '解析中...';
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/parse-link`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.title) document.getElementById('editTitle').value = data.title;
+        if (data.videoUrl) document.getElementById('editUrl').value = data.videoUrl;
+        if (data.cover) document.getElementById('editCover').value = data.cover;
+        if (data.source) document.getElementById('editSource').value = data.source;
+        if (data.author) document.getElementById('editAuthor').value = data.author;
+        status.textContent = '解析成功，已自动填充';
+        status.style.color = 'green';
+      } else {
+        status.textContent = '解析失败：' + (data.error || '未知错误');
+        status.style.color = 'red';
+      }
+    } catch (e) {
+      status.textContent = '网络错误，解析失败';
+      status.style.color = 'red';
+    }
+  }
+
+  // 全局函数绑定到 window 以便 onclick 调用
+  window.login = login;
+  window.loadDashboard = loadDashboard;
+  window.loadVideos = loadVideos;
+  window.togglePromote = togglePromote;
+  window.openAddModal = openAddModal;
+  window.openEditModal = openEditModal;
+  window.closeModal = closeModal;
+  window.saveVideo = saveVideo;
+  window.deleteVideo = deleteVideo;
+  window.setFeatured = setFeatured;
+  window.manualCollect = manualCollect;
+  window.parseShortLink = parseShortLink;
 </script>
 </body>
 </html>
