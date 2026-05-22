@@ -467,12 +467,11 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 }
 
 .video-title {
-    /* 原有样式保留 */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    max-width: 100%; /* 适应容器宽度 */
+  font-weight: 600;
+  color: #1f2937;
+  flex: 1;
+  margin-right: 30px;          /* 由12px改为30px */
+  line-height: 1.3;
 }
 
 .video-source {
