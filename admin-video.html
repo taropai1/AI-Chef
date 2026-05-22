@@ -8,37 +8,41 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
     body { background: #f5f7fa; padding: 20px; color: #1f2937; }
     .container { max-width: 1200px; margin: 0 auto; }
-    h1 { margin-bottom: 20px; }
+    h1 { margin-bottom: 20px; font-size: 24px; font-weight: 600; }
     .auth-section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .auth-section input { width: 300px; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-right: 10px; }
     button { padding: 8px 16px; border: none; border-radius: 8px; background: #4a90e2; color: #fff; cursor: pointer; font-weight: 500; }
     button:hover { opacity: 0.9; }
     button.danger { background: #ef4444; }
     button.warning { background: #f59e0b; }
-    .data-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .data-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
     .data-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .data-card h3 { font-size: 14px; color: #6b7280; margin-bottom: 8px; }
+    .data-card h3 { font-size: 13px; color: #6b7280; margin-bottom: 8px; font-weight: 500; }
     .data-card .value { font-size: 28px; font-weight: 600; color: #1f2937; }
     .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
     .chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 16px; }
+    .chart-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #1f2937; }
+    .top-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .top-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .top-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1f2937; }
+    .top-box table { width: 100%; border-collapse: collapse; }
+    .top-box th, .top-box td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
+    .top-box th { color: #6b7280; font-weight: 500; }
+    .main-table { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 16px; }
+    .main-table h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1f2937; }
+    table { width: 100%; border-collapse: collapse; }
     th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
-    th { background: #f9fafb; font-weight: 600; }
+    th { background: #f9fafb; font-weight: 600; color: #1f2937; }
     .pagination { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
     .pagination button { background: #f3f4f6; color: #1f2937; }
     .pagination button.active { background: #4a90e2; color: #fff; }
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: #fff; border-radius: 16px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
-    .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
     .form-row label { width: 80px; text-align: right; font-size: 14px; color: #6b7280; }
     .form-row input, .form-row select { flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; }
     .msg { color: green; margin: 10px 0; }
     .error { color: red; }
-    .top-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .top-box { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .top-box h3 { font-size: 14px; color: #1f2937; margin-bottom: 12px; }
-    .top-box ol { padding-left: 20px; font-size: 13px; color: #374151; }
-    .top-box li { margin-bottom: 6px; display: flex; justify-content: space-between; }
   </style>
 </head>
 <body>
@@ -53,7 +57,7 @@
   </div>
 
   <div id="mainSection" style="display:none;">
-    <!-- 手动采集按钮 -->
+    <!-- 手动采集 -->
     <div style="background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;align-items:center;gap:12px;">
       <button id="manualCollectBtn" onclick="manualCollect()" style="background:#10b981;">立即采集视频</button>
       <span id="collectStatus" style="font-size:14px;color:#6b7280;"></span>
@@ -64,20 +68,26 @@
 
     <!-- 来源和分类图表 -->
     <div class="charts-row">
-      <div class="chart-box"><canvas id="sourceChart"></canvas></div>
-      <div class="chart-box"><canvas id="categoryChart"></canvas></div>
+      <div class="chart-box"><h3>视频来源分布</h3><canvas id="sourceChart"></canvas></div>
+      <div class="chart-box"><h3>分类分布</h3><canvas id="categoryChart"></canvas></div>
     </div>
 
-    <!-- 热度前20 和 知名博主前20 -->
+    <!-- 热度前20 与 博主前20 对比 -->
     <div class="top-list">
       <div class="top-box">
-        <h3>热门视频 Top 20（按播放量）</h3>
-        <ol id="topVideos"></ol>
+        <h3>热门视频 Top 20（本站播放量 vs 外网热度）</h3>
+        <table id="topVideosTable"></table>
       </div>
       <div class="top-box">
-        <h3>知名博主 Top 20（按视频数量）</h3>
-        <ol id="topAuthors"></ol>
+        <h3>知名博主 Top 20（本站播放量 vs 外网热度）</h3>
+        <table id="topAuthorsTable"></table>
       </div>
+    </div>
+
+    <!-- 原创视频模块 -->
+    <div class="top-box" style="margin-bottom:24px;">
+      <h3>原创热门视频（本站播放量排序）</h3>
+      <table id="originalVideosTable"></table>
     </div>
 
     <!-- 主推设置 -->
@@ -92,17 +102,19 @@
 
     <button onclick="openAddModal()" style="margin-bottom:16px;">+ 添加视频</button>
 
-    <h3>视频列表</h3>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead>
-          <tr><th>展示标题</th><th>作者</th><th>来源</th><th>分类</th><th>播放量</th><th>推荐</th><th>操作</th></tr>
-        </thead>
-        <tbody id="videoTbody"></tbody>
-      </table>
+    <!-- 视频列表 -->
+    <div class="main-table">
+      <h3>视频列表</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>展示标题</th><th>作者</th><th>来源</th><th>分类</th><th>播放量</th><th>推荐</th><th>操作</th></tr>
+          </thead>
+          <tbody id="videoTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
     </div>
-
-    <div class="pagination" id="pagination"></div>
   </div>
 </div>
 
@@ -110,36 +122,14 @@
 <div class="modal" id="videoModal">
   <div class="modal-content">
     <h3 id="modalTitle">编辑视频</h3>
-        <div class="form-row">
-      <label>分享短链</label>
-      <input type="text" id="parseUrl" placeholder="粘贴可颂、小红书等分享链接">
-      <button type="button" onclick="parseShortLink()" style="background:#f59e0b; padding:8px 16px;">解析</button>
-      <span id="parseStatus" style="font-size:12px; color:#6b7280;"></span>
-    </div>
+    <div class="form-row"><label>分享短链</label><input type="text" id="parseUrl" placeholder="粘贴可颂、小红书等分享链接"><button type="button" onclick="parseShortLink()" style="background:#f59e0b;">解析</button><span id="parseStatus" style="font-size:12px;color:#6b7280;"></span></div>
     <div class="form-row"><label>展示标题</label><input type="text" id="editTitle"></div>
     <div class="form-row"><label>原标题</label><input type="text" id="editOriginalTitle" disabled></div>
     <div class="form-row"><label>播放链接</label><input type="text" id="editUrl"></div>
     <div class="form-row"><label>封面图</label><input type="text" id="editCover"></div>
-    <div class="form-row"><label>来源平台</label>
-      <select id="editSource">
-        <option value="Original">原创</option>
-        <option value="YouTube">YouTube</option>
-        <option value="Dailymotion">Dailymotion</option>
-        <option value="Odysee">Odysee</option>
-        <option value="PeerTube">PeerTube</option>
-        <option value="Keso">可颂</option>
-        <option value="Xiaohongshu">小红书</option>
-      </select>
-    </div>
+    <div class="form-row"><label>来源平台</label><select id="editSource"><option value="Original">原创</option><option value="YouTube">YouTube</option><option value="Dailymotion">Dailymotion</option><option value="Odysee">Odysee</option><option value="PeerTube">PeerTube</option><option value="Keso">可颂</option><option value="Xiaohongshu">小红书</option><option value="Douyin">抖音</option></select></div>
     <div class="form-row"><label>作者</label><input type="text" id="editAuthor"></div>
-    <div class="form-row"><label>分类</label>
-      <select id="editCategory">
-        <option value="Creative Food">创意美食</option>
-        <option value="Cooking Tutorial">烹饪教程</option>
-        <option value="Dessert & Drinks">甜品饮品</option>
-        <option value="Creator Picks">博主精选</option>
-      </select>
-    </div>
+    <div class="form-row"><label>分类</label><select id="editCategory"><option value="Creative Food">创意美食</option><option value="Cooking Tutorial">烹饪教程</option><option value="Dessert & Drinks">甜品饮品</option><option value="Creator Picks">博主精选</option></select></div>
     <div class="form-row"><label>权重</label><input type="number" id="editWeight" value="0"></div>
     <div class="form-row"><label>播放量</label><input type="number" id="editViews" value="0"></div>
     <div class="form-row"><label>点赞数</label><input type="number" id="editLikes" value="0"></div>
@@ -193,7 +183,6 @@
     }
   };
 
-  // 销毁旧图表（避免 Canvas 冲突）
   function destroyCharts() {
     const c1 = Chart.getChart('sourceChart');
     if (c1) c1.destroy();
@@ -207,7 +196,7 @@
       const data = await res.json();
       allVideosCache = data.videos || [];
 
-      // 基础卡片
+      // 基本卡片
       const total = allVideosCache.length;
       const promotedCount = allVideosCache.filter(v => v.promoted).length;
       const originalCount = allVideosCache.filter(v => v.source === 'Original').length;
@@ -217,9 +206,12 @@
         <div class="data-card"><h3>已推荐</h3><div class="value">${promotedCount}</div></div>
         <div class="data-card"><h3>原创视频</h3><div class="value">${originalCount}</div></div>
         <div class="data-card"><h3>自动采集</h3><div class="value">${autoCount}</div></div>
+        <div class="data-card"><h3>注册用户</h3><div class="value" id="userCount">…</div></div>
+        <div class="data-card"><h3>订阅用户</h3><div class="value" id="subCount">…</div></div>
       `;
+      // 注册/订阅用户数据需要主后端API，此处占位，后续可替换为真实数据
 
-      // 来源分布饼图
+      // 来源分布
       destroyCharts();
       const sourceCounts = {};
       allVideosCache.forEach(v => sourceCounts[v.source] = (sourceCounts[v.source]||0)+1);
@@ -231,7 +223,6 @@
         }
       });
 
-      // 分类分布饼图
       const catCounts = {};
       allVideosCache.forEach(v => catCounts[v.category] = (catCounts[v.category]||0)+1);
       new Chart(document.getElementById('categoryChart'), {
@@ -242,28 +233,38 @@
         }
       });
 
-      // 热度前20
-      const sortedByViews = [...allVideosCache].sort((a,b) => (b.stats?.views||0) - (a.stats?.views||0)).slice(0,20);
+      // 热门视频 Top 20（本站播放量 vs 外网热度）
+      // 本站播放量数据来自 internalViews 字段（需后端统计），此处模拟展示
+      const sortedByInternal = [...allVideosCache].sort((a,b) => (b.internalViews||0) - (a.internalViews||0)).slice(0,20);
       let topVhtml = '';
-      sortedByViews.forEach((v,i) => {
-        topVhtml += `<li><span>${i+1}. ${v.title}</span><span>${(v.stats?.views||0).toLocaleString()} 次播放</span></li>`;
+      sortedByInternal.forEach(v => {
+        topVhtml += `<tr><td>${v.title || ''}</td><td>${(v.internalViews||0).toLocaleString()} (本站)</td><td>${(v.stats?.views||0).toLocaleString()} (外站)</td></tr>`;
       });
-      document.getElementById('topVideos').innerHTML = topVhtml || '<li>暂无数据</li>';
+      document.getElementById('topVideosTable').innerHTML = topVhtml || '<tr><td colspan="3">暂无数据</td></tr>';
 
-      // 知名博主前20（按视频数量+总播放量）
+      // 知名博主 Top 20（外站热度排序，附带本站播放量）
       const authorMap = {};
       allVideosCache.forEach(v => {
         const a = v.author || '未知博主';
-        if (!authorMap[a]) authorMap[a] = { count: 0, totalViews: 0 };
+        if (!authorMap[a]) authorMap[a] = { count: 0, totalViews: 0, internalViews: 0 };
         authorMap[a].count++;
         authorMap[a].totalViews += (v.stats?.views||0);
+        authorMap[a].internalViews += (v.internalViews||0);
       });
-      const authorList = Object.entries(authorMap).sort((a,b) => b[1].count - a[1].count || b[1].totalViews - a[1].totalViews).slice(0,20);
+      const authorList = Object.entries(authorMap).sort((a,b) => b[1].totalViews - a[1].totalViews).slice(0,20);
       let topAhtml = '';
-      authorList.forEach(([name, info], i) => {
-        topAhtml += `<li><span>${i+1}. ${name}</span><span>${info.count} 个视频 / ${info.totalViews.toLocaleString()} 播放</span></li>`;
+      authorList.forEach(([name, info]) => {
+        topAhtml += `<tr><td>${name}</td><td>${info.count} 个视频</td><td>${info.totalViews.toLocaleString()} (外站)</td><td>${info.internalViews.toLocaleString()} (本站)</td></tr>`;
       });
-      document.getElementById('topAuthors').innerHTML = topAhtml || '<li>暂无数据</li>';
+      document.getElementById('topAuthorsTable').innerHTML = topAhtml || '<tr><td colspan="4">暂无数据</td></tr>';
+
+      // 原创视频模块
+      const originals = allVideosCache.filter(v => v.source === 'Original').sort((a,b) => (b.internalViews||0) - (a.internalViews||0)).slice(0,20);
+      let oriHtml = '';
+      originals.forEach(v => {
+        oriHtml += `<tr><td>${v.title || ''}</td><td>${(v.internalViews||0).toLocaleString()} 次播放</td></tr>`;
+      });
+      document.getElementById('originalVideosTable').innerHTML = oriHtml || '<tr><td colspan="2">暂无原创视频数据</td></tr>';
 
     } catch (e) { console.error(e); }
   }
