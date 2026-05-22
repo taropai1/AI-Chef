@@ -1527,7 +1527,7 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT, overlayPlayer
             // 弹窗播放
             overlayPlayer.src = videoUrl;
             overlayPlayer.play().catch(() => {});
-            mainPlayer.pause();
+            player.pause();
 
             // 横屏全屏逻辑
             if (window.innerWidth <= 767 && window.innerWidth > window.innerHeight) {
