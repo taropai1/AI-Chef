@@ -1295,36 +1295,13 @@ async function initVideoPage() {
   let currentIndex = 0;
   const MAX_VISIBLE_DOTS = 10;
 
-  // 复用已存在的弹窗播放器，避免重复创建
-  let videoOverlay = document.getElementById('videoOverlayContainer');
-  if (!videoOverlay) {
-    videoOverlay = document.createElement('div');
-    videoOverlay.id = 'videoOverlayContainer';
-    videoOverlay.className = 'video-player-overlay';
-    videoOverlay.innerHTML = `
-      <div class="overlay-container">
-        <div class="overlay-close" id="videoOverlayClose">✕</div>
-        <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
-      </div>
-    `;
-    document.body.appendChild(videoOverlay);
-  }
-  videoOverlay.classList.remove('active', 'fullscreen'); // 重置状态
-
-  const overlayPlayer = document.getElementById('overlayVideoPlayer');
-  const overlayClose = document.getElementById('videoOverlayClose');
-
-  // 绑定关闭按钮事件（每次初始化时重新绑定，确保生效）
-  overlayClose.onclick = () => {
-    overlayPlayer.pause();
-    videoOverlay.classList.remove('active', 'fullscreen');
-    if (currentPlaylist.length) {
-      player.play().catch(() => {});
-    }
-  };
+  // 弹窗相关变量（延迟初始化）
+  let videoOverlay = null;
+  let overlayPlayer = null;
 
   let allVideos = [];
 
+  // 1. 获取数据（不再提前创建弹窗）
   try {
     const res = await fetch('https://vid.taropai.com/api/videos');
     const data = await res.json();
@@ -1335,7 +1312,10 @@ async function initVideoPage() {
     return;
   }
 
-  // 构建轮播列表
+  // 2. 立即渲染卡片（数据已就绪）
+  renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
+
+  // 构建轮播列表（仅推荐视频）
   const promoted = allVideos.filter(v => v.promoted);
   if (promoted.length > 0) {
     currentPlaylist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
@@ -1436,7 +1416,7 @@ async function initVideoPage() {
     });
   }
 
-  // 分类按钮事件
+  // 分类按钮事件：仅更新卡片区，不动轮播
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
@@ -1446,19 +1426,44 @@ async function initVideoPage() {
         const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
         const data = await res.json();
         allVideos = data.list || [];
-        renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
+        renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
       } catch (e) {
         console.error('[视频] 分类加载失败:', e);
       }
     };
   });
 
-  // 初始渲染卡片
-  renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
+  // 3. 弹窗延迟初始化函数（仅在第一次点击卡片时调用）
+  function ensureOverlayCreated() {
+    if (videoOverlay) return; // 已创建，直接返回
+    videoOverlay = document.createElement('div');
+    videoOverlay.id = 'videoOverlayContainer';
+    videoOverlay.className = 'video-player-overlay';
+    videoOverlay.innerHTML = `
+      <div class="overlay-container">
+        <div class="overlay-close" id="videoOverlayClose">✕</div>
+        <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
+      </div>
+    `;
+    document.body.appendChild(videoOverlay);
+    overlayPlayer = document.getElementById('overlayVideoPlayer');
+    const overlayClose = document.getElementById('videoOverlayClose');
+    overlayClose.addEventListener('click', () => {
+      overlayPlayer.pause();
+      videoOverlay.classList.remove('active', 'fullscreen');
+      if (currentPlaylist.length) {
+        player.play().catch(() => {});
+      }
+    });
+  }
+
+  // 将弹窗创建函数暴露给卡片点击使用
+  window._ensureOverlayCreated = ensureOverlayCreated;
+  window._getOverlayElements = () => ({ videoOverlay, overlayPlayer });
 }
 
 // ==================== 渲染视频网格 ====================
-function renderVideoGrid(videos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay) {
+function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
   const grid = document.getElementById('videoGrid');
   if (!grid) return;
 
@@ -1504,6 +1509,14 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT, overlayPlayer
       const videoUrl = card.dataset.url;
       const videoId = card.dataset.id;
       if (!videoUrl) return;
+
+      // 延迟创建弹窗（第一次点击时）
+      if (typeof window._ensureOverlayCreated === 'function') {
+        window._ensureOverlayCreated();
+      }
+      const { videoOverlay, overlayPlayer } = window._getOverlayElements();
+
+      if (!overlayPlayer || !videoOverlay) return;
 
       overlayPlayer.src = videoUrl;
       overlayPlayer.play().catch(() => {});
