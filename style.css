@@ -709,19 +709,38 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     cursor: pointer;
 }
 
-/* 电脑端：右下角小窗，自带全屏控件 */
+/* 电脑/平板端：居中缩放弹窗，不遮挡内容 */
 @media (min-width: 768px) {
   .video-player-overlay {
-    bottom: 16px;
-    left: auto;
-    right: 16px;
-    width: 400px;
-    height: 300px;
-    max-height: none;
-    border-radius: 12px;
-    padding: 0;
+    background: rgba(0,0,0,0.01); /* 极淡背景，视觉无遮挡 */
+    pointer-events: none;
+    align-items: center;           /* 垂直居中 */
+    justify-content: center;       /* 水平居中 */
   }
-  .video-player-overlay .overlay-video-wrapper {
+
+  .video-player-overlay .overlay-container {
+    width: auto;
+    max-width: 800px;              /* 限制最大宽度 */
+    height: auto;
+    max-height: 80vh;             /* 不超出屏幕高度 */
+    aspect-ratio: 16 / 9;         /* 保持视频比例 */
+    border-radius: 12px;
+    pointer-events: auto;
+  }
+
+  /* 横屏全屏时恢复铺满 */
+  .video-player-overlay.fullscreen {
+    background: rgba(0,0,0,0.9);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .video-player-overlay.fullscreen .overlay-container {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
     aspect-ratio: auto;
   }
 }
