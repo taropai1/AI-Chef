@@ -712,23 +712,34 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 
 /* 电脑/平板端：居中缩放弹窗，半透明遮罩，点击遮罩空白处不关闭 */
 @media (min-width: 768px) {
+  /* 默认状态：隐藏，不占位，无交互 */
   .video-player-overlay {
-    background: rgba(0,0,0,0.5);
-    pointer-events: auto;
-    align-items: center;          /* 垂直居中 */
-    justify-content: center;      /* 水平居中 */
+    display: none;
+    background: transparent;
+    pointer-events: none;
   }
 
+  /* 激活状态：居中显示，半透明遮罩 */
+  .video-player-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+    pointer-events: auto;
+  }
+
+  /* 弹窗卡片尺寸 */
   .video-player-overlay .overlay-container {
-    width: auto;
-    max-width: 800px;
+    width: 60vw;                 /* 视口宽度的60% */
+    max-width: 800px;            /* 最大宽度限制 */
     height: auto;
-    max-height: 80vh;
-    aspect-ratio: 16 / 9;
+    max-height: 80vh;           /* 不超出屏幕高度 */
+    aspect-ratio: 16 / 9;       /* 保持视频比例 */
     border-radius: 12px;
     pointer-events: auto;
   }
-
+  
+  /* 横屏全屏时恢复铺满 */
   .video-player-overlay.fullscreen {
     background: rgba(0,0,0,0.9);
     align-items: center;
