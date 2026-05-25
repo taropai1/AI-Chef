@@ -728,7 +728,7 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
 
   .video-player-overlay .overlay-container {
     width: 80vw;
-    max-width: 800px;
+    max-width: 1200px;
     height: auto;
     max-height: 80vh;
     aspect-ratio: 16 / 9;
