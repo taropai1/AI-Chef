@@ -1295,27 +1295,33 @@ async function initVideoPage() {
   let currentIndex = 0;
   const MAX_VISIBLE_DOTS = 10;
 
-  // 创建弹窗播放器：无全屏按钮，原生全屏禁用，横屏自动全屏
-  const videoOverlay = document.createElement('div');
-  videoOverlay.className = 'video-player-overlay';
-  videoOverlay.innerHTML = `
-    <div class="overlay-close" id="videoOverlayClose">✕</div>
-    <div class="overlay-video-wrapper">
-      <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
-    </div>
-  `;
-  document.body.appendChild(videoOverlay);
+  // 复用已存在的弹窗播放器，避免重复创建
+  let videoOverlay = document.getElementById('videoOverlayContainer');
+  if (!videoOverlay) {
+    videoOverlay = document.createElement('div');
+    videoOverlay.id = 'videoOverlayContainer';
+    videoOverlay.className = 'video-player-overlay';
+    videoOverlay.innerHTML = `
+      <div class="overlay-container">
+        <div class="overlay-close" id="videoOverlayClose">✕</div>
+        <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
+      </div>
+    `;
+    document.body.appendChild(videoOverlay);
+  }
+  videoOverlay.classList.remove('active', 'fullscreen'); // 重置状态
+
   const overlayPlayer = document.getElementById('overlayVideoPlayer');
   const overlayClose = document.getElementById('videoOverlayClose');
 
-  overlayClose.addEventListener('click', () => {
+  // 绑定关闭按钮事件（每次初始化时重新绑定，确保生效）
+  overlayClose.onclick = () => {
     overlayPlayer.pause();
-    videoOverlay.classList.remove('active');
-    // 恢复主播放器轮播
+    videoOverlay.classList.remove('active', 'fullscreen');
     if (currentPlaylist.length) {
       player.play().catch(() => {});
     }
-  });
+  };
 
   let allVideos = [];
 
@@ -1329,7 +1335,7 @@ async function initVideoPage() {
     return;
   }
 
-  // 构建轮播列表：仅推荐视频
+  // 构建轮播列表
   const promoted = allVideos.filter(v => v.promoted);
   if (promoted.length > 0) {
     currentPlaylist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
@@ -1371,11 +1377,9 @@ async function initVideoPage() {
         }
         dot.style.width = width + 'px';
         dot.style.borderRadius = width > 6 ? '2px' : '50%';
-        if (dot.classList.contains('active')) {
-  dot.style.background = '#4a90e2';  // 激活时也直接设置背景，双重保险
-} else {
-  dot.style.background = '#fff';
-}
+        if (!dot.classList.contains('active')) {
+          dot.style.background = '#fff';
+        }
       } else {
         dot.style.display = 'none';
       }
@@ -1432,29 +1436,7 @@ async function initVideoPage() {
     });
   }
 
-  // 移动端/平板端：视频区域左右滑动切换视频
-const playerSection = document.querySelector('.video-player-section');
-if (playerSection) {
-  let touchStartX = 0;
-  playerSection.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-  });
-  playerSection.addEventListener('touchend', (e) => {
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchEndX - touchStartX;
-    // 滑动距离超过 50px 触发切换
-    if (Math.abs(diff) > 50) {
-      e.preventDefault(); // 阻止页面滚动
-      if (diff > 0 && currentIndex > 0) {
-        playVideoAtIndex(currentIndex - 1);
-      } else if (diff < 0 && currentIndex < currentPlaylist.length - 1) {
-        playVideoAtIndex(currentIndex + 1);
-      }
-    }
-  });
-}
-  
-   // 分类按钮：仅更新卡片区，不动轮播
+  // 分类按钮事件
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
@@ -1471,100 +1453,96 @@ if (playerSection) {
     };
   });
 
+  // 初始渲染卡片
   renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay);
 }
 
 // ==================== 渲染视频网格 ====================
 function renderVideoGrid(videos, player, titleEl, sourceEl, safeT, overlayPlayer, videoOverlay) {
-    const grid = document.getElementById('videoGrid');
-    if (!grid) return;
+  const grid = document.getElementById('videoGrid');
+  if (!grid) return;
 
-    grid.innerHTML = '';
-    grid.style.minHeight = '200px';
+  grid.innerHTML = '';
+  grid.style.minHeight = '200px';
 
-    if (!videos || videos.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px 0;">' +
-            (safeT ? safeT('noVideo', 'No videos available') : 'No videos available') + '</p>';
-        return;
-    }
+  if (!videos || videos.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px 0;">' +
+      (safeT ? safeT('noVideo', 'No videos available') : 'No videos available') + '</p>';
+    return;
+  }
 
-    let html = '';
-    for (const v of videos) {
-        const title = v.title || 'Untitled';
-        const source = v.source || 'Original';
-        const url = v.url || '';
-        const cover = v.cover || '';
-        const author = v.author || '';
-        const views = (v.stats && v.stats.views) ? v.stats.views.toLocaleString() : '';
-        const sourceLabel = source === 'Original'
-            ? (safeT('original', 'Original'))
-            : (safeT('fromSource', 'From') + ' ' + source);
+  let html = '';
+  for (const v of videos) {
+    const title = v.title || 'Untitled';
+    const source = v.source || 'Original';
+    const url = v.url || '';
+    const cover = v.cover || '';
+    const author = v.author || '';
+    const views = (v.stats && v.stats.views) ? v.stats.views.toLocaleString() : '';
+    const sourceLabel = source === 'Original'
+      ? (safeT('original', 'Original'))
+      : (safeT('fromSource', 'From') + ' ' + source);
 
-        const metaParts = [];
-        metaParts.push(`<span>${sourceLabel}</span>`);
-        if (author) metaParts.push(`<span>${author}</span>`);
-        if (views) metaParts.push(`<span>🔥 ${views}</span>`);
-        const metaHTML = metaParts.join('');
+    const metaParts = [];
+    metaParts.push('<span>' + sourceLabel + '</span>');
+    if (author) metaParts.push('<span>' + author + '</span>');
+    if (views) metaParts.push('<span>🔥 ' + views + '</span>');
+    const metaHTML = metaParts.join('');
 
-        // ★★★ 这里添加了 data-id 属性 ★★★
-        html += `<div class="video-card" data-url="${url}" data-id="${v.id}" data-title="${title}" data-source="${source}">` +
-            `<img class="video-card-img" src="${cover}" alt="${title}" loading="lazy" onerror="this.style.display='none'">` +
-            `<div class="video-card-info">` +
-                `<div class="video-card-title">${title}</div>` +
-                `<div class="video-card-meta">${metaHTML}</div>` +
-            `</div>` +
-        `</div>`;
-    }
-    grid.innerHTML = html;
+    html += '<div class="video-card" data-url="' + url + '" data-id="' + v.id + '" data-title="' + title + '" data-source="' + source + '">' +
+      '<img class="video-card-img" src="' + cover + '" alt="' + title + '" loading="lazy" onerror="this.style.display=\'none\'">' +
+      '<div class="video-card-info">' +
+        '<div class="video-card-title">' + title + '</div>' +
+        '<div class="video-card-meta">' + metaHTML + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  grid.innerHTML = html;
 
-    // ★★★ 完整的卡片点击事件，包含弹窗播放和时长统计 ★★★
-    grid.querySelectorAll('.video-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const videoUrl = card.dataset.url;
-            const videoId = card.dataset.id;
-            if (!videoUrl) return;
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const videoUrl = card.dataset.url;
+      const videoId = card.dataset.id;
+      if (!videoUrl) return;
 
-            // 弹窗播放
-            overlayPlayer.src = videoUrl;
-            overlayPlayer.play().catch(() => {});
-            player.pause();
+      overlayPlayer.src = videoUrl;
+      overlayPlayer.play().catch(() => {});
+      player.pause();
 
-            // 横屏全屏逻辑
-            if (window.innerWidth <= 767 && window.innerWidth > window.innerHeight) {
-                videoOverlay.style.width = '100%';
-                videoOverlay.style.height = '100%';
-                videoOverlay.style.maxHeight = '100vh';
-                videoOverlay.style.borderRadius = '0';
-                videoOverlay.style.bottom = '0';
-                videoOverlay.style.right = '0';
-            } else {
-                videoOverlay.style.width = '';
-                videoOverlay.style.height = '';
-                videoOverlay.style.maxHeight = '';
-                videoOverlay.style.borderRadius = '';
-                videoOverlay.style.bottom = '';
-                videoOverlay.style.right = '';
-            }
-            videoOverlay.classList.add('active');
+      if (window.innerWidth <= 767 && window.innerWidth > window.innerHeight) {
+        videoOverlay.style.width = '100%';
+        videoOverlay.style.height = '100%';
+        videoOverlay.style.maxHeight = '100vh';
+        videoOverlay.style.borderRadius = '0';
+        videoOverlay.style.bottom = '0';
+        videoOverlay.style.right = '0';
+      } else {
+        videoOverlay.style.width = '';
+        videoOverlay.style.height = '';
+        videoOverlay.style.maxHeight = '';
+        videoOverlay.style.borderRadius = '';
+        videoOverlay.style.bottom = '';
+        videoOverlay.style.right = '';
+      }
+      videoOverlay.classList.add('active');
 
-            // 播放时长统计
-            const startTime = Date.now();
-            const timer = setInterval(() => {
-                if (overlayPlayer.paused || overlayPlayer.ended || !videoOverlay.classList.contains('active')) {
-                    clearInterval(timer);
-                    return;
-                }
-                if (Date.now() - startTime >= 30000) {
-                    fetch('https://vid.taropai.com/api/stats/play', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ videoId: videoId, duration: Date.now() - startTime })
-                    }).catch(() => {});
-                    clearInterval(timer);
-                }
-            }, 5000);
-        });
+      const startTime = Date.now();
+      const timer = setInterval(() => {
+        if (overlayPlayer.paused || overlayPlayer.ended || !videoOverlay.classList.contains('active')) {
+          clearInterval(timer);
+          return;
+        }
+        if (Date.now() - startTime >= 30000) {
+          fetch('https://vid.taropai.com/api/stats/play', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ videoId: videoId, duration: Date.now() - startTime })
+          }).catch(() => {});
+          clearInterval(timer);
+        }
+      }, 5000);
     });
+  });
 }
 
 // ==================== 登录/注册 ====================
