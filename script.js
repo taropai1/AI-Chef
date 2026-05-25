@@ -79,6 +79,40 @@ function unlockSend() {
     const btn = activePage.querySelector('#qaSendBtn');
     if (btn) btn.disabled = false;
 }
+
+// ==================== 视频页面轮询缓存（跨页面共享） ====================
+let videoPageCache = {
+    videos: null,         // 视频列表数组
+    playlist: null,       // 轮播列表
+    version: null,        // 后端数据版本号
+    timestamp: 0          // 缓存时间戳
+};
+
+// 轮询定时器 ID
+let videoPollingTimer = null;
+
+async function prefetchVideosForCache() {
+    try {
+        const res = await fetch('https://vid.taropai.com/api/videos');
+        const data = await res.json();
+        if (data.list && data.list.length > 0) {
+            videoPageCache.videos = data.list;
+            videoPageCache.version = data.version || 0;
+            videoPageCache.timestamp = Date.now();
+
+            // 构建轮播列表
+            const promoted = data.list.filter(v => v.promoted);
+            if (promoted.length > 0) {
+                videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+            } else {
+                videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
+            }
+        }
+    } catch (e) {
+        // 静默失败，不影响用户体验
+    }
+}
+
 // ==================== 多语言翻译（7种语言完整） ====================
 const translations = {
   en: {
@@ -1279,196 +1313,245 @@ if (qaLimitNote && userData) {
 
 // ==================== 视频页面初始化 ====================
 async function initVideoPage() {
-  const grid = document.getElementById('videoGrid');
-  const player = document.getElementById('mainVideoPlayer');
-  const titleEl = document.getElementById('currentVideoTitle');
-  const sourceEl = document.getElementById('currentVideoSource');
-  const catBtns = document.querySelectorAll('#videoCategories .video-cat-btn');
-  const timelineTrack = document.getElementById('videoTimelineTrack');
-  const timelineContainer = document.getElementById('videoTimeline');
+    const grid = document.getElementById('videoGrid');
+    const player = document.getElementById('mainVideoPlayer');
+    const titleEl = document.getElementById('currentVideoTitle');
+    const sourceEl = document.getElementById('currentVideoSource');
+    const catBtns = document.querySelectorAll('#videoCategories .video-cat-btn');
+    const timelineTrack = document.getElementById('videoTimelineTrack');
+    const timelineContainer = document.getElementById('videoTimeline');
 
-  const safeT = (key, fallback) => (typeof t === 'function' ? t(key) : null) || fallback;
+    const safeT = (key, fallback) => (typeof t === 'function' ? t(key) : null) || fallback;
 
-  const SLIDE_DURATION = 60;
-  let slideTimer = null;
-  let currentPlaylist = [];
-  let currentIndex = 0;
-  const MAX_VISIBLE_DOTS = 10;
+    const SLIDE_DURATION = 60;
+    let slideTimer = null;
+    let currentPlaylist = [];
+    let currentIndex = 0;
+    const MAX_VISIBLE_DOTS = 10;
 
-  // 弹窗相关变量（延迟初始化）
-  let videoOverlay = null;
-  let overlayPlayer = null;
+    // 弹窗相关变量（延迟初始化）
+    let videoOverlay = null;
+    let overlayPlayer = null;
 
-  // 1. 立即渲染卡片（如果已有数据，直接展示；否则清空容器）
-  // 这里为了体验，先清空，数据返回后立刻填充
-  grid.innerHTML = ''; 
-  grid.style.minHeight = '200px';
+    let allVideos = []; // 修复：声明 allVideos 变量
 
-  let allVideos = [];
+    // 如果缓存有效，立即渲染（无延迟）
+    if (videoPageCache.videos && videoPageCache.videos.length > 0) {
+        allVideos = videoPageCache.videos;
+        const sorted = dynamicSort(allVideos);
+        renderVideoGrid(sorted, player, titleEl, sourceEl, safeT);
 
-  try {
-    const res = await fetch('https://vid.taropai.com/api/videos');
-    const data = await res.json();
-    allVideos = data.list || [];
-  } catch (err) {
-    console.error('[视频] 加载失败:', err);
-    if (grid) grid.innerHTML = '<p style="text-align:center;color:#ef4444;">Failed to load videos</p>';
-    return;
-  }
-
-  // 2. 数据就绪，立刻渲染卡片
-  renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
-
-  // 构建轮播列表（仅推荐视频）
-  const promoted = allVideos.filter(v => v.promoted);
-  if (promoted.length > 0) {
-    currentPlaylist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
-  } else {
-    currentPlaylist = allVideos.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
-  }
-
-  // 轮播线构建
-  function buildTimeline() {
-    if (!timelineTrack) return;
-    timelineTrack.innerHTML = '';
-    for (let i = 0; i < MAX_VISIBLE_DOTS; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'video-timeline-dot';
-      timelineTrack.appendChild(dot);
-    }
-  }
-  buildTimeline();
-
-  function updateTimeline(index, total) {
-    if (!timelineTrack || total === 0) return;
-    const dots = timelineTrack.querySelectorAll('.video-timeline-dot');
-    let windowStart = 0;
-    if (total > MAX_VISIBLE_DOTS) {
-      windowStart = Math.max(0, Math.min(index - Math.floor(MAX_VISIBLE_DOTS / 2), total - MAX_VISIBLE_DOTS));
-    }
-    dots.forEach((dot, i) => {
-      const videoIndex = windowStart + i;
-      if (videoIndex < total) {
-        dot.style.display = 'block';
-        const distance = Math.abs(videoIndex - index);
-        let width = 4;
-        if (distance === 0) {
-          width = 24;
-          dot.classList.add('active');
-        } else {
-          width = Math.max(4, Math.floor(24 * Math.pow(0.55, distance)));
-          dot.classList.remove('active');
+        if (videoPageCache.playlist && videoPageCache.playlist.length > 0) {
+            currentPlaylist = videoPageCache.playlist;
+            // 播放第一个视频（修复：只传 index，依赖闭包）
+            playVideoAtIndex(0);
         }
-        dot.style.width = width + 'px';
-        dot.style.borderRadius = width > 6 ? '2px' : '50%';
-        if (!dot.classList.contains('active')) {
-          dot.style.background = '#fff';
-        }
-      } else {
-        dot.style.display = 'none';
-      }
-    });
-  }
+    }
 
-  function playVideoAtIndex(index) {
-    if (!currentPlaylist.length) return;
-    const v = currentPlaylist[index];
-    player.src = v.url;
-    titleEl.textContent = v.title;
-    const src = v.source || 'Original';
-    sourceEl.textContent = src === 'Original'
-      ? (safeT('original', 'Original'))
-      : (safeT('fromSource', 'From') + ' ' + src);
-    player.play().catch(() => {});
-    currentIndex = index;
-    updateTimeline(index, currentPlaylist.length);
-
-    clearTimeout(slideTimer);
-    slideTimer = setTimeout(() => {
-      const next = (currentIndex + 1) % currentPlaylist.length;
-      playVideoAtIndex(next);
-    }, SLIDE_DURATION * 1000);
-  }
-
-  if (currentPlaylist.length) {
-    playVideoAtIndex(0);
-  }
-
-  // 轮播线交互
-  if (timelineContainer) {
-    timelineContainer.addEventListener('click', (e) => {
-      const rect = timelineTrack.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const ratio = clickX / rect.width;
-      const index = Math.min(currentPlaylist.length - 1, Math.floor(ratio * currentPlaylist.length));
-      playVideoAtIndex(index);
-    });
-
-    let touchStartX = 0;
-    timelineContainer.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-    });
-    timelineContainer.addEventListener('touchend', (e) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const diff = touchEndX - touchStartX;
-      if (Math.abs(diff) > 30) {
-        const rect = timelineTrack.getBoundingClientRect();
-        const ratio = (touchEndX - rect.left) / rect.width;
-        const index = Math.min(currentPlaylist.length - 1, Math.max(0, Math.floor(ratio * currentPlaylist.length)));
-        playVideoAtIndex(index);
-      }
-    });
-  }
-
-  // 分类按钮事件
-  catBtns.forEach(btn => {
-    btn.onclick = async function() {
-      catBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.dataset.cat;
-      try {
-        const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
+    // 发起网络请求更新缓存（静默）
+    try {
+        const res = await fetch('https://vid.taropai.com/api/videos');
         const data = await res.json();
-        allVideos = data.list || [];
-        renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
-      } catch (e) {
-        console.error('[视频] 分类加载失败:', e);
-      }
-    };
-  });
+        if (data.list && data.list.length > 0) {
+            allVideos = data.list;
+            videoPageCache.videos = data.list;
+            videoPageCache.version = data.version || 0;
+            videoPageCache.timestamp = Date.now();
 
-  // 3. 弹窗延迟初始化函数（仅在第一次点击卡片时调用）
-  function ensureOverlayCreated() {
-    // 如果已经存在，直接返回，避免重复创建
-    if (document.getElementById('videoOverlayContainer')) {
-      videoOverlay = document.getElementById('videoOverlayContainer');
-      overlayPlayer = document.getElementById('overlayVideoPlayer');
-      return;
+            // 更新轮播列表
+            const promoted = data.list.filter(v => v.promoted);
+            if (promoted.length > 0) {
+                videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+            } else {
+                videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
+            }
+            currentPlaylist = videoPageCache.playlist;
+
+            // 如果之前没有缓存（首次访问且首页未预加载），则立即渲染
+            if (!videoPageCache.videos || videoPageCache.videos.length === 0) {
+                renderVideoGrid(dynamicSort(data.list), player, titleEl, sourceEl, safeT);
+                playVideoAtIndex(0);
+            } else {
+                // 有缓存但数据可能有变化，仍然刷新一下卡片（确保数据最新）
+                renderVideoGrid(dynamicSort(data.list), player, titleEl, sourceEl, safeT);
+                playVideoAtIndex(0);
+            }
+        }
+    } catch (err) {
+        console.error('[视频] 加载失败:', err);
+        if (!allVideos || allVideos.length === 0) {
+            if (grid) grid.innerHTML = '<p style="text-align:center;color:#ef4444;">Failed to load videos</p>';
+        }
+        return;
     }
-    videoOverlay = document.createElement('div');
-    videoOverlay.id = 'videoOverlayContainer';
-    videoOverlay.className = 'video-player-overlay';
-    videoOverlay.innerHTML = `
-      <div class="overlay-container">
-        <div class="overlay-close" id="videoOverlayClose">✕</div>
-        <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
-      </div>
-    `;
-    document.body.appendChild(videoOverlay);
-    overlayPlayer = document.getElementById('overlayVideoPlayer');
-    const overlayClose = document.getElementById('videoOverlayClose');
-    overlayClose.addEventListener('click', () => {
-      overlayPlayer.pause();
-      videoOverlay.classList.remove('active', 'fullscreen');
-      if (currentPlaylist.length) {
-        player.play().catch(() => {});
-      }
-    });
-  }
 
-  // 将弹窗创建函数暴露给卡片点击使用
-  window._ensureOverlayCreated = ensureOverlayCreated;
-  window._getOverlayElements = () => ({ videoOverlay, overlayPlayer });
+    // 启动静默轮询（2分钟一次，仅更新缓存，不刷新UI）
+    clearInterval(videoPollingTimer);
+    videoPollingTimer = setInterval(async () => {
+        try {
+            const res = await fetch('https://vid.taropai.com/api/videos');
+            const data = await res.json();
+            if (data.list && data.version !== videoPageCache.version) {
+                videoPageCache.videos = data.list;
+                videoPageCache.version = data.version;
+                videoPageCache.timestamp = Date.now();
+                const promoted = data.list.filter(v => v.promoted);
+                if (promoted.length > 0) {
+                    videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+                } else {
+                    videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
+                }
+                // 不调用 renderVideoGrid，不打扰用户
+            }
+        } catch (e) {}
+    }, 120000); // 2分钟
+
+    // 轮播线构建
+    function buildTimeline() {
+        if (!timelineTrack) return;
+        timelineTrack.innerHTML = '';
+        for (let i = 0; i < MAX_VISIBLE_DOTS; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'video-timeline-dot';
+            timelineTrack.appendChild(dot);
+        }
+    }
+    buildTimeline();
+
+    function updateTimeline(index, total) {
+        if (!timelineTrack || total === 0) return;
+        const dots = timelineTrack.querySelectorAll('.video-timeline-dot');
+        let windowStart = 0;
+        if (total > MAX_VISIBLE_DOTS) {
+            windowStart = Math.max(0, Math.min(index - Math.floor(MAX_VISIBLE_DOTS / 2), total - MAX_VISIBLE_DOTS));
+        }
+        dots.forEach((dot, i) => {
+            const videoIndex = windowStart + i;
+            if (videoIndex < total) {
+                dot.style.display = 'block';
+                const distance = Math.abs(videoIndex - index);
+                let width = 4;
+                if (distance === 0) {
+                    width = 24;
+                    dot.classList.add('active');
+                } else {
+                    width = Math.max(4, Math.floor(24 * Math.pow(0.55, distance)));
+                    dot.classList.remove('active');
+                }
+                dot.style.width = width + 'px';
+                dot.style.borderRadius = width > 6 ? '2px' : '50%';
+                if (!dot.classList.contains('active')) {
+                    dot.style.background = '#fff';
+                }
+            } else {
+                dot.style.display = 'none';
+            }
+        });
+    }
+
+    // 修复：playVideoAtIndex 只接受 index，内部通过闭包访问 currentPlaylist、player 等
+    function playVideoAtIndex(index) {
+        if (!currentPlaylist.length) return;
+        const v = currentPlaylist[index];
+        player.src = v.url;
+        titleEl.textContent = v.title;
+        const src = v.source || 'Original';
+        sourceEl.textContent = src === 'Original'
+            ? (safeT('original', 'Original'))
+            : (safeT('fromSource', 'From') + ' ' + src);
+        player.play().catch(() => {});
+        currentIndex = index;
+        updateTimeline(index, currentPlaylist.length);
+
+        clearTimeout(slideTimer);
+        slideTimer = setTimeout(() => {
+            const next = (currentIndex + 1) % currentPlaylist.length;
+            playVideoAtIndex(next);
+        }, SLIDE_DURATION * 1000);
+    }
+
+    if (currentPlaylist.length) {
+        playVideoAtIndex(0);
+    }
+
+    // 轮播线交互
+    if (timelineContainer) {
+        timelineContainer.addEventListener('click', (e) => {
+            const rect = timelineTrack.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const ratio = clickX / rect.width;
+            const index = Math.min(currentPlaylist.length - 1, Math.floor(ratio * currentPlaylist.length));
+            playVideoAtIndex(index);
+        });
+
+        let touchStartX = 0;
+        timelineContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+        timelineContainer.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchEndX - touchStartX;
+            if (Math.abs(diff) > 30) {
+                const rect = timelineTrack.getBoundingClientRect();
+                const ratio = (touchEndX - rect.left) / rect.width;
+                const index = Math.min(currentPlaylist.length - 1, Math.max(0, Math.floor(ratio * currentPlaylist.length)));
+                playVideoAtIndex(index);
+            }
+        });
+    }
+
+    // 分类按钮事件
+    catBtns.forEach(btn => {
+        btn.onclick = async function() {
+            catBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const cat = btn.dataset.cat;
+            try {
+                const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
+                const data = await res.json();
+                allVideos = data.list || [];
+                renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
+            } catch (e) {
+                console.error('[视频] 分类加载失败:', e);
+            }
+        };
+    });
+
+    // 弹窗延迟初始化函数（仅在第一次点击卡片时调用）
+    function ensureOverlayCreated() {
+        // 如果已经存在，直接返回，避免重复创建
+        if (document.getElementById('videoOverlayContainer')) {
+            videoOverlay = document.getElementById('videoOverlayContainer');
+            overlayPlayer = document.getElementById('overlayVideoPlayer');
+            return;
+        }
+        videoOverlay = document.createElement('div');
+        videoOverlay.id = 'videoOverlayContainer';
+        videoOverlay.className = 'video-player-overlay';
+        videoOverlay.innerHTML = `
+              <div class="overlay-container">
+                <div class="overlay-close" id="videoOverlayClose">✕</div>
+                <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
+              </div>
+            `;
+        document.body.appendChild(videoOverlay);
+        overlayPlayer = document.getElementById('overlayVideoPlayer');
+        const overlayClose = document.getElementById('videoOverlayClose');
+        overlayClose.addEventListener('click', () => {
+            overlayPlayer.pause();
+            videoOverlay.classList.remove('active', 'fullscreen');
+            if (currentPlaylist.length) {
+                player.play().catch(() => {});
+            }
+        });
+    }
+
+    // 将弹窗创建函数暴露给卡片点击使用
+    window._ensureOverlayCreated = ensureOverlayCreated;
+    window._getOverlayElements = () => ({
+        videoOverlay,
+        overlayPlayer
+    });
 }
 
 // ==================== 渲染视频网格 ====================
@@ -1565,6 +1648,17 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
       }, 5000);
     });
   });
+}
+
+function dynamicSort(videos) {
+    if (!videos || videos.length === 0) return videos;
+    const promoted = videos.filter(v => v.promoted).sort((a, b) => (b.weight || 0) - (a.weight || 0));
+    const normal = videos.filter(v => !v.promoted).sort((a, b) => {
+        const scoreA = (a.weight || 0) * 1000 + (a.stats?.views || 0) + Math.random() * 100;
+        const scoreB = (b.weight || 0) * 1000 + (b.stats?.views || 0) + Math.random() * 100;
+        return scoreB - scoreA;
+    });
+    return [...promoted, ...normal].slice(0, 48);
 }
 
 // ==================== 登录/注册 ====================
@@ -2042,34 +2136,50 @@ if (aiTrialInfoEl) {
 async function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
-    
+
     // ===== 关键修复：确保生成器页面激活时发送功能可用 =====
     if (pageId === 'page-generator') {
         sendLocked = false;
         const genSendBtn = document.getElementById('qaSendBtn');
-        if (genSendBtn) genSendBtn.disabled = false;
+        if (genSendBtn)
+            genSendBtn.disabled = false;
     }
     // ===== 修复结束 =====
-    
+
+    // 离开视频页时清除轮询定时器
+    if (pageId !== 'page-video' && videoPollingTimer) {
+        clearInterval(videoPollingTimer);
+        videoPollingTimer = null;
+    }
+
     if (pageId === 'page-generator') {
-        if (userData) await refreshUserData();
+        if (userData)
+            await refreshUserData();
         updateLimitInfo();
         populateCuisines();
         switchGeneratorMode('recipe');
     }
     if (pageId === 'page-ai-assistant') {
-        if (userData) await refreshUserData();
+        if (userData)
+            await refreshUserData();
         initAiPage();
     }
-    if (pageId === 'page-subscribe') renderPayPal();
+    if (pageId === 'page-subscribe')
+        renderPayPal();
     if (pageId === 'page-profile') {
         renderProfile();
         renderLanguage();
     }
     if (pageId === 'page-video') {
-    initVideoPage();
-  }
-    if (pageId === 'page-home') renderLanguage();
+        initVideoPage();
+    }
+
+    if (pageId === 'page-home') {
+        setTimeout(() => {
+            prefetchVideosForCache();
+        }, 100); // 延迟一点，优先渲染首页
+    }
+
     renderLanguage();
 }
 
