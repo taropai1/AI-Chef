@@ -1299,9 +1299,13 @@ async function initVideoPage() {
   let videoOverlay = null;
   let overlayPlayer = null;
 
+  // 1. 立即渲染卡片（如果已有数据，直接展示；否则清空容器）
+  // 这里为了体验，先清空，数据返回后立刻填充
+  grid.innerHTML = ''; 
+  grid.style.minHeight = '200px';
+
   let allVideos = [];
 
-  // 1. 获取数据（不再提前创建弹窗）
   try {
     const res = await fetch('https://vid.taropai.com/api/videos');
     const data = await res.json();
@@ -1312,7 +1316,7 @@ async function initVideoPage() {
     return;
   }
 
-  // 2. 立即渲染卡片（数据已就绪）
+  // 2. 数据就绪，立刻渲染卡片
   renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
 
   // 构建轮播列表（仅推荐视频）
@@ -1416,7 +1420,7 @@ async function initVideoPage() {
     });
   }
 
-  // 分类按钮事件：仅更新卡片区，不动轮播
+  // 分类按钮事件
   catBtns.forEach(btn => {
     btn.onclick = async function() {
       catBtns.forEach(b => b.classList.remove('active'));
@@ -1435,7 +1439,12 @@ async function initVideoPage() {
 
   // 3. 弹窗延迟初始化函数（仅在第一次点击卡片时调用）
   function ensureOverlayCreated() {
-    if (videoOverlay) return; // 已创建，直接返回
+    // 如果已经存在，直接返回，避免重复创建
+    if (document.getElementById('videoOverlayContainer')) {
+      videoOverlay = document.getElementById('videoOverlayContainer');
+      overlayPlayer = document.getElementById('overlayVideoPlayer');
+      return;
+    }
     videoOverlay = document.createElement('div');
     videoOverlay.id = 'videoOverlayContainer';
     videoOverlay.className = 'video-player-overlay';
