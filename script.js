@@ -100,7 +100,6 @@ async function prefetchVideosForCache() {
             videoPageCache.version = data.version || 0;
             videoPageCache.timestamp = Date.now();
 
-            // 构建轮播列表
             const promoted = data.list.filter(v => v.promoted);
             if (promoted.length > 0) {
                 videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
@@ -108,9 +107,7 @@ async function prefetchVideosForCache() {
                 videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
             }
         }
-    } catch (e) {
-        // 静默失败，不影响用户体验
-    }
+    } catch (e) {}
 }
 
 // ==================== 多语言翻译（7种语言完整） ====================
@@ -1311,7 +1308,7 @@ if (qaLimitNote && userData) {
 }
 }
 
-// ==================== 视频页面初始化 ====================
+// ==================== 视频页面初始化（修复滑动与缓存） ====================
 async function initVideoPage() {
     const grid = document.getElementById('videoGrid');
     const player = document.getElementById('mainVideoPlayer');
@@ -1329,26 +1326,22 @@ async function initVideoPage() {
     let currentIndex = 0;
     const MAX_VISIBLE_DOTS = 10;
 
-    // 弹窗相关变量（延迟初始化）
     let videoOverlay = null;
     let overlayPlayer = null;
+    let allVideos = [];
 
-    let allVideos = []; // 修复：声明 allVideos 变量
-
-    // 如果缓存有效，立即渲染（无延迟）
+    // 立即从缓存渲染（消除延迟）
     if (videoPageCache.videos && videoPageCache.videos.length > 0) {
         allVideos = videoPageCache.videos;
         const sorted = dynamicSort(allVideos);
         renderVideoGrid(sorted, player, titleEl, sourceEl, safeT);
-
         if (videoPageCache.playlist && videoPageCache.playlist.length > 0) {
             currentPlaylist = videoPageCache.playlist;
-            // 播放第一个视频（修复：只传 index，依赖闭包）
             playVideoAtIndex(0);
         }
     }
 
-    // 发起网络请求更新缓存（静默）
+    // 网络更新缓存（静默）
     try {
         const res = await fetch('https://vid.taropai.com/api/videos');
         const data = await res.json();
@@ -1358,7 +1351,6 @@ async function initVideoPage() {
             videoPageCache.version = data.version || 0;
             videoPageCache.timestamp = Date.now();
 
-            // 更新轮播列表
             const promoted = data.list.filter(v => v.promoted);
             if (promoted.length > 0) {
                 videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
@@ -1367,15 +1359,8 @@ async function initVideoPage() {
             }
             currentPlaylist = videoPageCache.playlist;
 
-            // 如果之前没有缓存（首次访问且首页未预加载），则立即渲染
-            if (!videoPageCache.videos || videoPageCache.videos.length === 0) {
-                renderVideoGrid(dynamicSort(data.list), player, titleEl, sourceEl, safeT);
-                playVideoAtIndex(0);
-            } else {
-                // 有缓存但数据可能有变化，仍然刷新一下卡片（确保数据最新）
-                renderVideoGrid(dynamicSort(data.list), player, titleEl, sourceEl, safeT);
-                playVideoAtIndex(0);
-            }
+            renderVideoGrid(dynamicSort(data.list), player, titleEl, sourceEl, safeT);
+            playVideoAtIndex(0);
         }
     } catch (err) {
         console.error('[视频] 加载失败:', err);
@@ -1385,7 +1370,7 @@ async function initVideoPage() {
         return;
     }
 
-    // 启动静默轮询（2分钟一次，仅更新缓存，不刷新UI）
+    // 轮询（2分钟，仅更新缓存）
     clearInterval(videoPollingTimer);
     videoPollingTimer = setInterval(async () => {
         try {
@@ -1401,12 +1386,10 @@ async function initVideoPage() {
                 } else {
                     videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
                 }
-                // 不调用 renderVideoGrid，不打扰用户
             }
         } catch (e) {}
-    }, 120000); // 2分钟
+    }, 120000);
 
-    // 轮播线构建
     function buildTimeline() {
         if (!timelineTrack) return;
         timelineTrack.innerHTML = '';
@@ -1449,7 +1432,6 @@ async function initVideoPage() {
         });
     }
 
-    // 修复：playVideoAtIndex 只接受 index，内部通过闭包访问 currentPlaylist、player 等
     function playVideoAtIndex(index) {
         if (!currentPlaylist.length) return;
         const v = currentPlaylist[index];
@@ -1462,7 +1444,6 @@ async function initVideoPage() {
         player.play().catch(() => {});
         currentIndex = index;
         updateTimeline(index, currentPlaylist.length);
-
         clearTimeout(slideTimer);
         slideTimer = setTimeout(() => {
             const next = (currentIndex + 1) % currentPlaylist.length;
@@ -1483,7 +1464,6 @@ async function initVideoPage() {
             const index = Math.min(currentPlaylist.length - 1, Math.floor(ratio * currentPlaylist.length));
             playVideoAtIndex(index);
         });
-
         let touchStartX = 0;
         timelineContainer.addEventListener('touchstart', (e) => {
             touchStartX = e.touches[0].clientX;
@@ -1496,6 +1476,26 @@ async function initVideoPage() {
                 const ratio = (touchEndX - rect.left) / rect.width;
                 const index = Math.min(currentPlaylist.length - 1, Math.max(0, Math.floor(ratio * currentPlaylist.length)));
                 playVideoAtIndex(index);
+            }
+        });
+    }
+
+    // ★ 修复播放器区域左右滑动（触摸事件）
+    const playerSection = document.querySelector('.video-player-section');
+    if (playerSection) {
+        let playerTouchStartX = 0;
+        playerSection.addEventListener('touchstart', (e) => {
+            playerTouchStartX = e.touches[0].clientX;
+        });
+        playerSection.addEventListener('touchend', (e) => {
+            const diff = e.changedTouches[0].clientX - playerTouchStartX;
+            if (Math.abs(diff) > 50) {
+                e.preventDefault();
+                if (diff > 0 && currentIndex > 0) {
+                    playVideoAtIndex(currentIndex - 1);
+                } else if (diff < 0 && currentIndex < currentPlaylist.length - 1) {
+                    playVideoAtIndex(currentIndex + 1);
+                }
             }
         });
     }
@@ -1517,9 +1517,7 @@ async function initVideoPage() {
         };
     });
 
-    // 弹窗延迟初始化函数（仅在第一次点击卡片时调用）
     function ensureOverlayCreated() {
-        // 如果已经存在，直接返回，避免重复创建
         if (document.getElementById('videoOverlayContainer')) {
             videoOverlay = document.getElementById('videoOverlayContainer');
             overlayPlayer = document.getElementById('overlayVideoPlayer');
@@ -1529,11 +1527,11 @@ async function initVideoPage() {
         videoOverlay.id = 'videoOverlayContainer';
         videoOverlay.className = 'video-player-overlay';
         videoOverlay.innerHTML = `
-              <div class="overlay-container">
+            <div class="overlay-container">
                 <div class="overlay-close" id="videoOverlayClose">✕</div>
                 <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
-              </div>
-            `;
+            </div>
+        `;
         document.body.appendChild(videoOverlay);
         overlayPlayer = document.getElementById('overlayVideoPlayer');
         const overlayClose = document.getElementById('videoOverlayClose');
@@ -1546,12 +1544,23 @@ async function initVideoPage() {
         });
     }
 
-    // 将弹窗创建函数暴露给卡片点击使用
     window._ensureOverlayCreated = ensureOverlayCreated;
     window._getOverlayElements = () => ({
         videoOverlay,
         overlayPlayer
     });
+}
+
+// 动态排序（确保函数存在）
+function dynamicSort(videos) {
+    if (!videos || videos.length === 0) return videos;
+    const promoted = videos.filter(v => v.promoted).sort((a, b) => (b.weight || 0) - (a.weight || 0));
+    const normal = videos.filter(v => !v.promoted).sort((a, b) => {
+        const scoreA = (a.weight || 0) * 1000 + (a.stats?.views || 0) + Math.random() * 100;
+        const scoreB = (b.weight || 0) * 1000 + (b.stats?.views || 0) + Math.random() * 100;
+        return scoreB - scoreA;
+    });
+    return [...promoted, ...normal].slice(0, 48);
 }
 
 // ==================== 渲染视频网格 ====================
@@ -1648,17 +1657,6 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
       }, 5000);
     });
   });
-}
-
-function dynamicSort(videos) {
-    if (!videos || videos.length === 0) return videos;
-    const promoted = videos.filter(v => v.promoted).sort((a, b) => (b.weight || 0) - (a.weight || 0));
-    const normal = videos.filter(v => !v.promoted).sort((a, b) => {
-        const scoreA = (a.weight || 0) * 1000 + (a.stats?.views || 0) + Math.random() * 100;
-        const scoreB = (b.weight || 0) * 1000 + (b.stats?.views || 0) + Math.random() * 100;
-        return scoreB - scoreA;
-    });
-    return [...promoted, ...normal].slice(0, 48);
 }
 
 // ==================== 登录/注册 ====================
