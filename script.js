@@ -2146,8 +2146,7 @@ async function showPage(pageId) {
     if (pageId === 'page-generator') {
         sendLocked = false;
         const genSendBtn = document.getElementById('qaSendBtn');
-        if (genSendBtn)
-            genSendBtn.disabled = false;
+        if (genSendBtn) genSendBtn.disabled = false;
     }
     // ===== 修复结束 =====
 
@@ -2158,22 +2157,19 @@ async function showPage(pageId) {
     }
 
     if (pageId === 'page-generator') {
-        if (userData)
-            await refreshUserData();
+        if (userData) await refreshUserData();
         updateLimitInfo();
         populateCuisines();
         switchGeneratorMode('recipe');
     }
     if (pageId === 'page-login-register') {
-    switchAuthTab('login');
-}
+        switchAuthTab('login');
+    }
     if (pageId === 'page-ai-assistant') {
-        if (userData)
-            await refreshUserData();
+        if (userData) await refreshUserData();
         initAiPage();
     }
-    if (pageId === 'page-subscribe')
-        renderPayPal();
+    if (pageId === 'page-subscribe') renderPayPal();
     if (pageId === 'page-profile') {
         renderProfile();
         renderLanguage();
@@ -2181,11 +2177,10 @@ async function showPage(pageId) {
     if (pageId === 'page-video') {
         initVideoPage();
     }
-
     if (pageId === 'page-home') {
         setTimeout(() => {
             prefetchVideosForCache();
-        }, 100); // 延迟一点，优先渲染首页
+        }, 100);
     }
 
     renderLanguage();
