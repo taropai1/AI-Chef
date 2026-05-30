@@ -2447,6 +2447,7 @@ if (videoBtn) {
 }
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
+  showPage('page-home');
 })();
 
 // ==================== 生成器完整交互（状态 + 模式切换 + 发送 + 弹窗 + 初始化） ====================
