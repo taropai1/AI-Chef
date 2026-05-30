@@ -2826,3 +2826,31 @@ renderLanguage = function() {
         console.warn('语音模块初始化失败，已自动禁用', globalError);
     }
 })();
+
+// 社交登录按钮事件绑定
+(function initSocialLogin() {
+  const providers = {
+    socialGoogle: 'google',
+    socialFacebook: 'facebook',
+    socialApple: 'apple',
+    socialWechat: 'wechat',
+    socialQQ: 'qq',
+    socialDevice: 'device'
+  };
+
+  for (const [id, provider] of Object.entries(providers)) {
+    const btn = document.getElementById(id);
+    if (!btn) continue;
+    btn.addEventListener('click', function() {
+      if (provider === 'device') {
+        alert('Device login is not yet available. Please use email login.');
+        return;
+      }
+      if (provider === 'google' || provider === 'facebook') {
+        window.location.href = `/api/auth/${provider}`;
+        return;
+      }
+      alert('This login method is coming soon.');
+    });
+  }
+})();
