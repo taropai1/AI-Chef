@@ -760,7 +760,34 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
   margin-top: 32px;
   padding: 0 16px;
 }
+/* 修复：登录面板内容塌陷 */
+.auth-panel.active .auth-input-wrapper,
+.auth-panel.active .pwd-wrapper,
+.auth-panel.active .auth-link-row,
+.auth-panel.active .auth-swap,
+.auth-panel.active .auth-btn-primary {
+  display: block !important;
+  visibility: visible !important;
+}
+.auth-panel.active .auth-input-new {
+  display: block !important;
+  width: 100% !important;
+  height: 46px !important;
+}
 
+/* 修复：视频卡片不可见 */
+.video-card {
+  min-height: 120px;
+}
+.video-card-img {
+  min-height: 90px;
+  background: #e5e7eb;
+}
+@media (max-width: 767px) {
+  .video-card {
+    min-height: auto;
+  }
+}
 /* ==================== 响应式 ==================== */
 @media (max-width:1000px){.plans-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.features{grid-template-columns:1fr}.hero{padding:40px 20px}}
