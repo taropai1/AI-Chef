@@ -1980,8 +1980,7 @@ function renderLanguage() {
   safeText('nicknameTitle', 'nicknameTitle'); safeText('cancelNickname', 'cancel'); safeText('saveNicknameBtn', 'save');
   safeText('emailTitle', 'emailTitle'); safeText('cancelEmail', 'cancel'); safeText('saveEmailBtn', 'save');
   safeText('successTitle', 'success'); safeText('closeSuccessBtn', 'ok');
-  safeText('sendCodeBtn', 'sendCode'); safeText('sendResetCodeBtn', 'sendCode'); safeText('sendEmailChangeCodeBtn', 'sendCode');
-
+  
   // ========== 营销首页 ==========
   safeText('homeHeroTitle', 'homeHeroTitle'); safeText('homeHeroDesc', 'homeHeroDesc');
   safeText('homeCtaBtn', 'homeCtaBtn'); safeText('homeBottomTitle', 'homeBottomTitle');
