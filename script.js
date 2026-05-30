@@ -2234,6 +2234,26 @@ function handleUrlParams() {
 
     if (!action || !email) return;
 
+    if (action === 'verify-email') {
+    const token = urlParams.get('token');
+    if (token) {
+        try {
+            const res = await fetch(`https://auth.taropai.com/api/verify-email?token=${token}`);
+            if (res.ok) {
+                alert('Email verified successfully! You can now log in.');
+            } else {
+                alert('Verification link is invalid or expired.');
+            }
+        } catch (e) {
+            alert('Verification failed. Please try again later.');
+        }
+    }
+    showPage('page-login-register');
+    switchAuthTab('login');
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+}
+  
     if (action === 'register') {
         showPage('page-login-register');
         switchAuthTab('register');
