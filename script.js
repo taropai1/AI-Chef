@@ -2164,6 +2164,9 @@ async function showPage(pageId) {
         populateCuisines();
         switchGeneratorMode('recipe');
     }
+    if (pageId === 'page-login-register') {
+    switchAuthTab('login');
+}
     if (pageId === 'page-ai-assistant') {
         if (userData)
             await refreshUserData();
