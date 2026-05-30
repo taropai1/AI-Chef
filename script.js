@@ -2238,6 +2238,8 @@ function handleUrlParams() {
   const action = urlParams.get('action');
   const token = urlParams.get('token');
   const verified = urlParams.get('verified');
+  const email = urlParams.get('email');
+  const code = urlParams.get('code');
 
   // 1) 邮箱验证回调（新流程）
   if (action === 'verify-email') {
@@ -2447,7 +2449,6 @@ if (videoBtn) {
 }
   document.getElementById('editNicknameBtn').onclick = showNicknameModal;
   document.getElementById('editEmailBtn').onclick = showEmailModal;
-  showPage('page-home');
 })();
 
 // ==================== 生成器完整交互（状态 + 模式切换 + 发送 + 弹窗 + 初始化） ====================
