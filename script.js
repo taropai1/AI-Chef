@@ -2239,29 +2239,27 @@ function handleUrlParams() {
     const action = urlParams.get('action');
     const email = urlParams.get('email');
     const code = urlParams.get('code');
-
-    if (!action || !email) return;
-
-    if (action === 'verify-email') {
+    const verified = urlParams.get('verified');
     const token = urlParams.get('token');
-    if (token) {
-        try {
-            const res = await fetch(`https://auth.taropai.com/api/verify-email?token=${token}`);
-            if (res.ok) {
-                alert('Email verified successfully! You can now log in.');
-            } else {
-                alert('Verification link is invalid or expired.');
-            }
-        } catch (e) {
-            alert('Verification failed. Please try again later.');
+
+    // ★ 邮箱验证回调处理（使用 .then() 而非 await）
+    if (action === 'verify-email') {
+        if (token) {
+            fetch(`https://auth.taropai.com/api/verify-email?token=${token}`)
+                .then(res => {
+                    if (res.ok) alert('Email verified successfully! You can now log in.');
+                    else alert('Verification link is invalid or expired.');
+                })
+                .catch(() => alert('Verification failed. Please try again later.'));
         }
+        showPage('page-login-register');
+        switchAuthTab('login');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
     }
-    showPage('page-login-register');
-    switchAuthTab('login');
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return;
-}
-  
+
+    if (!action || !email) return;   // 其他情况必须有 action 和 email
+
     if (action === 'register') {
         showPage('page-login-register');
         switchAuthTab('register');
@@ -2293,6 +2291,29 @@ function handleUrlParams() {
                 if (codeInput) codeInput.value = code;
             }, 500);
         }
+    }
+
+    if (verified === '1') {
+        const token = urlParams.get('token');
+        if (action === 'register') {
+            showPage('page-login-register');
+            switchAuthTab('register');
+            document.getElementById('registerEmail').value = decodeURIComponent(email);
+            markEmailVerified('register', token);
+            document.getElementById('registerPassword').focus();
+        } else if (action === 'reset') {
+            showPage('page-login-register');
+            switchAuthTab('login');
+            document.getElementById('loginEmail').value = decodeURIComponent(email);
+            showForgotModal();
+            document.getElementById('forgotEmail').value = decodeURIComponent(email);
+            markEmailVerified('reset', token);
+        } else if (action === 'changeEmail') {
+            showPage('page-profile');
+            markEmailVerified('changeEmail', token);
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
     }
 
     window.history.replaceState({}, document.title, window.location.pathname);
