@@ -246,45 +246,80 @@
   
     <!-- 登录/注册页 -->
   <div class="page" id="page-login-register">
-    <div class="auth-container">
-      <div class="auth-card-new">
-        <div class="auth-tabs">
-          <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
-          <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
+  <div class="auth-container">
+    <div class="auth-card-new">
+
+      <!-- 标签切换 -->
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
+        <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
+      </div>
+
+      <!-- ========== 登录面板 ========== -->
+      <div class="auth-panel active" id="loginForm">
+        <!-- 社交登录网格 -->
+        <div class="social-grid">
+          <button class="social-btn" id="socialGoogle"><i class="fa-brands fa-google google-color"></i>Google</button>
+          <button class="social-btn" id="socialFacebook"><i class="fa-brands fa-facebook-f fb-color"></i>Facebook</button>
+          <button class="social-btn" id="socialApple"><i class="fa-brands fa-apple"></i>Apple</button>
+          <button class="social-btn" id="socialWechat"><i class="fa-brands fa-weixin wx-color"></i>WeChat</button>
+          <button class="social-btn" id="socialQQ"><i class="fa-brands fa-qq qq-color"></i>QQ</button>
+          <button class="social-btn" id="socialDevice"><i class="fa-solid fa-mobile-screen-button device-color"></i>Device</button>
         </div>
-        <div class="auth-panel active" id="loginForm">
-          <div class="auth-input-wrapper">
-            <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email address">
-          </div>
-          <div class="auth-input-wrapper pwd-wrapper">
-            <input type="password" class="auth-input-new" id="loginPassword" placeholder="Password">
-            <span class="pwd-toggle" onclick="togglePasswordWithIcon('loginPassword', this)"><i class="pwd-icon pwd-icon-eye"></i></span>
-          </div>
-          <div class="auth-link-row"><span class="auth-link-text" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span></div>
-          <button class="auth-btn-primary" id="btnLoginSubmit" onclick="login()">Login</button>
-          <div class="auth-swap"><span class="auth-swap-label" id="noAccount">New?</span> <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Register</span></div>
+        <div class="divider">or continue with email</div>
+
+        <!-- 邮箱登录（保留原有 ID） -->
+        <div class="auth-input-wrapper">
+          <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email address">
         </div>
-        <div class="auth-panel" id="registerForm" style="display:none;">
-          <div class="auth-input-wrapper"><input type="email" class="auth-input-new" id="registerEmail" placeholder="Email address"></div>
-          <div class="auth-row">
-            <input type="text" class="auth-input-new auth-code-input" id="registerCode" placeholder="Verification code">
-            <button class="auth-btn-secondary" id="sendCodeBtn">Send Code</button>
-          </div>
-          <div class="auth-input-wrapper pwd-wrapper">
-            <input type="password" class="auth-input-new" id="registerPassword" placeholder="Password">
-            <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerPassword', this)"><i class="pwd-icon pwd-icon-eye"></i></span>
-          </div>
-          <div class="auth-input-wrapper pwd-wrapper">
-            <input type="password" class="auth-input-new" id="registerConfirmPwd" placeholder="Confirm password">
-            <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerConfirmPwd', this)"><i class="pwd-icon pwd-icon-eye"></i></span>
-          </div>
-          <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Register</button>
-          <div class="auth-swap"><span class="auth-swap-label" id="haveAccount">Have account?</span> <span class="auth-swap-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span></div>
+        <div class="auth-input-wrapper pwd-wrapper">
+          <input type="password" class="auth-input-new" id="loginPassword" placeholder="Password">
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('loginPassword', this)">
+            <i class="pwd-icon pwd-icon-eye"></i>
+          </span>
+        </div>
+        <div class="auth-link-row">
+          <span class="auth-link-text" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span>
+        </div>
+        <button class="auth-btn-primary" id="btnLoginSubmit" onclick="login()">Login</button>
+        <div class="auth-swap">
+          <span class="auth-swap-label" id="noAccount">New?</span>
+          <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Register</span>
+        </div>
+      </div>
+
+      <!-- ========== 注册面板 ========== -->
+      <div class="auth-panel" id="registerForm" style="display:none;">
+        <div class="auth-input-wrapper">
+          <input type="email" class="auth-input-new" id="registerEmail" placeholder="Email address">
+        </div>
+        <div class="auth-input-wrapper pwd-wrapper">
+          <input type="password" class="auth-input-new" id="registerPassword" placeholder="Password">
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerPassword', this)">
+            <i class="pwd-icon pwd-icon-eye"></i>
+          </span>
+        </div>
+        <div class="auth-input-wrapper pwd-wrapper">
+          <input type="password" class="auth-input-new" id="registerConfirmPwd" placeholder="Confirm password">
+          <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerConfirmPwd', this)">
+            <i class="pwd-icon pwd-icon-eye"></i>
+          </span>
+        </div>
+        <!-- 保留验证码输入框，但隐藏 -->
+        <div class="auth-input-wrapper" style="display:none;">
+          <input type="text" class="auth-input-new" id="registerCode" placeholder="Verification code">
+        </div>
+        <button class="auth-btn-secondary" id="sendCodeBtn" style="display:none;">Send Code</button>
+        <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Register</button>
+        <div class="auth-swap">
+          <span class="auth-swap-label" id="haveAccount">Have account?</span>
+          <span class="auth-swap-link" id="switchToLogin" onclick="switchAuthTab('login')">Login</span>
         </div>
       </div>
     </div>
-    <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
   </div>
+  <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
+</div>
 
   <!-- 忘记密码弹窗 -->
   <div class="modal-overlay-new" id="forgotModal">
