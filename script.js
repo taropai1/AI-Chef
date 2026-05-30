@@ -1682,7 +1682,7 @@ async function register() {
       body: JSON.stringify({ email, password: pwd, deviceId, bindCode })
     });
     if (data.success) {
-      alert('Verification email sent! Please check your inbox to verify your email address.');
+      alert('Verification email sent! Please check your inbox.');
       showPage('page-login-register');
       switchAuthTab('login');
     }
@@ -2233,93 +2233,172 @@ function updateHistoryButtons() {
     if (nextBtn) nextBtn.disabled = historyIndex >= recipeHistory.length - 1;
 }
 
-// ==================== 验证码自动填充 ====================
+// ==================== URL 参数处理 ====================
 function handleUrlParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
-    const email = urlParams.get('email');
-    const code = urlParams.get('code');
-    const verified = urlParams.get('verified');
-    const token = urlParams.get('token');
+  const urlParams = new URLSearchParams(window.location.search);
+  const action = urlParams.get('action');
+  const token = urlParams.get('token');
+  const email = urlParams.get('email');
+  const code = urlParams.get('code');
+  const verified = urlParams.get('verified');
 
-    // ★ 邮箱验证回调处理（使用 .then() 而非 await）
-    if (action === 'verify-email') {
-        if (token) {
-            fetch(`https://auth.taropai.com/api/verify-email?token=${token}`)
-                .then(res => {
-                    if (res.ok) alert('Email verified successfully! You can now log in.');
-                    else alert('Verification link is invalid or expired.');
-                })
-                .catch(() => alert('Verification failed. Please try again later.'));
-        }
-        showPage('page-login-register');
-        switchAuthTab('login');
-        window.history.replaceState({}, document.title, window.location.pathname);
-        return;
+  // 1) 邮箱验证回调（新流程）
+  if (action === 'verify-email') {
+    if (token) {
+      fetch(`https://auth.taropai.com/api/verify-email?token=${token}`)
+        .then(res => {
+          if (res.ok) alert('Email verified successfully! You can now log in.');
+          else alert('Verification link is invalid or expired.');
+        })
+        .catch(() => alert('Verification failed. Please try again later.'));
     }
-
-    if (!action || !email) return;   // 其他情况必须有 action 和 email
-
-    if (action === 'register') {
-        showPage('page-login-register');
-        switchAuthTab('register');
-        document.getElementById('registerEmail').value = decodeURIComponent(email);
-        if (code) {
-            setTimeout(() => {
-                const codeInput = document.getElementById('registerCode');
-                if (codeInput) codeInput.value = code;
-            }, 500);
-        }
-        document.getElementById('registerPassword').focus();
-    } else if (action === 'reset') {
-        showPage('page-login-register');
-        switchAuthTab('login');
-        document.getElementById('loginEmail').value = decodeURIComponent(email);
-        showForgotModal();
-        document.getElementById('forgotEmail').value = decodeURIComponent(email);
-        if (code) {
-            setTimeout(() => {
-                const codeInput = document.getElementById('forgotCode');
-                if (codeInput) codeInput.value = code;
-            }, 500);
-        }
-    } else if (action === 'changeEmail') {
-        showPage('page-profile');
-        if (code) {
-            setTimeout(() => {
-                const codeInput = document.getElementById('emailChangeCode');
-                if (codeInput) codeInput.value = code;
-            }, 500);
-        }
-    }
-
-    if (verified === '1') {
-        const token = urlParams.get('token');
-        if (action === 'register') {
-            showPage('page-login-register');
-            switchAuthTab('register');
-            document.getElementById('registerEmail').value = decodeURIComponent(email);
-            markEmailVerified('register', token);
-            document.getElementById('registerPassword').focus();
-        } else if (action === 'reset') {
-            showPage('page-login-register');
-            switchAuthTab('login');
-            document.getElementById('loginEmail').value = decodeURIComponent(email);
-            showForgotModal();
-            document.getElementById('forgotEmail').value = decodeURIComponent(email);
-            markEmailVerified('reset', token);
-        } else if (action === 'changeEmail') {
-            showPage('page-profile');
-            markEmailVerified('changeEmail', token);
-        }
-        window.history.replaceState({}, document.title, window.location.pathname);
-        return;
-    }
-
+    showPage('page-login-register');
+    switchAuthTab('login');
     window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+
+  // 2) 重置密码回调（新流程）
+  if (action === 'reset-password') {
+    if (token) {
+      const newPwd = prompt('Enter your new password:');
+      if (newPwd) {
+        fetch(`${BACKEND_URL}/api/user/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, newPassword: newPwd })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert('Password reset successfully! You can now log in.');
+              showPage('page-login-register');
+              switchAuthTab('login');
+            } else {
+              alert(data.error || 'Reset failed.');
+            }
+          })
+          .catch(() => alert('Network error'));
+      }
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+
+  // 3) 修改邮箱验证回调（新流程）
+  if (action === 'change-email-verify') {
+    if (token) {
+      fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`)
+        .then(res => {
+          if (res.ok) alert('Email changed successfully!');
+          else alert('Verification failed.');
+        })
+        .catch(() => alert('Network error'));
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+
+  // 4) 原有逻辑：需要 action 和 email
+  if (!action || !email) return;
+
+  // 5) 注册/重置/修改邮箱的自动填充（原有逻辑）
+  if (action === 'register') {
+    showPage('page-login-register');
+    switchAuthTab('register');
+    document.getElementById('registerEmail').value = decodeURIComponent(email);
+    if (code) {
+      setTimeout(() => {
+        const codeInput = document.getElementById('registerCode');
+        if (codeInput) codeInput.value = code;
+      }, 500);
+    }
+    document.getElementById('registerPassword').focus();
+  } else if (action === 'reset') {
+    showPage('page-login-register');
+    switchAuthTab('login');
+    document.getElementById('loginEmail').value = decodeURIComponent(email);
+    showForgotModal();
+    document.getElementById('forgotEmail').value = decodeURIComponent(email);
+    if (code) {
+      setTimeout(() => {
+        const codeInput = document.getElementById('forgotCode');
+        if (codeInput) codeInput.value = code;
+      }, 500);
+    }
+  } else if (action === 'changeEmail') {
+    showPage('page-profile');
+    if (code) {
+      setTimeout(() => {
+        const codeInput = document.getElementById('emailChangeCode');
+        if (codeInput) codeInput.value = code;
+      }, 500);
+    }
+  }
+
+  // 6) 标记邮箱已验证（原有逻辑）
+  if (verified === '1') {
+    const token = urlParams.get('token');
+    if (action === 'register') {
+      showPage('page-login-register');
+      switchAuthTab('register');
+      document.getElementById('registerEmail').value = decodeURIComponent(email);
+      markEmailVerified('register', token);
+      document.getElementById('registerPassword').focus();
+    } else if (action === 'reset') {
+      showPage('page-login-register');
+      switchAuthTab('login');
+      document.getElementById('loginEmail').value = decodeURIComponent(email);
+      showForgotModal();
+      document.getElementById('forgotEmail').value = decodeURIComponent(email);
+      markEmailVerified('reset', token);
+    } else if (action === 'changeEmail') {
+      showPage('page-profile');
+      markEmailVerified('changeEmail', token);
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+
+  window.history.replaceState({}, document.title, window.location.pathname);
 }
 
-// ==================== URL 参数处理 ====================
+// 发送重置密码链接（新）
+async function sendResetLink() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/send-reset-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, lang: getCurrentLang() })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('Reset link sent! Please check your email.');
+      closeModal('forgotModal');
+    } else {
+      alert(data.error || 'Failed to send reset link.');
+    }
+  } catch (e) { alert('Network error'); }
+}
+
+// 修改邮箱（新）
+async function changeEmail() {
+  const newEmail = document.getElementById('newEmailInput').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { alert('Invalid email'); return; }
+  try {
+    const data = await apiCall('/api/user/change-email', {
+      method: 'POST',
+      body: JSON.stringify({ newEmail, lang: getCurrentLang() })
+    });
+    if (data.success) {
+      alert('Verification link sent to new email. Please check your inbox.');
+      closeModal('emailModal');
+    }
+  } catch (e) { alert(e.message); }
+}
+
 function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card-generator'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
 
 // ==================== 头像裁剪 ====================
@@ -2876,7 +2955,6 @@ renderLanguage = function() {
     }
 })();
 
-// 社交登录按钮事件绑定
 (function initSocialLogin() {
   const providers = {
     socialGoogle: 'google',
@@ -2890,9 +2968,28 @@ renderLanguage = function() {
   for (const [id, provider] of Object.entries(providers)) {
     const btn = document.getElementById(id);
     if (!btn) continue;
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', async function() {
       if (provider === 'device') {
-        alert('Device login is not yet available. Please use email login.');
+        await initDeviceId();
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/user/device-login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ deviceId })
+          });
+          const data = await res.json();
+          if (data.token) {
+            localStorage.setItem('authToken', data.token);
+            userData = data.user;
+            showPage('page-generator');
+            renderProfile();
+            updateLimitInfo();
+          } else {
+            alert('No account found on this device. Please log in first.');
+          }
+        } catch (e) {
+          alert('Device login failed.');
+        }
         return;
       }
       if (provider === 'google' || provider === 'facebook') {
