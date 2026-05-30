@@ -2427,7 +2427,14 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
   await initDeviceId(); userData = await loadUserData(); updateNavButton(); loadHistoryFromCache();
   document.querySelector('.lang-btn').addEventListener('click', (e) => { e.stopPropagation(); const dd = document.getElementById('langDropdown'); dd.style.display = dd.style.display === 'block' ? 'none' : 'block'; });
   populateCuisines(); renderLanguage(); initSocialLogin(); checkOAuthCallback();
-  document.getElementById('sendEmailChangeCodeBtn').addEventListener('click', sendEmailChangeCode);
+  const sendCodeBtn = document.getElementById('sendCodeBtn');
+if (sendCodeBtn) sendCodeBtn.addEventListener('click', sendVerificationCode);
+
+const sendResetCodeBtn = document.getElementById('sendResetCodeBtn');
+if (sendResetCodeBtn) sendResetCodeBtn.addEventListener('click', sendResetCode);
+
+const sendEmailChangeCodeBtn = document.getElementById('sendEmailChangeCodeBtn');
+if (sendEmailChangeCodeBtn) sendEmailChangeCodeBtn.addEventListener('click', sendEmailChangeCode);
   addRestoreLink(); handleUrlParams(); if (userData?.email) updateLimitInfo();
 
   const videoBtn = document.getElementById('openVideoBtn');
