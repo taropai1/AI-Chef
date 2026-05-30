@@ -1668,16 +1668,24 @@ function switchAuthTab(tab) {
 }
 
 async function register() {
-  const email = document.getElementById('registerEmail').value, code = document.getElementById('registerCode').value;
-  const pwd = document.getElementById('registerPassword').value, confirm = document.getElementById('registerConfirmPwd').value;
+  const email = document.getElementById('registerEmail').value.trim();
+  const pwd = document.getElementById('registerPassword').value;
+  const confirm = document.getElementById('registerConfirmPwd').value;
   if (pwd !== confirm) { alert('Passwords do not match'); return; }
-  if (!code) { alert('Verification code required'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
+
   await initDeviceId();
   const bindCode = localStorage.getItem('tempBindCode');
   try {
-    const data = await apiCall('/api/user/register', { method: 'POST', body: JSON.stringify({ email, password: pwd, verificationCode: code, deviceId, bindCode }) });
-    localStorage.setItem('authToken', data.token); userData = data.user; localStorage.removeItem('tempBindCode');
-    alert(t('registerSuccess')); showPage('page-generator'); renderProfile(); updateLimitInfo();
+    const data = await apiCall('/api/user/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: pwd, deviceId, bindCode })
+    });
+    if (data.success) {
+      alert('Verification email sent! Please check your inbox to verify your email address.');
+      showPage('page-login-register');
+      switchAuthTab('login');
+    }
   } catch (e) { alert(e.message); }
 }
 
