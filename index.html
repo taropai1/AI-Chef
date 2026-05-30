@@ -268,7 +268,7 @@
         </div>
         <div class="divider">or continue with email</div>
 
-        <!-- 邮箱登录（保留原有 ID） -->
+        <!-- 邮箱登录 -->
         <div class="auth-input-wrapper">
           <input type="email" class="auth-input-new" id="loginEmail" placeholder="Email address">
         </div>
@@ -305,10 +305,11 @@
             <i class="pwd-icon pwd-icon-eye"></i>
           </span>
         </div>
-        <!-- 保留验证码输入框，但隐藏 -->
+        <!-- 隐藏验证码输入框，保留 ID -->
         <div class="auth-input-wrapper" style="display:none;">
           <input type="text" class="auth-input-new" id="registerCode" placeholder="Verification code">
         </div>
+        <!-- 发送验证码按钮隐藏，注册时改为发送验证邮件 -->
         <button class="auth-btn-secondary" id="sendCodeBtn" style="display:none;">Send Code</button>
         <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Register</button>
         <div class="auth-swap">
@@ -320,8 +321,8 @@
   </div>
   <div class="footer-links"><a onclick="showPage('page-legal')">Privacy/Terms</a></div>
 </div>
-
-  <!-- 忘记密码弹窗 -->
+  
+    <!-- 忘记密码弹窗 -->
   <div class="modal-overlay-new" id="forgotModal">
     <div class="modal-card-new">
       <h3 class="modal-title-new" id="forgotTitle">Reset Password</h3>
