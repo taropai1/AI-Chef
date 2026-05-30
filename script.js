@@ -2238,8 +2238,6 @@ function handleUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get('action');
   const token = urlParams.get('token');
-  const email = urlParams.get('email');
-  const code = urlParams.get('code');
   const verified = urlParams.get('verified');
 
   // 1) 邮箱验证回调（新流程）
@@ -2300,7 +2298,7 @@ function handleUrlParams() {
   }
 
   // 4) 原有逻辑：需要 action 和 email
-  if (!action || !email) return;
+  if (!action) return;
 
   // 5) 注册/重置/修改邮箱的自动填充（原有逻辑）
   if (action === 'register') {
