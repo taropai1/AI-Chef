@@ -1662,10 +1662,16 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
 
 // ==================== 登录/注册 ====================
 function switchAuthTab(tab) {
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
   document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+  loginForm.style.display = tab === 'login' ? 'block' : 'none';
+  registerForm.style.display = tab === 'register' ? 'block' : 'none';
+
+  // 强制重绘解决布局塌陷
+  void loginForm.offsetHeight;
+  void registerForm.offsetHeight;
 }
 
 async function register() {
