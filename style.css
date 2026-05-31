@@ -589,12 +589,12 @@ body{background:#f8f9fa;color:#1f2937;line-height:1.6}
     max-width: 90px;
     overflow: hidden;
   }
-  .select-btn {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  .select-group .select-btn {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
   .transparent-select {
     width: 100%;
   }
