@@ -1662,16 +1662,12 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
 
 // ==================== 登录/注册 ====================
 function switchAuthTab(tab) {
-  const loginForm = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
-  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-  loginForm.style.display = tab === 'login' ? 'block' : 'none';
-  registerForm.style.display = tab === 'register' ? 'block' : 'none';
-
-  // 强制重绘解决布局塌陷
-  void loginForm.offsetHeight;
-  void registerForm.offsetHeight;
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    // 强制浏览器重绘
+    document.getElementById('loginForm').offsetHeight;
 }
 
 async function register() {
@@ -2170,8 +2166,10 @@ async function showPage(pageId) {
         switchGeneratorMode('recipe');
     }
     if (pageId === 'page-login-register') {
-        switchAuthTab('login');
-    }
+    switchAuthTab('login');
+    // 强制浏览器重绘，解决布局塌陷
+    document.getElementById('page-login-register').offsetHeight;
+}
     if (pageId === 'page-ai-assistant') {
         if (userData) await refreshUserData();
         initAiPage();
