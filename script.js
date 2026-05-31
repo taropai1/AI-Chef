@@ -1533,6 +1533,7 @@ async function initVideoPage() {
             </div>
         `;
         document.body.appendChild(videoOverlay);
+        videoOverlay.style.display = 'none';
         overlayPlayer = document.getElementById('overlayVideoPlayer');
         const overlayClose = document.getElementById('videoOverlayClose');
         overlayClose.addEventListener('click', () => {
