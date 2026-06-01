@@ -269,7 +269,6 @@
         </div>
         <div class="auth-link-row"><span class="auth-link-text" id="forgotPwdLink" onclick="showForgotModal()">Forgot password?</span></div>
         <button class="auth-btn-primary" id="btnLoginSubmit" onclick="login()">Log in</button>
-        <div class="auth-swap"><span class="auth-swap-label" id="noAccount">New?</span> <span class="auth-swap-link" id="switchToRegister" onclick="switchAuthTab('register')">Sign up</span></div>
       </div>
       <div class="auth-panel" id="registerForm" style="display:none;">
         <div class="auth-input-wrapper"><input type="email" class="auth-input-new" id="registerEmail" placeholder="Email address"></div>
@@ -282,7 +281,6 @@
           <span class="pwd-toggle" onclick="togglePasswordWithIcon('registerConfirmPwd', this)"><i class="pwd-icon pwd-icon-eye"></i></span>
         </div>
         <button class="auth-btn-primary" id="btnRegisterSubmit" onclick="register()">Send Verification Email</button>
-        <div class="auth-swap"><span class="auth-swap-label" id="haveAccount">Have account?</span> <span class="auth-swap-link" id="switchToLogin" onclick="switchAuthTab('login')">Log in</span></div>
       </div>
     </div>
   </div>
