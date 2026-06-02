@@ -2385,6 +2385,60 @@ async function sendResetLink() {
   } catch (e) { alert('Network error'); }
 }
 
+// 显示自定义重置密码弹窗
+function showResetPasswordModal(token) {
+  // 移除旧弹窗（如果存在）
+  const oldModal = document.getElementById('resetPasswordModal');
+  if (oldModal) oldModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'resetPasswordModal';
+  modal.className = 'modal-overlay-new show';
+  modal.innerHTML = `
+    <div class="modal-card-new">
+      <h3 class="modal-title-new">${t('resetPasswordTitle') || 'Set New Password'}</h3>
+      <div class="auth-input-wrapper">
+        <input type="password" class="auth-input-new" id="resetNewPassword" placeholder="${t('newPasswordPlaceholder') || 'New password'}">
+      </div>
+      <div class="modal-actions-new">
+        <button class="auth-btn-secondary" id="cancelResetPwd">${t('cancel') || 'Cancel'}</button>
+        <button class="auth-btn-primary" id="confirmResetPwd">${t('confirm') || 'Confirm'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // 绑定事件
+  document.getElementById('cancelResetPwd').onclick = function() {
+    modal.remove();
+  };
+  document.getElementById('confirmResetPwd').onclick = async function() {
+    const newPwd = document.getElementById('resetNewPassword').value.trim();
+    if (!newPwd || newPwd.length < 6) {
+      alert(t('passwordTooShort') || 'Password must be at least 6 characters');
+      return;
+    }
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/user/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, newPassword: newPwd })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(t('passwordResetSuccess') || 'Password reset successfully! You can now log in.');
+        modal.remove();
+        showPage('page-login-register');
+        switchAuthTab('login');
+      } else {
+        alert(data.error || t('resetFailed') || 'Reset failed.');
+      }
+    } catch (e) {
+      alert(t('networkError') || 'Network error');
+    }
+  };
+}
+
 // 修改邮箱（新）
 async function changeEmail() {
   const newEmail = document.getElementById('newEmailInput').value.trim();
