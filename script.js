@@ -202,7 +202,12 @@ const translations = {
     subscribeBtn: 'Subscribe Now', freeTrialStatus: 'Recipes left: {{recipeLeft}}/3, AI questions left: {{aiLeft}}/10',
     videoAll: 'All', videoCreativeFood: 'Creative Food', videoCookingTutorial: 'Cooking Tutorial', videoDessertDrinks: 'Dessert & Drinks', videoCreatorPicks: 'Creator Picks',
     videoFooter: 'Original videos by AI Chef. Other videos are from YouTube, TikTok, Ins, Keso, Xiaohongshu. Copyright belongs to original creators.',
-    noVideo: 'No videos available', original: 'Original', fromSource: 'From',
+    noVideo: 'No videos available', original: 'Original', fromSource: 'From', emailVerifiedSuccess: 'Email verified successfully! You can now log in.',
+    verificationLinkInvalid: 'Verification link is invalid or expired.', verificationFailed: 'Verification failed. Please try again later.',
+    emailChangedSuccess: 'Email changed successfully!', invalidEmail: 'Invalid email', resetLinkSent: 'Reset link sent! Please check your email.',
+    resetLinkFailed: 'Failed to send reset link.', networkError: 'Network error', emailChangeLinkSent: 'Verification link sent to new email. Please check your inbox.',
+    resetPasswordTitle: 'Set New Password', newPasswordPlaceholder: 'New password', cancel: 'Cancel', confirm: 'Confirm', passwordTooShort: 'Password must be at least 6 characters',
+    passwordResetSuccess: 'Password reset successfully! You can now log in.', resetFailed: 'Reset failed.',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -280,7 +285,10 @@ const translations = {
     subscribeBtn: '付费订阅', freeTrialStatus: '食谱剩余：{{recipeLeft}}/3 次，AI问答剩余：{{aiLeft}}/10 次',
     videoAll: '全部', videoCreativeFood: '创意美食', videoCookingTutorial: '烹饪教程', videoDessertDrinks: '甜品与饮品', videoCreatorPicks: '博主精选',
     videoFooter: '原创视频由AI Chef制作。其余视频来源：油管、抖音国际版、照片墙、可颂、小红书。版权归原创创作者所有。',
-    noVideo: '暂无视频', original: '原创', fromSource: '来源',
+    noVideo: '暂无视频', original: '原创', fromSource: '来源', emailVerifiedSuccess: '邮箱验证成功！您现在可以登录了。', verificationLinkInvalid: '验证链接无效或已过期。',
+    verificationFailed: '验证失败，请稍后重试。', emailChangedSuccess: '邮箱修改成功！', invalidEmail: '邮箱地址无效', resetLinkSent: '重置链接已发送，请查看您的邮箱。',
+    resetLinkFailed: '重置链接发送失败。', networkError: '网络错误', emailChangeLinkSent: '验证链接已发送至您的新邮箱，请查收。', resetPasswordTitle: '设置新密码',
+    newPasswordPlaceholder: '新密码', cancel: '取消', confirm: '确认', passwordTooShort: '密码长度至少6位', passwordResetSuccess: '密码重置成功！您现在可以登录了。', resetFailed: '重置失败。',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
@@ -366,7 +374,12 @@ const translations = {
     subscribeBtn: 'Suscríbete Ya', freeTrialStatus: 'Recetas restantes: {{recipeLeft}}/3, Preguntas IA restantes: {{aiLeft}}/10',
     videoAll: 'Todo', videoCreativeFood: 'Comida creativa', videoCookingTutorial: 'Tutorial de cocina', videoDessertDrinks: 'Postres y bebidas', videoCreatorPicks: 'Selección del creador',
     videoFooter: 'Videos originales hechos por Chef IA. Los demás videos provienen de YouTube, TikTok, Ins, Keso y Xiaohongshu. Los derechos de autor pertenecen a sus creadores originales.',
-    noVideo: 'No hay videos disponibles', original: 'Original', fromSource: 'De',
+    noVideo: 'No hay videos disponibles', original: 'Original', fromSource: 'De', emailVerifiedSuccess: '¡Correo verificado con éxito! Ya puedes iniciar sesión.',
+    verificationLinkInvalid: 'El enlace de verificación no es válido o ha expirado.', verificationFailed: 'Error de verificación. Inténtalo de nuevo más tarde.',
+    emailChangedSuccess: '¡Correo electrónico cambiado con éxito!', invalidEmail: 'Correo electrónico no válido', resetLinkSent: 'Enlace de restablecimiento enviado. Revisa tu correo.',
+    resetLinkFailed: 'Error al enviar el enlace de restablecimiento.', networkError: 'Error de red', emailChangeLinkSent: 'Enlace de verificación enviado a tu nuevo correo. Revisa tu bandeja de entrada.',
+    resetPasswordTitle: 'Establecer nueva contraseña', newPasswordPlaceholder: 'Nueva contraseña', cancel: 'Cancelar', confirm: 'Confirmar',
+    passwordTooShort: 'La contraseña debe tener al menos 6 caracteres', passwordResetSuccess: '¡Contraseña restablecida con éxito! Ya puedes iniciar sesión.', resetFailed: 'Error al restablecer.',
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -453,7 +466,12 @@ const translations = {
     subscribeBtn: "S'abonner Maintenant", freeTrialStatus: 'Recettes restantes : {{recipeLeft}}/3, Questions IA restantes : {{aiLeft}}/10',
     videoAll: 'Tout', videoCreativeFood: 'Cuisine créative', videoCookingTutorial: 'Tutoriel de cuisine', videoDessertDrinks: 'Desserts et boissons', videoCreatorPicks: 'Choix du créateur',
     videoFooter: 'Vidéos originales réalisées par Chef IA. Les autres vidéos proviennent de YouTube, TikTok, Ins, Keso et Xiaohongshu. Le droit d’auteur appartient aux créateurs originaux.',
-    noVideo: 'Aucune vidéo disponible', original: 'Original', fromSource: 'De',
+    noVideo: 'Aucune vidéo disponible', original: 'Original', fromSource: 'De', emailVerifiedSuccess: 'Email vérifié avec succès ! Vous pouvez maintenant vous connecter.',
+    verificationLinkInvalid: 'Le lien de vérification est invalide ou a expiré.', verificationFailed: 'Échec de la vérification. Veuillez réessayer plus tard.',
+    emailChangedSuccess: 'Email modifié avec succès !', invalidEmail: 'Email invalide', resetLinkSent: 'Lien de réinitialisation envoyé. Veuillez vérifier votre email.',
+    resetLinkFailed: 'Échec de l\'envoi du lien de réinitialisation.', networkError: 'Erreur réseau', emailChangeLinkSent: 'Lien de vérification envoyé à votre nouvel email. Veuillez vérifier votre boîte de réception.',
+    resetPasswordTitle: 'Définir un nouveau mot de passe', newPasswordPlaceholder: 'Nouveau mot de passe', cancel: 'Annuler', confirm: 'Confirmer',
+    passwordTooShort: 'Le mot de passe doit comporter au moins 6 caractères', passwordResetSuccess: 'Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.', resetFailed: 'Échec de la réinitialisation.',
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -541,7 +559,12 @@ const translations = {
     subscribeBtn: 'Jetzt Abonnieren', freeTrialStatus: 'Rezepte übrig: {{recipeLeft}}/3, KI-Fragen übrig: {{aiLeft}}/10',
     videoAll: 'Alle', videoCreativeFood: 'Kreatives Essen', videoCookingTutorial: 'Kochanleitung', videoDessertDrinks: 'Desserts & Getränke', videoCreatorPicks: 'Ersteller-Auswahl',
     videoFooter: 'Originalvideos von KI-Koch. Weitere Videos stammen von YouTube, TikTok, Ins, Keso und Xiaohongshu. Das Urheberrecht liegt bei den ursprünglichen Erstellern.',
-    noVideo: 'Keine Videos verfügbar', original: 'Original', fromSource: 'Von',
+    noVideo: 'Keine Videos verfügbar', original: 'Original', fromSource: 'Von', emailVerifiedSuccess: 'E-Mail erfolgreich verifiziert! Sie können sich jetzt anmelden.',
+    verificationLinkInvalid: 'Der Verifizierungslink ist ungültig oder abgelaufen.', verificationFailed: 'Verifizierung fehlgeschlagen. Bitte versuchen Sie es später erneut.',
+    emailChangedSuccess: 'E-Mail erfolgreich geändert!', invalidEmail: 'Ungültige E-Mail', resetLinkSent: 'Link zum Zurücksetzen gesendet. Bitte überprüfen Sie Ihre E-Mail.',
+    resetLinkFailed: 'Senden des Links zum Zurücksetzen fehlgeschlagen.', networkError: 'Netzwerkfehler', emailChangeLinkSent: 'Verifizierungslink an Ihre neue E-Mail gesendet. Bitte überprüfen Sie Ihren Posteingang.',
+    resetPasswordTitle: 'Neues Passwort festlegen', newPasswordPlaceholder: 'Neues Passwort', cancel: 'Abbrechen', confirm: 'Bestätigen',
+    passwordTooShort: 'Das Passwort muss mindestens 6 Zeichen lang sein', passwordResetSuccess: 'Passwort erfolgreich zurückgesetzt! Sie können sich jetzt anmelden.', resetFailed: 'Zurücksetzen fehlgeschlagen.',
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -628,7 +651,12 @@ const translations = {
     subscribeBtn: 'Abbonati Subito', freeTrialStatus: 'Ricette rimanenti: {{recipeLeft}}/3, Domande IA rimanenti: {{aiLeft}}/10',
     videoAll: 'Tutti', videoCreativeFood: 'Cibo creativo', videoCookingTutorial: 'Tutorial di cucina', videoDessertDrinks: 'Dolci e bevande', videoCreatorPicks: 'Scelta del creatore',
     videoFooter: 'Video originali realizzati da Chef IA. Gli altri video provengono da YouTube, TikTok, Ins, Keso e Xiaohongshu. I diritti d’autore appartengono ai creatori originali.',
-    noVideo: 'Nessun video disponibile', original: 'Originale', fromSource: 'Da',
+    noVideo: 'Nessun video disponibile', original: 'Originale', fromSource: 'Da', emailVerifiedSuccess: 'Email verificata con successo! Ora puoi accedere.',
+    verificationLinkInvalid: 'Il link di verifica non è valido o è scaduto.', verificationFailed: 'Verifica fallita. Riprova più tardi.',
+    emailChangedSuccess: 'Email modificata con successo!', invalidEmail: 'Email non valida', resetLinkSent: 'Link di ripristino inviato. Controlla la tua email.',
+    resetLinkFailed: 'Invio del link di ripristino fallito.', networkError: 'Errore di rete', emailChangeLinkSent: 'Link di verifica inviato alla tua nuova email. Controlla la tua casella di posta.',
+    resetPasswordTitle: 'Imposta nuova password', newPasswordPlaceholder: 'Nuova password', cancel: 'Annulla', confirm: 'Conferma', passwordTooShort: 'La password deve contenere almeno 6 caratteri',
+    passwordResetSuccess: 'Password reimpostata con successo! Ora puoi accedere.', resetFailed: 'Ripristino fallito.',
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -716,7 +744,12 @@ const translations = {
     subscribeBtn: 'Assine Agora', freeTrialStatus: 'Receitas restantes: {{recipeLeft}}/3, Perguntas IA restantes: {{aiLeft}}/10',
     videoAll: 'Todos', videoCreativeFood: 'Comida criativa', videoCookingTutorial: 'Tutorial de culinária', videoDessertDrinks: 'Sobremesas e bebidas', videoCreatorPicks: 'Escolha do criador',
     videoFooter: 'Vídeos originais feitos pelo Chef IA. Os demais vídeos são do YouTube, TikTok, Ins, Keso e Xiaohongshu. Os direitos autorais pertencem aos criadores originais.',
-    noVideo: 'Nenhum vídeo disponível', original: 'Original', fromSource: 'De',
+    noVideo: 'Nenhum vídeo disponível', original: 'Original', fromSource: 'De', emailVerifiedSuccess: 'Email verificado com sucesso! Agora você pode fazer login.',
+    verificationLinkInvalid: 'O link de verificação é inválido ou expirou.', verificationFailed: 'Falha na verificação. Por favor, tente novamente mais tarde.',
+    emailChangedSuccess: 'Email alterado com sucesso!', invalidEmail: 'Email inválido', resetLinkSent: 'Link de redefinição enviado. Verifique seu email.',
+    resetLinkFailed: 'Falha ao enviar o link de redefinição.', networkError: 'Erro de rede', emailChangeLinkSent: 'Link de verificação enviado para seu novo email. Verifique sua caixa de entrada.',
+    resetPasswordTitle: 'Definir nova senha', newPasswordPlaceholder: 'Nova senha', cancel: 'Cancelar', confirm: 'Confirmar', passwordTooShort: 'A senha deve ter pelo menos 6 caracteres',
+    passwordResetSuccess: 'Senha redefinida com sucesso! Agora você pode fazer login.', resetFailed: 'Falha na redefinição.',
   },
 }
 function t(key, params) {
@@ -2249,10 +2282,10 @@ function handleUrlParams() {
     if (token) {
       fetch(`https://auth.taropai.com/api/verify-email?token=${token}`)
         .then(res => {
-          if (res.ok) alert('Email verified successfully! You can now log in.');
-          else alert('Verification link is invalid or expired.');
+          if (res.ok) alert(t('emailVerifiedSuccess') || 'Email verified successfully! You can now log in.');
+          else alert(t('verificationLinkInvalid') || 'Verification link is invalid or expired.');
         })
-        .catch(() => alert('Verification failed. Please try again later.'));
+        .catch(() => alert(t('verificationFailed') || 'Verification failed. Please try again later.'));
     }
     showPage('page-login-register');
     switchAuthTab('login');
@@ -2263,25 +2296,7 @@ function handleUrlParams() {
   // 2) 重置密码回调（新流程）
   if (action === 'reset-password') {
     if (token) {
-      const newPwd = prompt('Enter your new password:');
-      if (newPwd) {
-        fetch(`${BACKEND_URL}/api/user/reset-password`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, newPassword: newPwd })
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              alert('Password reset successfully! You can now log in.');
-              showPage('page-login-register');
-              switchAuthTab('login');
-            } else {
-              alert(data.error || 'Reset failed.');
-            }
-          })
-          .catch(() => alert('Network error'));
-      }
+      showResetPasswordModal(token);
     }
     window.history.replaceState({}, document.title, window.location.pathname);
     return;
@@ -2292,10 +2307,10 @@ function handleUrlParams() {
     if (token) {
       fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`)
         .then(res => {
-          if (res.ok) alert('Email changed successfully!');
-          else alert('Verification failed.');
+          if (res.ok) alert(t('emailChangedSuccess') || 'Email changed successfully!');
+          else alert(t('verificationFailed') || 'Verification failed.');
         })
-        .catch(() => alert('Network error'));
+        .catch(() => alert(t('networkError') || 'Network error'));
     }
     window.history.replaceState({}, document.title, window.location.pathname);
     return;
@@ -2368,7 +2383,10 @@ function handleUrlParams() {
 // 发送重置密码链接（新）
 async function sendResetLink() {
   const email = document.getElementById('forgotEmail').value.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert(t('invalidEmail') || 'Invalid email');
+    return;
+  }
   try {
     const res = await fetch(`${BACKEND_URL}/api/send-reset-link`, {
       method: 'POST',
@@ -2377,17 +2395,18 @@ async function sendResetLink() {
     });
     const data = await res.json();
     if (data.success) {
-      alert('Reset link sent! Please check your email.');
+      alert(t('resetLinkSent') || 'Reset link sent! Please check your email.');
       closeModal('forgotModal');
     } else {
-      alert(data.error || 'Failed to send reset link.');
+      alert(data.error || t('resetLinkFailed') || 'Failed to send reset link.');
     }
-  } catch (e) { alert('Network error'); }
+  } catch (e) {
+    alert(t('networkError') || 'Network error');
+  }
 }
 
 // 显示自定义重置密码弹窗
 function showResetPasswordModal(token) {
-  // 移除旧弹窗（如果存在）
   const oldModal = document.getElementById('resetPasswordModal');
   if (oldModal) oldModal.remove();
 
@@ -2408,7 +2427,6 @@ function showResetPasswordModal(token) {
   `;
   document.body.appendChild(modal);
 
-  // 绑定事件
   document.getElementById('cancelResetPwd').onclick = function() {
     modal.remove();
   };
@@ -2442,17 +2460,22 @@ function showResetPasswordModal(token) {
 // 修改邮箱（新）
 async function changeEmail() {
   const newEmail = document.getElementById('newEmailInput').value.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { alert('Invalid email'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    alert(t('invalidEmail') || 'Invalid email');
+    return;
+  }
   try {
     const data = await apiCall('/api/user/change-email', {
       method: 'POST',
       body: JSON.stringify({ newEmail, lang: getCurrentLang() })
     });
     if (data.success) {
-      alert('Verification link sent to new email. Please check your inbox.');
+      alert(t('emailChangeLinkSent') || 'Verification link sent to new email. Please check your inbox.');
       closeModal('emailModal');
     }
-  } catch (e) { alert(e.message); }
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 function addRestoreLink() { const generatorCard = document.querySelector('#page-generator .card-generator'); if (generatorCard && !document.getElementById('restoreRecentLink')) { const link = document.createElement('div'); link.id = 'restoreRecentLink'; link.style.cssText = 'text-align:right;margin-top:8px;font-size:12px;color:#64788b;'; link.innerHTML = '<span style="cursor:pointer;" onclick="restoreRecentRecipes()">↻ 恢复最近3条</span>'; generatorCard.appendChild(link); } }
