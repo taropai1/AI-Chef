@@ -2413,6 +2413,9 @@ function showResetPasswordModal(token) {
   const modal = document.createElement('div');
   modal.id = 'resetPasswordModal';
   modal.className = 'modal-overlay-new show';
+  modal.onclick = function(e) {
+    if (e.target === modal) modal.remove();
+  };
   modal.innerHTML = `
     <div class="modal-card-new">
       <h3 class="modal-title-new">${t('resetPasswordTitle') || 'Set New Password'}</h3>
@@ -2420,16 +2423,12 @@ function showResetPasswordModal(token) {
         <input type="password" class="auth-input-new" id="resetNewPassword" placeholder="${t('newPasswordPlaceholder') || 'New password'}">
       </div>
       <div class="modal-actions-new">
-        <button class="auth-btn-secondary" id="cancelResetPwd">${t('cancel') || 'Cancel'}</button>
         <button class="auth-btn-primary" id="confirmResetPwd">${t('confirm') || 'Confirm'}</button>
       </div>
     </div>
   `;
   document.body.appendChild(modal);
 
-  document.getElementById('cancelResetPwd').onclick = function() {
-    modal.remove();
-  };
   document.getElementById('confirmResetPwd').onclick = async function() {
     const newPwd = document.getElementById('resetNewPassword').value.trim();
     if (!newPwd || newPwd.length < 6) {
