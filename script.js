@@ -207,7 +207,9 @@ const translations = {
     emailChangedSuccess: 'Email changed successfully!', invalidEmail: 'Invalid email', resetLinkSent: 'Reset link sent! Please check your email.',
     resetLinkFailed: 'Failed to send reset link.', networkError: 'Network error', emailChangeLinkSent: 'Verification link sent to new email. Please check your inbox.',
     resetPasswordTitle: 'Set New Password', newPasswordPlaceholder: 'New password', cancel: 'Cancel', confirm: 'Confirm', passwordTooShort: 'Password must be at least 6 characters',
-    passwordResetSuccess: 'Password reset successfully! You can now log in.', resetFailed: 'Reset failed.',
+    passwordResetSuccess: 'Password reset successfully! You can now log in.', resetFailed: 'Reset failed.', dividerText: 'or continue with email',
+    registerBtn: 'Send Verification Email', sendResetLink: 'Send Reset Link', sendVerification: 'Send Verification', save: 'Save', forgotTitle: 'Reset Password',
+    emailTitle: 'Change Email', nicknameTitle: 'Edit Nickname',
   },
   'zh-CN': {
     heroSubtitle: '全球菜系 · 智能搭配', sectionFeatures: '功能特点', feat1: '18种菜系', feat1Sub: '世界风味',
@@ -289,6 +291,8 @@ const translations = {
     verificationFailed: '验证失败，请稍后重试。', emailChangedSuccess: '邮箱修改成功！', invalidEmail: '邮箱地址无效', resetLinkSent: '重置链接已发送，请查看您的邮箱。',
     resetLinkFailed: '重置链接发送失败。', networkError: '网络错误', emailChangeLinkSent: '验证链接已发送至您的新邮箱，请查收。', resetPasswordTitle: '设置新密码',
     newPasswordPlaceholder: '新密码', cancel: '取消', confirm: '确认', passwordTooShort: '密码长度至少6位', passwordResetSuccess: '密码重置成功！您现在可以登录了。', resetFailed: '重置失败。',
+    dividerText: '或使用邮箱继续', registerBtn: '发送验证邮件', sendResetLink: '发送重置链接', sendVerification: '发送验证', save: '保存', forgotTitle: '重置密码',
+    emailTitle: '修改邮箱', nicknameTitle: '编辑昵称',
   },
   es: {
     heroSubtitle: 'Cocinas Globales · Combinación Inteligente', sectionFeatures: 'Características', feat1: '18 Cocinas', feat1Sub: 'Sabores globales',
@@ -380,6 +384,9 @@ const translations = {
     resetLinkFailed: 'Error al enviar el enlace de restablecimiento.', networkError: 'Error de red', emailChangeLinkSent: 'Enlace de verificación enviado a tu nuevo correo. Revisa tu bandeja de entrada.',
     resetPasswordTitle: 'Establecer nueva contraseña', newPasswordPlaceholder: 'Nueva contraseña', cancel: 'Cancelar', confirm: 'Confirmar',
     passwordTooShort: 'La contraseña debe tener al menos 6 caracteres', passwordResetSuccess: '¡Contraseña restablecida con éxito! Ya puedes iniciar sesión.', resetFailed: 'Error al restablecer.',
+    dividerText: 'o continuar con email', registerBtn: 'Enviar correo de verificación', sendResetLink: 'Enviar enlace de restablecimiento',
+    sendVerification: 'Enviar verificación', save: 'Guardar', forgotTitle: 'Restablecer contraseña', emailTitle: 'Cambiar correo electrónico',
+    nicknameTitle: 'Editar apodo',
   },
   fr: {
     heroSubtitle: 'Cuisines mondiales · Association intelligente', sectionFeatures: 'Fonctionnalités', feat1: '18 cuisines', feat1Sub: 'Saveurs du monde',
@@ -472,6 +479,9 @@ const translations = {
     resetLinkFailed: 'Échec de l\'envoi du lien de réinitialisation.', networkError: 'Erreur réseau', emailChangeLinkSent: 'Lien de vérification envoyé à votre nouvel email. Veuillez vérifier votre boîte de réception.',
     resetPasswordTitle: 'Définir un nouveau mot de passe', newPasswordPlaceholder: 'Nouveau mot de passe', cancel: 'Annuler', confirm: 'Confirmer',
     passwordTooShort: 'Le mot de passe doit comporter au moins 6 caractères', passwordResetSuccess: 'Mot de passe réinitialisé avec succès ! Vous pouvez maintenant vous connecter.', resetFailed: 'Échec de la réinitialisation.',
+    dividerText: 'ou continuer avec e-mail', registerBtn: 'Envoyer l’e-mail de vérification', sendResetLink: 'Envoyer le lien de réinitialisation',
+    sendVerification: 'Envoyer la vérification', save: 'Enregistrer', forgotTitle: 'Réinitialiser le mot de passe', emailTitle: 'Changer l’e-mail',
+    nicknameTitle: 'Modifier le pseudo',
   },
   de: {
     heroSubtitle: 'Globale Küchen · Intelligente Kombination', sectionFeatures: 'Funktionen', feat1: '18 Küchen', feat1Sub: 'Weltweite Aromen',
@@ -565,6 +575,8 @@ const translations = {
     resetLinkFailed: 'Senden des Links zum Zurücksetzen fehlgeschlagen.', networkError: 'Netzwerkfehler', emailChangeLinkSent: 'Verifizierungslink an Ihre neue E-Mail gesendet. Bitte überprüfen Sie Ihren Posteingang.',
     resetPasswordTitle: 'Neues Passwort festlegen', newPasswordPlaceholder: 'Neues Passwort', cancel: 'Abbrechen', confirm: 'Bestätigen',
     passwordTooShort: 'Das Passwort muss mindestens 6 Zeichen lang sein', passwordResetSuccess: 'Passwort erfolgreich zurückgesetzt! Sie können sich jetzt anmelden.', resetFailed: 'Zurücksetzen fehlgeschlagen.',
+    dividerText: 'oder mit E-Mail fortfahren', registerBtn: 'Bestätigungs-E-Mail senden', sendResetLink: 'Link zum Zurücksetzen senden', sendVerification: 'Bestätigung senden',
+    save: 'Speichern', forgotTitle: 'Passwort zurücksetzen', emailTitle: 'E-Mail ändern', nicknameTitle: 'Spitznamen bearbeiten',
   },
   it: {
     heroSubtitle: 'Cucine globali · Abbinamento intelligente', sectionFeatures: 'Caratteristiche', feat1: '18 cucine', feat1Sub: 'Sapori globali',
@@ -657,6 +669,8 @@ const translations = {
     resetLinkFailed: 'Invio del link di ripristino fallito.', networkError: 'Errore di rete', emailChangeLinkSent: 'Link di verifica inviato alla tua nuova email. Controlla la tua casella di posta.',
     resetPasswordTitle: 'Imposta nuova password', newPasswordPlaceholder: 'Nuova password', cancel: 'Annulla', confirm: 'Conferma', passwordTooShort: 'La password deve contenere almeno 6 caratteri',
     passwordResetSuccess: 'Password reimpostata con successo! Ora puoi accedere.', resetFailed: 'Ripristino fallito.',
+    dividerText: 'o continua con email', registerBtn: 'Invia email di verifica', sendResetLink: 'Invia link di reimpostazione', sendVerification: 'Invia verifica',
+    save: 'Salva', forgotTitle: 'Reimposta password', emailTitle: 'Cambia email', nicknameTitle: 'Modifica nickname',
   },
   pt: {
     heroSubtitle: 'Cozinhas globais · Combinação inteligente', sectionFeatures: 'Características', feat1: '18 cozinhas', feat1Sub: 'Sabores globais',
@@ -750,6 +764,8 @@ const translations = {
     resetLinkFailed: 'Falha ao enviar o link de redefinição.', networkError: 'Erro de rede', emailChangeLinkSent: 'Link de verificação enviado para seu novo email. Verifique sua caixa de entrada.',
     resetPasswordTitle: 'Definir nova senha', newPasswordPlaceholder: 'Nova senha', cancel: 'Cancelar', confirm: 'Confirmar', passwordTooShort: 'A senha deve ter pelo menos 6 caracteres',
     passwordResetSuccess: 'Senha redefinida com sucesso! Agora você pode fazer login.', resetFailed: 'Falha na redefinição.',
+    dividerText: 'ou continuar com e-mail', registerBtn: 'Enviar e-mail de verificação', sendResetLink: 'Enviar link de redefinição', sendVerification: 'Enviar verificação',
+    save: 'Salvar', forgotTitle: 'Redefinir senha', emailTitle: 'Alterar e-mail', nicknameTitle: 'Editar apelido',
   },
 }
 function t(key, params) {
@@ -1963,7 +1979,11 @@ function renderLanguage() {
   safePlaceholder('registerEmail', 'email'); safePlaceholder('registerPassword', 'password');
   safePlaceholder('registerConfirmPwd', 'confirmPwd'); safeText('btnRegisterSubmit', 'signUp');
   safeText('haveAccount', 'haveAccount'); safeText('switchToLogin', 'signIn');
-
+  safeText('dividerText', 'dividerText'); safeText('btnRegisterSubmit', 'registerBtn');
+  safeText('resetPwdBtn', 'sendResetLink'); safeText('saveEmailBtn', 'sendVerification');
+  safeText('saveNicknameBtn', 'save'); safeText('forgotTitle', 'forgotTitle');
+  safeText('emailTitle', 'emailTitle'); safeText('nicknameTitle', 'nicknameTitle');
+  
   // ========== 个人信息页 ==========
   safeText('profileNicknameLabel', 'profileNickname');
   safeText('profileEmailLabel', 'profileEmail');
@@ -3040,41 +3060,21 @@ renderLanguage = function() {
     }
 })();
 
-(function initSocialLogin() {
+    (function initSocialLogin() {
   const providers = {
     socialGoogle: 'google',
     socialFacebook: 'facebook',
     socialApple: 'apple',
     socialWechat: 'wechat',
     socialQQ: 'qq',
-    socialDevice: 'device'
+    socialAlipay: 'alipay'
   };
-
   for (const [id, provider] of Object.entries(providers)) {
     const btn = document.getElementById(id);
     if (!btn) continue;
     btn.addEventListener('click', async function() {
-      if (provider === 'device') {
-        await initDeviceId();
-        try {
-          const res = await fetch(`${BACKEND_URL}/api/user/device-login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ deviceId })
-          });
-          const data = await res.json();
-          if (data.token) {
-            localStorage.setItem('authToken', data.token);
-            userData = data.user;
-            showPage('page-generator');
-            renderProfile();
-            updateLimitInfo();
-          } else {
-            alert('No account found on this device. Please log in first.');
-          }
-        } catch (e) {
-          alert('Device login failed.');
-        }
+      if (provider === 'alipay') {
+        window.location.href = '/api/auth/alipay';
         return;
       }
       if (provider === 'google' || provider === 'facebook') {
