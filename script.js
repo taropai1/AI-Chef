@@ -2298,20 +2298,23 @@ function handleUrlParams() {
 
   // 1) 邮箱验证回调（新流程）
   if (action === 'verify-email') {
-    if (token) {
-      fetch(`https://auth.taropai.com/api/verify-email?token=${token}`)
-        .then(res => {
-          if (res.ok) alert(t('emailVerifiedSuccess') || 'Email verified successfully! You can now log in.');
-          else alert(t('verificationLinkInvalid') || 'Verification link is invalid or expired.');
-        })
-        .catch(() => alert(t('verificationFailed') || 'Verification failed. Please try again later.'));
-    }
-    showPage('page-login-register');
-    switchAuthTab('login');
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return;
+  if (token) {
+    fetch(`https://auth.taropai.com/api/verify-email?token=${token}`)
+      .then(res => res.json().catch(() => ({ success: false, error: `HTTP ${res.status}` })))
+      .then(data => {
+        if (data.success) {
+          alert(t('emailVerifiedSuccess') || 'Email verified successfully! You can now log in.');
+        } else {
+          alert(data.error || t('verificationLinkInvalid') || 'Verification link is invalid or expired.');
+        }
+      })
+      .catch(() => alert(t('verificationFailed') || 'Verification failed. Please try again later.'));
   }
-
+  showPage('page-login-register');
+  switchAuthTab('login');
+  window.history.replaceState({}, document.title, window.location.pathname);
+  return;
+}
   // 2) 重置密码回调（新流程）
   if (action === 'reset-password') {
     if (token) {
@@ -2325,21 +2328,26 @@ function handleUrlParams() {
   if (action === 'change-email-verify') {
   if (token) {
     fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`)
-      .then(async (res) => {
-        if (res.ok) {
+      .then(res => {
+        // 无论状态码，先转为 JSON（如果响应不是 JSON 则捕获）
+        return res.json().catch(() => ({ success: false, error: `HTTP ${res.status}` }));
+      })
+      .then(async (data) => {
+        if (data.success) {
           alert(t('emailChangedSuccess') || 'Email changed successfully!');
-          // 刷新全局用户数据（包含新邮箱）
+          // 刷新用户数据，更新个人信息页的邮箱显示
           await refreshUserData();
-          // 重新渲染个人信息页（如果当前页面是个人信息页）
-          if (document.getElementById('page-profile').classList.contains('active')) {
+          const profilePage = document.getElementById('page-profile');
+          if (profilePage && profilePage.classList.contains('active')) {
             renderProfile();
           }
         } else {
-          alert(t('verificationFailed') || 'Verification failed. Please try again.');
-          // 失败也留在当前页，不做跳转
+          // 显示后端返回的错误信息（如“链接已过期”、“邮箱已被占用”等）
+          alert(data.error || t('verificationFailed') || 'Verification failed. Please try again.');
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err);
         alert(t('networkError') || 'Network error');
       });
   }
