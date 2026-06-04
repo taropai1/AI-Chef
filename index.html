@@ -478,114 +478,261 @@
 </div>
   
     <script src="script.js"></script>
-    <!-- ========== Cookie 同意横幅（轻量、合规、自适应） ========== -->
+   <!-- ========== Cookie 同意横幅（欧盟IP检测 + 延迟升起 + 多语言 + 响应式） ========== -->
 <script>
 (function() {
+  // 已永久同意/拒绝，不再显示
   if (localStorage.getItem('cookie_consent')) return;
+  // 本次会话已手动关闭（X）
+  if (sessionStorage.getItem('cookie_banner_closed')) return;
 
-  var banner = document.createElement('div');
-  banner.id = 'cookie-consent-banner';
-  banner.innerHTML = `
-    <div style="
+  // 欧盟27国代码
+  const euCountries = [
+    'AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT',
+    'LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE'
+  ];
+
+  // 多语言文案（浏览器语言匹配，默认英文）
+  const messages = {
+    en: { text: 'We use cookies to improve your experience.', accept: 'Accept', decline: 'Decline', linkText: 'Learn more' },
+    zh: { text: '我们使用 Cookie 来提升您的体验。', accept: '接受', decline: '拒绝', linkText: '了解更多' },
+    'zh-CN': { text: '我们使用 Cookie 来提升您的体验。', accept: '接受', decline: '拒绝', linkText: '了解更多' },
+    fr: { text: 'Nous utilisons des cookies pour améliorer votre expérience.', accept: 'Accepter', decline: 'Refuser', linkText: 'En savoir plus' },
+    de: { text: 'Wir verwenden Cookies, um Ihr Erlebnis zu verbessern.', accept: 'Akzeptieren', decline: 'Ablehnen', linkText: 'Mehr erfahren' },
+    es: { text: 'Usamos cookies para mejorar su experiencia.', accept: 'Aceptar', decline: 'Rechazar', linkText: 'Más información' },
+    it: { text: 'Utilizziamo i cookie per migliorare la tua esperienza.', accept: 'Accetta', decline: 'Rifiuta', linkText: 'Scopri di più' },
+    pt: { text: 'Usamos cookies para melhorar sua experiência.', accept: 'Aceitar', decline: 'Recusar', linkText: 'Saiba mais' }
+  };
+
+  // 获取浏览器语言（优先匹配）
+  function getUserLang() {
+    const raw = navigator.language || 'en';
+    if (messages[raw]) return raw;
+    const short = raw.split('-')[0];
+    return messages[short] ? short : 'en';
+  }
+
+  const currentLang = getUserLang();
+  const t = messages[currentLang] || messages.en;
+
+  // 创建横幅DOM
+  function createBanner() {
+    const banner = document.createElement('div');
+    banner.id = 'cookie-consent-banner';
+    banner.innerHTML = `
+      <div class="cookie-banner-inner">
+        <span class="cookie-text">
+          🍪 ${t.text}
+          <a href="#" class="cookie-link">${t.linkText}</a>
+        </span>
+        <span class="cookie-buttons">
+          <button class="cookie-btn cookie-decline">${t.decline}</button>
+          <button class="cookie-btn cookie-accept">${t.accept}</button>
+          <button class="cookie-close" aria-label="Close">✕</button>
+        </span>
+      </div>
+    `;
+    document.body.appendChild(banner);
+    return banner;
+  }
+
+  // 注入样式（与站点风格协调，不影响现有样式）
+  const style = document.createElement('style');
+  style.textContent = `
+    #cookie-consent-banner {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      right: auto;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      color: #f9fafb;
-      padding: 12px 18px;
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       z-index: 10001;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 14px;
-      line-height: 1.4;
+      visibility: hidden;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0s 0.4s;
+      will-change: transform;
+      box-sizing: border-box;
+    }
+    #cookie-consent-banner.show {
+      visibility: visible;
+      transform: translateY(0);
+      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0s 0s;
+    }
+    .cookie-banner-inner {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 10px 16px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      max-width: 480px;
-      width: calc(100% - 40px);
-      box-sizing: border-box;
-      pointer-events: auto;
-    ">
-      <div style="flex: 1; min-width: 140px;">
-        🍪 We use cookies to improve your experience.
-        <a href="#" onclick="showPage('page-legal'); return false;" style="color: #4a9eff; text-decoration: none; border-bottom: 1px dotted #4a9eff;">Learn more</a>
-      </div>
-      <div style="display: flex; gap: 10px; flex-shrink: 0;">
-        <button id="cookie-reject" style="
-          background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.3);
-          border-radius: 40px;
-          padding: 5px 14px;
-          font-size: 13px;
-          color: #e5e7eb;
-          cursor: pointer;
-          transition: all 0.2s;
-          font-weight: 500;
-        ">Decline</button>
-        <button id="cookie-accept" style="
-          background: #4a90e2;
-          border: none;
-          border-radius: 40px;
-          padding: 5px 18px;
-          font-size: 13px;
-          font-weight: 600;
-          color: white;
-          cursor: pointer;
-          transition: all 0.2s;
-        ">Accept</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(banner);
-
-  // 可选：如果你将来接入 Google Analytics，将下面的变量改为你的测量ID即可自动集成
-  var gaMeasurementId = null;
-
-  function updateConsent(granted) {
-    if (!gaMeasurementId) return;
-    if (typeof gtag === 'function') {
-      gtag('consent', 'update', {
-        'ad_storage': granted ? 'granted' : 'denied',
-        'analytics_storage': granted ? 'granted' : 'denied'
-      });
-    } else {
-      var script = document.createElement('script');
-      script.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaMeasurementId;
-      script.async = true;
-      document.head.appendChild(script);
-      script.onload = function() {
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        window.gtag = gtag;
-        gtag('js', new Date());
-        gtag('config', gaMeasurementId);
-        gtag('consent', 'update', {
-          'ad_storage': granted ? 'granted' : 'denied',
-          'analytics_storage': granted ? 'granted' : 'denied'
-        });
-      };
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     }
+    .cookie-text {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #f0f0f0;
+      flex: 2;
+    }
+    .cookie-link {
+      color: #6ab0ff;
+      text-decoration: none;
+      border-bottom: 1px dotted #6ab0ff;
+      margin-left: 6px;
+      cursor: pointer;
+    }
+    .cookie-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .cookie-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 40px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+    }
+    .cookie-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    .cookie-accept {
+      background: #4a90e2;
+      border-color: #4a90e2;
+    }
+    .cookie-accept:hover {
+      background: #3a7bc8;
+    }
+    .cookie-close {
+      background: transparent;
+      border: none;
+      color: #ccc;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 6px;
+      line-height: 1;
+      touch-action: manipulation;
+    }
+    /* 桌面端 & 平板：左下角 */
+    @media (min-width: 768px) {
+      #cookie-consent-banner {
+        bottom: 20px;
+        left: 20px;
+        right: auto;
+        max-width: 420px;
+      }
+      .cookie-banner-inner {
+        border-radius: 20px;
+      }
+    }
+    /* 手机端：底部居中，左右留边距 */
+    @media (max-width: 767px) {
+      #cookie-consent-banner {
+        left: 16px;
+        right: 16px;
+        bottom: 20px;
+        width: auto;
+      }
+      .cookie-banner-inner {
+        flex-wrap: nowrap;
+        padding: 8px 12px;
+      }
+      .cookie-text {
+        font-size: 12px;
+      }
+      .cookie-btn {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+      .cookie-close {
+        font-size: 16px;
+        padding: 0 4px;
+      }
+    }
+    /* 当页面存在底部固定输入框时，横幅上移（避免遮挡） */
+    #cookie-consent-banner.with-input {
+      bottom: 80px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // IP检测并决定是否显示
+  function detectAndShow() {
+    fetch('https://ip-api.com/json/?fields=countryCode')
+      .then(res => res.json())
+      .then(data => {
+        const country = data.countryCode;
+        if (!euCountries.includes(country)) return; // 非欧盟用户，无横幅
+
+        const banner = createBanner();
+
+        // 检查页面是否有固定底部输入框（生成器或AI助手页）
+        function checkFixedInput() {
+          if (window.innerWidth <= 767) {
+            const active = document.querySelector('.page.active');
+            if (active && (active.id === 'page-generator' || active.id === 'page-ai-assistant')) {
+              banner.classList.add('with-input');
+            } else {
+              banner.classList.remove('with-input');
+            }
+          } else {
+            banner.classList.remove('with-input');
+          }
+        }
+        checkFixedInput();
+        window.addEventListener('resize', checkFixedInput);
+        // 监听页面切换（active类变化）
+        const observer = new MutationObserver(checkFixedInput);
+        const activePage = document.querySelector('.page.active');
+        if (activePage) observer.observe(activePage, { attributes: true, attributeFilter: ['class'] });
+
+        // 延迟3秒升起
+        setTimeout(() => banner.classList.add('show'), 3000);
+
+        // 按钮事件
+        const acceptBtn = banner.querySelector('.cookie-accept');
+        const declineBtn = banner.querySelector('.cookie-decline');
+        const closeBtn = banner.querySelector('.cookie-close');
+        const link = banner.querySelector('.cookie-link');
+
+        acceptBtn.onclick = () => {
+          localStorage.setItem('cookie_consent', 'accepted');
+          banner.classList.remove('show');
+          setTimeout(() => banner.remove(), 400);
+        };
+        declineBtn.onclick = () => {
+          localStorage.setItem('cookie_consent', 'declined');
+          banner.classList.remove('show');
+          setTimeout(() => banner.remove(), 400);
+        };
+        closeBtn.onclick = () => {
+          sessionStorage.setItem('cookie_banner_closed', 'true');
+          banner.classList.remove('show');
+          setTimeout(() => banner.remove(), 400);
+        };
+        link.onclick = (e) => {
+          e.preventDefault();
+          if (typeof showPage === 'function') showPage('page-legal');
+          else window.location.href = '/#page-legal';
+        };
+      })
+      .catch(err => {
+        // IP检测失败时，为保守起见不显示横幅（避免误伤非欧盟用户）
+        console.warn('[CookieBanner] IP detection failed:', err);
+      });
   }
 
-  document.getElementById('cookie-accept').onclick = function() {
-    localStorage.setItem('cookie_consent', 'accepted');
-    updateConsent(true);
-    banner.remove();
-  };
-  document.getElementById('cookie-reject').onclick = function() {
-    localStorage.setItem('cookie_consent', 'declined');
-    updateConsent(false);
-    banner.remove();
-  };
-
-  var style = document.createElement('style');
-  style.textContent = '#cookie-consent-banner button { touch-action: manipulation; }';
-  document.head.appendChild(style);
+  // 页面加载完成后启动
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', detectAndShow);
+  } else {
+    detectAndShow();
+  }
 })();
 </script>
   </body>
