@@ -710,42 +710,24 @@
     };
   }
 
-  // IP 检测（增强版）
-  function detectAndShow() {
-    // 主 API: ip-api.com
-    fetch('https://ip-api.com/json/?fields=countryCode')
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Non-JSON response');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data && data.countryCode && euCountries.includes(data.countryCode)) {
-          showBanner();
-        }
-      })
-      .catch(err => {
-        console.warn('[CookieBanner] Primary IP detection failed:', err);
-        // 备用 API: ipapi.co
-        fetch('https://ipapi.co/json/')
-          .then(resp => {
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            return resp.json();
-          })
-          .then(data => {
-            if (data && data.country_code && euCountries.includes(data.country_code)) {
-              showBanner();
-            }
-          })
-          .catch(err2 => {
-            console.warn('[CookieBanner] Backup IP detection also failed:', err2);
-            // 最终降级：不显示横幅
-          });
-      });
-  }
+  // IP 检测
+ function detectAndShow() {
+  // 使用 ipapi.co（支持 CORS，无需 API key）
+  fetch('https://ipapi.co/json/')
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (data && data.country_code && euCountries.includes(data.country_code)) {
+        showBanner();  // 欧盟用户显示横幅
+      }
+    })
+    .catch(err => {
+      console.warn('[CookieBanner] IP detection failed:', err);
+      // 降级：不显示横幅（避免误伤非欧盟用户）
+    });
+}
 
   // 启动检测
   if (document.readyState === 'loading') {
