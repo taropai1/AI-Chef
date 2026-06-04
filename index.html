@@ -478,7 +478,7 @@
 </div>
   
     <script src="script.js"></script>
-   <!-- ========== Cookie 同意横幅（欧盟IP检测 + 延迟升起 + 多语言 + 响应式） ========== -->
+   <!-- ========== Cookie 同意横幅（欧盟 IP 检测，修复解析错误） ========== -->
 <script>
 (function() {
   // 已永久同意/拒绝，不再显示
@@ -486,13 +486,12 @@
   // 本次会话已手动关闭（X）
   if (sessionStorage.getItem('cookie_banner_closed')) return;
 
-  // 欧盟27国代码
   const euCountries = [
     'AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT',
     'LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE'
   ];
 
-  // 多语言文案（浏览器语言匹配，默认英文）
+  // 多语言文案（与站点一致）
   const messages = {
     en: { text: 'We use cookies to improve your experience.', accept: 'Accept', decline: 'Decline', linkText: 'Learn more' },
     zh: { text: '我们使用 Cookie 来提升您的体验。', accept: '接受', decline: '拒绝', linkText: '了解更多' },
@@ -504,7 +503,6 @@
     pt: { text: 'Usamos cookies para melhorar sua experiência.', accept: 'Aceitar', decline: 'Recusar', linkText: 'Saiba mais' }
   };
 
-  // 获取浏览器语言（优先匹配）
   function getUserLang() {
     const raw = navigator.language || 'en';
     if (messages[raw]) return raw;
@@ -515,7 +513,7 @@
   const currentLang = getUserLang();
   const t = messages[currentLang] || messages.en;
 
-  // 创建横幅DOM
+  // 创建横幅 DOM
   function createBanner() {
     const banner = document.createElement('div');
     banner.id = 'cookie-consent-banner';
@@ -536,7 +534,7 @@
     return banner;
   }
 
-  // 注入样式（与站点风格协调，不影响现有样式）
+  // 样式注入（保持不变）
   const style = document.createElement('style');
   style.textContent = `
     #cookie-consent-banner {
@@ -618,7 +616,6 @@
       line-height: 1;
       touch-action: manipulation;
     }
-    /* 桌面端 & 平板：左下角 */
     @media (min-width: 768px) {
       #cookie-consent-banner {
         bottom: 20px;
@@ -630,7 +627,6 @@
         border-radius: 20px;
       }
     }
-    /* 手机端：底部居中，左右留边距 */
     @media (max-width: 767px) {
       #cookie-consent-banner {
         left: 16px;
@@ -654,80 +650,104 @@
         padding: 0 4px;
       }
     }
-    /* 当页面存在底部固定输入框时，横幅上移（避免遮挡） */
     #cookie-consent-banner.with-input {
       bottom: 80px;
     }
   `;
   document.head.appendChild(style);
 
-  // IP检测并决定是否显示
-  function detectAndShow() {
-    fetch('https://ip-api.com/json/?fields=countryCode')
-      .then(res => res.json())
-      .then(data => {
-        const country = data.countryCode;
-        if (!euCountries.includes(country)) return; // 非欧盟用户，无横幅
+  // 显示横幅的完整流程（创建、延迟、事件绑定）
+  function showBanner() {
+    const banner = createBanner();
 
-        const banner = createBanner();
-
-        // 检查页面是否有固定底部输入框（生成器或AI助手页）
-        function checkFixedInput() {
-          if (window.innerWidth <= 767) {
-            const active = document.querySelector('.page.active');
-            if (active && (active.id === 'page-generator' || active.id === 'page-ai-assistant')) {
-              banner.classList.add('with-input');
-            } else {
-              banner.classList.remove('with-input');
-            }
-          } else {
-            banner.classList.remove('with-input');
-          }
+    // 检测是否有底部固定输入框
+    function checkFixedInput() {
+      if (window.innerWidth <= 767) {
+        const active = document.querySelector('.page.active');
+        if (active && (active.id === 'page-generator' || active.id === 'page-ai-assistant')) {
+          banner.classList.add('with-input');
+        } else {
+          banner.classList.remove('with-input');
         }
-        checkFixedInput();
-        window.addEventListener('resize', checkFixedInput);
-        // 监听页面切换（active类变化）
-        const observer = new MutationObserver(checkFixedInput);
-        const activePage = document.querySelector('.page.active');
-        if (activePage) observer.observe(activePage, { attributes: true, attributeFilter: ['class'] });
+      } else {
+        banner.classList.remove('with-input');
+      }
+    }
+    checkFixedInput();
+    window.addEventListener('resize', checkFixedInput);
+    const observer = new MutationObserver(checkFixedInput);
+    const activePage = document.querySelector('.page.active');
+    if (activePage) observer.observe(activePage, { attributes: true, attributeFilter: ['class'] });
 
-        // 延迟3秒升起
-        setTimeout(() => banner.classList.add('show'), 3000);
+    // 延迟 3 秒升起
+    setTimeout(() => banner.classList.add('show'), 3000);
 
-        // 按钮事件
-        const acceptBtn = banner.querySelector('.cookie-accept');
-        const declineBtn = banner.querySelector('.cookie-decline');
-        const closeBtn = banner.querySelector('.cookie-close');
-        const link = banner.querySelector('.cookie-link');
+    // 按钮事件
+    const acceptBtn = banner.querySelector('.cookie-accept');
+    const declineBtn = banner.querySelector('.cookie-decline');
+    const closeBtn = banner.querySelector('.cookie-close');
+    const link = banner.querySelector('.cookie-link');
 
-        acceptBtn.onclick = () => {
-          localStorage.setItem('cookie_consent', 'accepted');
-          banner.classList.remove('show');
-          setTimeout(() => banner.remove(), 400);
-        };
-        declineBtn.onclick = () => {
-          localStorage.setItem('cookie_consent', 'declined');
-          banner.classList.remove('show');
-          setTimeout(() => banner.remove(), 400);
-        };
-        closeBtn.onclick = () => {
-          sessionStorage.setItem('cookie_banner_closed', 'true');
-          banner.classList.remove('show');
-          setTimeout(() => banner.remove(), 400);
-        };
-        link.onclick = (e) => {
-          e.preventDefault();
-          if (typeof showPage === 'function') showPage('page-legal');
-          else window.location.href = '/#page-legal';
-        };
+    acceptBtn.onclick = () => {
+      localStorage.setItem('cookie_consent', 'accepted');
+      banner.classList.remove('show');
+      setTimeout(() => banner.remove(), 400);
+    };
+    declineBtn.onclick = () => {
+      localStorage.setItem('cookie_consent', 'declined');
+      banner.classList.remove('show');
+      setTimeout(() => banner.remove(), 400);
+    };
+    closeBtn.onclick = () => {
+      sessionStorage.setItem('cookie_banner_closed', 'true');
+      banner.classList.remove('show');
+      setTimeout(() => banner.remove(), 400);
+    };
+    link.onclick = (e) => {
+      e.preventDefault();
+      if (typeof showPage === 'function') showPage('page-legal');
+      else window.location.href = '/#page-legal';
+    };
+  }
+
+  // IP 检测（增强版）
+  function detectAndShow() {
+    // 主 API: ip-api.com
+    fetch('https://ip-api.com/json/?fields=countryCode')
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Non-JSON response');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.countryCode && euCountries.includes(data.countryCode)) {
+          showBanner();
+        }
       })
       .catch(err => {
-        // IP检测失败时，为保守起见不显示横幅（避免误伤非欧盟用户）
-        console.warn('[CookieBanner] IP detection failed:', err);
+        console.warn('[CookieBanner] Primary IP detection failed:', err);
+        // 备用 API: ipapi.co
+        fetch('https://ipapi.co/json/')
+          .then(resp => {
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            return resp.json();
+          })
+          .then(data => {
+            if (data && data.country_code && euCountries.includes(data.country_code)) {
+              showBanner();
+            }
+          })
+          .catch(err2 => {
+            console.warn('[CookieBanner] Backup IP detection also failed:', err2);
+            // 最终降级：不显示横幅
+          });
       });
   }
 
-  // 页面加载完成后启动
+  // 启动检测
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', detectAndShow);
   } else {
