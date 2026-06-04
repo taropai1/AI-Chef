@@ -133,7 +133,7 @@ const translations = {
     businessDesc: '300 recipes/day · 300 AI questions/day · Commercial use', finePrint: 'By subscribing you agree to our ',
     loginTitle: 'Login', registerTitle: 'Sign Up', email: 'Email', password: 'Password', confirmPwd: 'Confirm Password',
     forgot: 'Forgot password?', noAccount: 'New?', signUp: 'Sign Up', signIn: 'Login', haveAccount: 'Have account?',
-    forgotTitle: 'Reset Password', cancel: 'Cancel', reset: 'Reset', profileNickname: 'Nickname', profileEmail: 'Email',
+    forgotTitle: 'Reset Password', cancel: 'Cancel', profileNickname: 'Nickname', profileEmail: 'Email',
     profilePlan: 'Plan', profileJoined: 'Joined', logout: 'Sign Out', profileSub: 'My Subscription', subStatus: 'Status',
     subExpiry: 'Expires', inviteCodeTitle: 'Invite Code', joinFamily: 'Join', nicknameTitle: 'Change Nickname',
     emailTitle: 'Change Email', legalPrivacyTitle: 'Privacy Policy', legalEffDate: 'Effective date: 2026-05-01', legalPrivacyCollect: '1. Information We Collect',
