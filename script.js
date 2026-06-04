@@ -2033,7 +2033,7 @@ function renderLanguage() {
   for (let i=1;i<=10;i++) { safeText(`legalTermsSub${i}`, `legalTermsSub${i}`); }
 
   // ========== 弹窗及按钮 ==========
-  safeText('forgotTitle', 'forgotTitle'); safeText('cancelForgot', 'cancel'); safeText('resetPwdBtn', 'reset');
+  safeText('forgotTitle', 'forgotTitle'); safeText('cancelForgot', 'cancel'); safeText('resetPwdBtn', 'sendResetLink');
   safeText('nicknameTitle', 'nicknameTitle'); safeText('cancelNickname', 'cancel'); safeText('saveNicknameBtn', 'save');
   safeText('emailTitle', 'emailTitle'); safeText('cancelEmail', 'cancel'); safeText('saveEmailBtn', 'save');
   safeText('successTitle', 'success'); safeText('closeSuccessBtn', 'ok');
