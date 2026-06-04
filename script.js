@@ -1723,8 +1723,6 @@ function switchAuthTab(tab) {
 async function register() {
   const email = document.getElementById('registerEmail').value.trim();
   const pwd = document.getElementById('registerPassword').value;
-  const confirm = document.getElementById('registerConfirmPwd').value;
-  if (pwd !== confirm) { alert('Passwords do not match'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
 
   await initDeviceId();
