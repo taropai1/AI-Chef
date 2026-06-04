@@ -2323,17 +2323,29 @@ function handleUrlParams() {
 
   // 3) 修改邮箱验证回调（新流程）
   if (action === 'change-email-verify') {
-    if (token) {
-      fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`)
-        .then(res => {
-          if (res.ok) alert(t('emailChangedSuccess') || 'Email changed successfully!');
-          else alert(t('verificationFailed') || 'Verification failed.');
-        })
-        .catch(() => alert(t('networkError') || 'Network error'));
-    }
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return;
+  if (token) {
+    fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`)
+      .then(async (res) => {
+        if (res.ok) {
+          alert(t('emailChangedSuccess') || 'Email changed successfully!');
+          // 刷新全局用户数据（包含新邮箱）
+          await refreshUserData();
+          // 重新渲染个人信息页（如果当前页面是个人信息页）
+          if (document.getElementById('page-profile').classList.contains('active')) {
+            renderProfile();
+          }
+        } else {
+          alert(t('verificationFailed') || 'Verification failed. Please try again.');
+          // 失败也留在当前页，不做跳转
+        }
+      })
+      .catch(() => {
+        alert(t('networkError') || 'Network error');
+      });
   }
+  window.history.replaceState({}, document.title, window.location.pathname);
+  return;
+}
 
   // 4) 原有逻辑：需要 action 和 email
   if (!action) return;
