@@ -2035,7 +2035,7 @@ function renderLanguage() {
   // ========== 弹窗及按钮 ==========
   safeText('forgotTitle', 'forgotTitle'); safeText('cancelForgot', 'cancel'); safeText('resetPwdBtn', 'sendResetLink');
   safeText('nicknameTitle', 'nicknameTitle'); safeText('cancelNickname', 'cancel'); safeText('saveNicknameBtn', 'save');
-  safeText('emailTitle', 'emailTitle'); safeText('cancelEmail', 'cancel'); safeText('saveEmailBtn', 'save');
+  safeText('emailTitle', 'emailTitle'); safeText('cancelEmail', 'cancel'); safeText('saveEmailBtn', 'registerBtn');
   safeText('successTitle', 'success'); safeText('closeSuccessBtn', 'ok');
   
   // ========== 营销首页 ==========
