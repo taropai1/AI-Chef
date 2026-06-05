@@ -2296,23 +2296,30 @@ function handleUrlParams() {
   const email = urlParams.get('email');
   const code = urlParams.get('code');
 
-  // 1) 邮箱验证回调（新流程）
+  // 1) 注册邮箱验证回调（新流程）
   if (action === 'verify-email') {
   if (token) {
-    fetch(`https://auth.taropai.com/api/verify-email?token=${token}`)
-      .then(res => res.json().catch(() => ({ success: false, error: `HTTP ${res.status}` })))
-      .then(data => {
-        if (data.success) {
+    // 使用 manual redirect 以便检测 302 状态码
+    fetch(`https://auth.taropai.com/api/verify-email?token=${token}`, { redirect: 'manual' })
+      .then(async res => {
+        if (res.status === 302) {
           alert(t('emailVerifiedSuccess') || 'Email verified successfully! You can now log in.');
+          // 清理 URL 参数
+          window.history.replaceState({}, document.title, window.location.pathname);
+          showPage('page-login-register');
+          switchAuthTab('login');
         } else {
-          alert(data.error || t('verificationLinkInvalid') || 'Verification link is invalid or expired.');
+          const text = await res.text();
+          alert(text || t('verificationFailed') || 'Verification failed. Please try again.');
         }
       })
-      .catch(() => alert(t('verificationFailed') || 'Verification failed. Please try again later.'));
+      .catch(() => alert(t('networkError') || 'Network error'));
+  } else {
+    // 没有 token 时直接跳转登录页
+    showPage('page-login-register');
+    switchAuthTab('login');
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
-  showPage('page-login-register');
-  switchAuthTab('login');
-  window.history.replaceState({}, document.title, window.location.pathname);
   return;
 }
   // 2) 重置密码回调（新流程）
@@ -2325,97 +2332,29 @@ function handleUrlParams() {
   }
 
   // 3) 修改邮箱验证回调（新流程）
-  if (action === 'change-email-verify') {
+   if (action === 'change-email-verify') {
   if (token) {
-    fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`)
-      .then(res => {
-        // 无论状态码，先转为 JSON（如果响应不是 JSON 则捕获）
-        return res.json().catch(() => ({ success: false, error: `HTTP ${res.status}` }));
-      })
-      .then(async (data) => {
-        if (data.success) {
+    fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`, { redirect: 'manual' })
+      .then(async res => {
+        if (res.status === 302) {
           alert(t('emailChangedSuccess') || 'Email changed successfully!');
-          // 刷新用户数据，更新个人信息页的邮箱显示
           await refreshUserData();
-          const profilePage = document.getElementById('page-profile');
-          if (profilePage && profilePage.classList.contains('active')) {
+          if (document.getElementById('page-profile')?.classList.contains('active')) {
             renderProfile();
           }
+          window.history.replaceState({}, document.title, window.location.pathname);
         } else {
-          // 显示后端返回的错误信息（如“链接已过期”、“邮箱已被占用”等）
-          alert(data.error || t('verificationFailed') || 'Verification failed. Please try again.');
+          const text = await res.text();
+          alert(text || t('verificationFailed') || 'Verification failed. Please try again.');
         }
       })
-      .catch((err) => {
-        console.error(err);
-        alert(t('networkError') || 'Network error');
-      });
+      .catch(() => alert(t('networkError') || 'Network error'));
+  } else {
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
-  window.history.replaceState({}, document.title, window.location.pathname);
   return;
 }
-
-  // 4) 原有逻辑：需要 action 和 email
-  if (!action) return;
-
-  // 5) 注册/重置/修改邮箱的自动填充（原有逻辑）
-  if (action === 'register') {
-    showPage('page-login-register');
-    switchAuthTab('register');
-    document.getElementById('registerEmail').value = decodeURIComponent(email);
-    if (code) {
-      setTimeout(() => {
-        const codeInput = document.getElementById('registerCode');
-        if (codeInput) codeInput.value = code;
-      }, 500);
-    }
-    document.getElementById('registerPassword').focus();
-  } else if (action === 'reset') {
-    showPage('page-login-register');
-    switchAuthTab('login');
-    document.getElementById('loginEmail').value = decodeURIComponent(email);
-    showForgotModal();
-    document.getElementById('forgotEmail').value = decodeURIComponent(email);
-    if (code) {
-      setTimeout(() => {
-        const codeInput = document.getElementById('forgotCode');
-        if (codeInput) codeInput.value = code;
-      }, 500);
-    }
-  } else if (action === 'changeEmail') {
-    showPage('page-profile');
-    if (code) {
-      setTimeout(() => {
-        const codeInput = document.getElementById('emailChangeCode');
-        if (codeInput) codeInput.value = code;
-      }, 500);
-    }
-  }
-
-  // 6) 标记邮箱已验证（原有逻辑）
-  if (verified === '1') {
-    const token = urlParams.get('token');
-    if (action === 'register') {
-      showPage('page-login-register');
-      switchAuthTab('register');
-      document.getElementById('registerEmail').value = decodeURIComponent(email);
-      markEmailVerified('register', token);
-      document.getElementById('registerPassword').focus();
-    } else if (action === 'reset') {
-      showPage('page-login-register');
-      switchAuthTab('login');
-      document.getElementById('loginEmail').value = decodeURIComponent(email);
-      showForgotModal();
-      document.getElementById('forgotEmail').value = decodeURIComponent(email);
-      markEmailVerified('reset', token);
-    } else if (action === 'changeEmail') {
-      showPage('page-profile');
-      markEmailVerified('changeEmail', token);
-    }
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return;
-  }
-
+  
   window.history.replaceState({}, document.title, window.location.pathname);
 }
 
