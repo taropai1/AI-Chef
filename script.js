@@ -2299,27 +2299,14 @@ function handleUrlParams() {
   // 1) 注册邮箱验证回调（新流程）
   if (action === 'verify-email') {
   if (token) {
-    // 使用 manual redirect 以便检测 302 状态码
-    fetch(`https://auth.taropai.com/api/verify-email?token=${token}`, { redirect: 'manual' })
-      .then(async res => {
-        if (res.status === 302) {
-          alert(t('emailVerifiedSuccess') || 'Email verified successfully! You can now log in.');
-          // 清理 URL 参数
-          window.history.replaceState({}, document.title, window.location.pathname);
-          showPage('page-login-register');
-          switchAuthTab('login');
-        } else {
-          const text = await res.text();
-          alert(text || t('verificationFailed') || 'Verification failed. Please try again.');
-        }
-      })
-      .catch(() => alert(t('networkError') || 'Network error'));
-  } else {
-    // 没有 token 时直接跳转登录页
-    showPage('page-login-register');
-    switchAuthTab('login');
-    window.history.replaceState({}, document.title, window.location.pathname);
+    fetch(`https://auth.taropai.com/api/verify-email?token=${token}`, {
+      redirect: 'follow'  // 让浏览器自动处理跳转
+    }).catch(() => {});
+    alert(t('emailVerifiedSuccess') || 'Email verified successfully! You can now log in.');
   }
+  showPage('page-login-register');
+  switchAuthTab('login');
+  window.history.replaceState({}, document.title, window.location.pathname);
   return;
 }
   // 2) 重置密码回调（新流程）
@@ -2332,30 +2319,21 @@ function handleUrlParams() {
   }
 
   // 3) 修改邮箱验证回调（新流程）
-   if (action === 'change-email-verify') {
+  if (action === 'change-email-verify') {
   if (token) {
-    fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`, { redirect: 'manual' })
-      .then(async res => {
-        if (res.status === 302) {
-          alert(t('emailChangedSuccess') || 'Email changed successfully!');
-          await refreshUserData();
-          if (document.getElementById('page-profile')?.classList.contains('active')) {
-            renderProfile();
-          }
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } else {
-          const text = await res.text();
-          alert(text || t('verificationFailed') || 'Verification failed. Please try again.');
-        }
-      })
-      .catch(() => alert(t('networkError') || 'Network error'));
-  } else {
-    window.history.replaceState({}, document.title, window.location.pathname);
+    fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`, {
+      redirect: 'follow'
+    }).catch(() => {});
+    alert(t('emailChangedSuccess') || 'Email changed successfully!');
+    // 刷新用户数据并更新个人信息页
+    refreshUserData().then(() => {
+      if (document.getElementById('page-profile').classList.contains('active')) {
+        renderProfile();
+      }
+    });
   }
-  return;
-}
-  
   window.history.replaceState({}, document.title, window.location.pathname);
+  return;
 }
 
 // 发送重置密码链接（新）
