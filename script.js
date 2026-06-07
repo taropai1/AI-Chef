@@ -2319,7 +2319,6 @@ async function handleUrlParams() {
 
   // 2) 重置密码回调
   if (action === 'reset-password') {
-  console.log('reset token from URL:', token);
   if (token) {
     showResetPasswordModal(token);
   }
@@ -2402,7 +2401,6 @@ function showResetPasswordModal(token) {
   document.body.appendChild(modal);
 
   document.getElementById('confirmResetPwd').onclick = async function() {
-    console.log('token in modal:', token);
     const newPwd = document.getElementById('resetNewPassword').value.trim();
     if (!newPwd || newPwd.length < 6) {
       alert(t('passwordTooShort') || 'Password must be at least 6 characters');
