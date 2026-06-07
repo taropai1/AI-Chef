@@ -2319,12 +2319,13 @@ async function handleUrlParams() {
 
   // 2) 重置密码回调
   if (action === 'reset-password') {
-    if (token) {
-      showResetPasswordModal(token);
-    }
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return;
+  console.log('reset token from URL:', token);
+  if (token) {
+    showResetPasswordModal(token);
   }
+  window.history.replaceState({}, document.title, window.location.pathname);
+  return;
+}
 
   // 3) 修改邮箱验证回调
   if (action === 'change-email-verify') {
@@ -2401,6 +2402,7 @@ function showResetPasswordModal(token) {
   document.body.appendChild(modal);
 
   document.getElementById('confirmResetPwd').onclick = async function() {
+    console.log('token in modal:', token);
     const newPwd = document.getElementById('resetNewPassword').value.trim();
     if (!newPwd || newPwd.length < 6) {
       alert(t('passwordTooShort') || 'Password must be at least 6 characters');
