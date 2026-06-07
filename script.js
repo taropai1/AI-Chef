@@ -2288,7 +2288,7 @@ function updateHistoryButtons() {
 }
 
 // ==================== URL 参数处理 ====================
-function handleUrlParams() {
+async function handleUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get('action');
   const token = urlParams.get('token');
@@ -2296,28 +2296,28 @@ function handleUrlParams() {
   const email = urlParams.get('email');
   const code = urlParams.get('code');
 
-  // 1) 注册邮箱验证回调（新流程）
+  // 1) 注册邮箱验证回调
   if (action === 'verify-email') {
-  if (token) {
-    try {
-      const res = await fetch(`https://auth.taropai.com/api/verify-email?token=${token}`);
-      const data = await res.json();
-      if (data.success) {
-        alert('Email verified successfully! You can now log in.');
-      } else {
-        alert(data.error || 'Verification failed. The link may have expired.');
+    if (token) {
+      try {
+        const res = await fetch(`https://auth.taropai.com/api/verify-email?token=${token}`);
+        const data = await res.json();
+        if (data.success) {
+          alert('Email verified successfully! You can now log in.');
+        } else {
+          alert(data.error || 'Verification failed. The link may have expired.');
+        }
+      } catch (e) {
+        alert('Network error, please try again.');
       }
-    } catch (e) {
-      alert('Network error, please try again.');
     }
+    showPage('page-login-register');
+    switchAuthTab('login');
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
   }
-  // 无论成功失败，都引导到登录页
-  showPage('page-login-register');
-  switchAuthTab('login');
-  window.history.replaceState({}, document.title, window.location.pathname);
-  return;
-}
-  // 2) 重置密码回调（新流程）
+
+  // 2) 重置密码回调
   if (action === 'reset-password') {
     if (token) {
       showResetPasswordModal(token);
@@ -2326,30 +2326,29 @@ function handleUrlParams() {
     return;
   }
 
-  // 3) 修改邮箱验证回调（新流程）
+  // 3) 修改邮箱验证回调
   if (action === 'change-email-verify') {
-  if (token) {
-    try {
-      const res = await fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`);
-      const data = await res.json();
-      if (data.success) {
-        alert('Email changed successfully! Please log in with your new email.');
-        // 邮箱已改变，强制清空登录态
-        localStorage.removeItem('authToken');
-        userData = null;
-        updateNavButton();
-      } else {
-        alert(data.error || 'Email change failed. The link may have expired.');
+    if (token) {
+      try {
+        const res = await fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`);
+        const data = await res.json();
+        if (data.success) {
+          alert('Email changed successfully! Please log in with your new email.');
+          localStorage.removeItem('authToken');
+          userData = null;
+          updateNavButton();
+        } else {
+          alert(data.error || 'Email change failed. The link may have expired.');
+        }
+      } catch (e) {
+        alert('Network error, please try again.');
       }
-    } catch (e) {
-      alert('Network error, please try again.');
     }
+    showPage('page-login-register');
+    switchAuthTab('login');
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
   }
-  showPage('page-login-register');
-  switchAuthTab('login');
-  // 可选：预填新邮箱（由于没有保存新邮箱地址，此处不做自动填充）
-  window.history.replaceState({}, document.title, window.location.pathname);
-  return;
 }
 
 // 发送重置密码链接（新）
