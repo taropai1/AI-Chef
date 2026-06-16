@@ -1360,6 +1360,7 @@ if (qaLimitNote && userData) {
 }
 
 // ==================== 热门视频页（双播放器+双视频源） ====================
+// 从 YouTube URL 提取 videoId（全局）
 function getYouTubeVideoId(url) {
     const match = url.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/);
     return match ? match[1] : null;
@@ -1367,59 +1368,59 @@ function getYouTubeVideoId(url) {
 
 async function initVideoPage() {
     // 加载 YouTube API
-if (!window.YT) {
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(tag);
-}
+    if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+    }
 
-  // 确保 YT API 就绪的 Promise
-let ytApiReady = window.ytApiReady;
-if (!ytApiReady) {
-    ytApiReady = new Promise((resolve) => {
-        if (window.YT && window.YT.Player) {
-            resolve();
-        } else {
-            const orig = window.onYouTubeIframeAPIReady;
-            window.onYouTubeIframeAPIReady = () => {
-                if (orig) orig();
+    // 确保 YT API 就绪的 Promise
+    let ytApiReady = window.ytApiReady;
+    if (!ytApiReady) {
+        ytApiReady = new Promise((resolve) => {
+            if (window.YT && window.YT.Player) {
                 resolve();
-            };
+            } else {
+                const orig = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = () => {
+                    if (orig) orig();
+                    resolve();
+                };
+            }
+        });
+        window.ytApiReady = ytApiReady;
+    }
+
+    // 全局 YouTube 变量
+    let ytPlayer = null;
+    let ytContainer = null;
+    let ytOverlay = null;
+
+    // 创建透明遮罩（覆盖 YouTube 播放器，阻止跳转）
+    function addTransparentOverlay(container) {
+        if (ytOverlay) ytOverlay.remove();
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:transparent;pointer-events:all;';
+        container.style.position = 'relative';
+        container.appendChild(overlay);
+        ytOverlay = overlay;
+    }
+
+    // 清理 YouTube 播放器和遮罩
+    function destroyCurrentYTPlayer() {
+        if (ytPlayer && typeof ytPlayer.destroy === 'function') {
+            ytPlayer.destroy();
         }
-    });
-    window.ytApiReady = ytApiReady;
-}
-
-// 全局 YouTube 变量
-let ytPlayer = null;
-let ytContainer = null;
-let ytOverlay = null;
-  
-// 创建透明遮罩
-function addTransparentOverlay(container) {
-    if (ytOverlay) ytOverlay.remove();
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:transparent;pointer-events:all;';
-    container.style.position = 'relative';
-    container.appendChild(overlay);
-    ytOverlay = overlay;
-}
-
-// 清理 YouTube 播放器和遮罩
-function destroyCurrentYTPlayer() {
-    if (ytPlayer && typeof ytPlayer.destroy === 'function') {
-        ytPlayer.destroy();
+        ytPlayer = null;
+        if (ytContainer) {
+            ytContainer.remove();
+            ytContainer = null;
+        }
+        if (ytOverlay) {
+            ytOverlay.remove();
+            ytOverlay = null;
+        }
     }
-    ytPlayer = null;
-    if (ytContainer) {
-        ytContainer.remove();
-        ytContainer = null;
-    }
-    if (ytOverlay) {
-        ytOverlay.remove();
-        ytOverlay = null;
-    }
-}
 
     const grid = document.getElementById('videoGrid');
     const player = document.getElementById('mainVideoPlayer');
@@ -1441,8 +1442,9 @@ function destroyCurrentYTPlayer() {
     let overlayPlayer = null;
     let allVideos = [];
 
+    // ★ 确保弹窗 DOM 尽早创建
     ensureOverlayCreated();
-  
+
     // 立即从缓存渲染（消除延迟）
     if (videoPageCache.videos && videoPageCache.videos.length > 0) {
         allVideos = videoPageCache.videos;
@@ -1552,26 +1554,64 @@ function destroyCurrentYTPlayer() {
     const src = v.source || 'Original';
     sourceEl.textContent = src === 'Original' ? safeT('original', 'Original') : safeT('fromSource', 'From') + ' ' + src;
 
+    // 清除上一次的播放器残留
     destroyCurrentYTPlayer();
 
     if (src === 'YouTube') {
-        player.style.display = 'none';
+        // 隐藏原生 video，保留占位（避免白屏）
+        player.style.visibility = 'hidden';
+        player.style.display = 'block'; // 保留占位，避免布局塌陷
+
+        // 创建 YouTube 容器，复用原生 video 容器样式
         ytContainer = document.createElement('div');
         ytContainer.id = 'top-youtube-container';
-        ytContainer.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%;';
+        ytContainer.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
         player.parentNode.appendChild(ytContainer);
+
         const videoId = getYouTubeVideoId(v.url);
-        if (!videoId) { player.style.display = ''; return; }
+        if (!videoId) {
+            player.style.visibility = '';
+            destroyCurrentYTPlayer();
+            return;
+        }
+
+        await window.ytApiReady;
         ytPlayer = new YT.Player(ytContainer, {
             videoId: videoId,
-            playerVars: { autoplay: 1, mute: 1, controls: 0, modestbranding: 1, rel: 0, playsinline: 1, loop: 1, playlist: videoId, disablekb: 1, enablejsapi: 1, origin: window.location.origin, widget_referrer: window.location.origin },
+            playerVars: {
+                autoplay: 1,
+                mute: 1,
+                controls: 0,
+                modestbranding: 1,
+                rel: 0,
+                playsinline: 1,
+                loop: 1,
+                playlist: videoId,
+                disablekb: 1,
+                enablejsapi: 1,
+                origin: window.location.origin,
+                widget_referrer: window.location.origin,
+            },
             events: {
-                onReady: (e) => { e.target.playVideo(); addTransparentOverlay(ytContainer); },
-                onError: () => { destroyCurrentYTPlayer(); player.style.display = ''; }
+                onReady: (e) => {
+                    e.target.playVideo();
+                    // 叠加透明遮罩，完全阻止点击跳转
+                    addTransparentOverlay(ytContainer);
+                    // 确保播放器占据整个区域，适配原始 video 样式
+                    const iframe = ytContainer.querySelector('iframe');
+                    if (iframe) {
+                        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;';
+                    }
+                },
+                onError: () => {
+                    player.style.visibility = '';
+                    destroyCurrentYTPlayer();
+                }
             }
         });
     } else {
-        player.style.display = '';
+        // 原创视频：恢复原生 video 显示
+        player.style.visibility = '';
         player.src = v.url;
         player.muted = true;
         player.playsInline = true;
@@ -1651,36 +1691,40 @@ function destroyCurrentYTPlayer() {
     });
 
     function ensureOverlayCreated() {
-        if (document.getElementById('videoOverlayContainer')) {
-            videoOverlay = document.getElementById('videoOverlayContainer');
-            overlayPlayer = document.getElementById('overlayVideoPlayer');
-            return;
-        }
-        videoOverlay = document.createElement('div');
-        videoOverlay.id = 'videoOverlayContainer';
-        videoOverlay.className = 'video-player-overlay';
-        videoOverlay.innerHTML = `
-            <div class="overlay-container">
-                <div class="overlay-close" id="videoOverlayClose">✕</div>
-                <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
-            </div>
-        `;
-        document.body.appendChild(videoOverlay);
+    if (document.getElementById('videoOverlayContainer')) {
+        videoOverlay = document.getElementById('videoOverlayContainer');
         overlayPlayer = document.getElementById('overlayVideoPlayer');
-      
-        const overlayClose = document.getElementById('videoOverlayClose');
-overlayClose.addEventListener('click', () => {
-    overlayPlayer.pause();
-    videoOverlay.classList.remove('active', 'fullscreen');
-    const overlayYT = document.querySelector('#overlay-youtube');
-    if (overlayYT) {
-        const ytPlayer = YT.get(overlayYT.id);
-        if (ytPlayer && typeof ytPlayer.destroy === 'function') ytPlayer.destroy();
-        overlayYT.remove();
+        return;
     }
-    playVideoAtIndex(currentIndex);
-});
-    }
+    videoOverlay = document.createElement('div');
+    videoOverlay.id = 'videoOverlayContainer';
+    videoOverlay.className = 'video-player-overlay';
+    videoOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;display:none;align-items:center;justify-content:center;';
+    videoOverlay.innerHTML = `
+        <div class="overlay-container" style="position:relative;width:100%;max-width:900px;aspect-ratio:16/9;max-height:90vh;">
+            <div class="overlay-close" id="videoOverlayClose" style="position:absolute;top:-30px;right:0;z-index:10;color:#fff;font-size:24px;cursor:pointer;">✕</div>
+            <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;" style="width:100%;height:100%;display:none;"></video>
+        </div>
+    `;
+    document.body.appendChild(videoOverlay);
+    overlayPlayer = document.getElementById('overlayVideoPlayer');
+
+    const overlayClose = document.getElementById('videoOverlayClose');
+    overlayClose.addEventListener('click', () => {
+        overlayPlayer.pause();
+        videoOverlay.style.display = 'none';
+        videoOverlay.classList.remove('active', 'fullscreen');
+        // 清理弹窗 YouTube
+        const overlayYT = document.querySelector('#overlay-youtube');
+        if (overlayYT) {
+            const ytPlayer = YT.get(overlayYT.id);
+            if (ytPlayer && typeof ytPlayer.destroy === 'function') ytPlayer.destroy();
+            overlayYT.remove();
+        }
+        // 恢复顶部轮播
+        playVideoAtIndex(currentIndex);
+    });
+}
 
     window._ensureOverlayCreated = ensureOverlayCreated;
     window._getOverlayElements = () => ({
