@@ -1359,8 +1359,52 @@ if (qaLimitNote && userData) {
 }
 }
 
-// ==================== 视频页面初始化（修复滑动与缓存） ====================
+// ==================== 热门视频页（双播放器+双视频源） ====================
+function getYouTubeVideoId(url) {
+    const match = url.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/);
+    return match ? match[1] : null;
+}
+
 async function initVideoPage() {
+    // 加载 YouTube API
+if (!window.YT) {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+}
+window.onYouTubeIframeAPIReady = () => {};
+
+// 全局 YouTube 变量
+let ytPlayer = null;
+let ytContainer = null;
+let ytOverlay = null;
+  
+// 创建透明遮罩
+function addTransparentOverlay(container) {
+    if (ytOverlay) ytOverlay.remove();
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:transparent;pointer-events:all;';
+    container.style.position = 'relative';
+    container.appendChild(overlay);
+    ytOverlay = overlay;
+}
+
+// 清理 YouTube 播放器和遮罩
+function destroyCurrentYTPlayer() {
+    if (ytPlayer && typeof ytPlayer.destroy === 'function') {
+        ytPlayer.destroy();
+    }
+    ytPlayer = null;
+    if (ytContainer) {
+        ytContainer.remove();
+        ytContainer = null;
+    }
+    if (ytOverlay) {
+        ytOverlay.remove();
+        ytOverlay = null;
+    }
+}
+
     const grid = document.getElementById('videoGrid');
     const player = document.getElementById('mainVideoPlayer');
     const titleEl = document.getElementById('currentVideoTitle');
@@ -1371,7 +1415,7 @@ async function initVideoPage() {
 
     const safeT = (key, fallback) => (typeof t === 'function' ? t(key) : null) || fallback;
 
-    const SLIDE_DURATION = 60;
+    const SLIDE_DURATION = 12;
     let slideTimer = null;
     let currentPlaylist = [];
     let currentIndex = 0;
@@ -1381,6 +1425,8 @@ async function initVideoPage() {
     let overlayPlayer = null;
     let allVideos = [];
 
+    ensureOverlayCreated();
+  
     // 立即从缓存渲染（消除延迟）
     if (videoPageCache.videos && videoPageCache.videos.length > 0) {
         allVideos = videoPageCache.videos;
@@ -1483,24 +1529,44 @@ async function initVideoPage() {
         });
     }
 
-    function playVideoAtIndex(index) {
-        if (!currentPlaylist.length) return;
-        const v = currentPlaylist[index];
+    async function playVideoAtIndex(index) {
+    if (!currentPlaylist.length) return;
+    const v = currentPlaylist[index];
+    titleEl.textContent = v.title;
+    const src = v.source || 'Original';
+    sourceEl.textContent = src === 'Original' ? safeT('original', 'Original') : safeT('fromSource', 'From') + ' ' + src;
+
+    destroyCurrentYTPlayer();
+
+    if (src === 'YouTube') {
+        player.style.display = 'none';
+        ytContainer = document.createElement('div');
+        ytContainer.id = 'top-youtube-container';
+        ytContainer.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%;';
+        player.parentNode.appendChild(ytContainer);
+        const videoId = getYouTubeVideoId(v.url);
+        if (!videoId) { player.style.display = ''; return; }
+        ytPlayer = new YT.Player(ytContainer, {
+            videoId: videoId,
+            playerVars: { autoplay: 1, mute: 1, controls: 0, modestbranding: 1, rel: 0, playsinline: 1, loop: 1, playlist: videoId, disablekb: 1, enablejsapi: 1, origin: window.location.origin, widget_referrer: window.location.origin },
+            events: {
+                onReady: (e) => { e.target.playVideo(); addTransparentOverlay(ytContainer); },
+                onError: () => { destroyCurrentYTPlayer(); player.style.display = ''; }
+            }
+        });
+    } else {
+        player.style.display = '';
         player.src = v.url;
-        titleEl.textContent = v.title;
-        const src = v.source || 'Original';
-        sourceEl.textContent = src === 'Original'
-            ? (safeT('original', 'Original'))
-            : (safeT('fromSource', 'From') + ' ' + src);
+        player.muted = true;
+        player.playsInline = true;
         player.play().catch(() => {});
-        currentIndex = index;
-        updateTimeline(index, currentPlaylist.length);
-        clearTimeout(slideTimer);
-        slideTimer = setTimeout(() => {
-            const next = (currentIndex + 1) % currentPlaylist.length;
-            playVideoAtIndex(next);
-        }, SLIDE_DURATION * 1000);
     }
+
+    currentIndex = index;
+    updateTimeline(index, currentPlaylist.length);
+    clearTimeout(slideTimer);
+    slideTimer = setTimeout(() => playVideoAtIndex((currentIndex + 1) % currentPlaylist.length), SLIDE_DURATION * 1000);
+}
 
     if (currentPlaylist.length) {
         playVideoAtIndex(0);
@@ -1585,14 +1651,19 @@ async function initVideoPage() {
         `;
         document.body.appendChild(videoOverlay);
         overlayPlayer = document.getElementById('overlayVideoPlayer');
+      
         const overlayClose = document.getElementById('videoOverlayClose');
-        overlayClose.addEventListener('click', () => {
-            overlayPlayer.pause();
-            videoOverlay.classList.remove('active', 'fullscreen');
-            if (currentPlaylist.length) {
-                player.play().catch(() => {});
-            }
-        });
+overlayClose.addEventListener('click', () => {
+    overlayPlayer.pause();
+    videoOverlay.classList.remove('active', 'fullscreen');
+    const overlayYT = document.querySelector('#overlay-youtube');
+    if (overlayYT) {
+        const ytPlayer = YT.get(overlayYT.id);
+        if (ytPlayer && typeof ytPlayer.destroy === 'function') ytPlayer.destroy();
+        overlayYT.remove();
+    }
+    playVideoAtIndex(currentIndex);
+});
     }
 
     window._ensureOverlayCreated = ensureOverlayCreated;
@@ -1657,57 +1728,64 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
   grid.innerHTML = html;
 
   grid.querySelectorAll('.video-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const videoUrl = card.dataset.url;
-      const videoId = card.dataset.id;
-      if (!videoUrl) return;
+  card.addEventListener('click', () => {
+    const videoUrl = card.dataset.url;
+    const videoSource = card.dataset.source;
+    const { videoOverlay, overlayPlayer } = window._getOverlayElements();
 
-      // 延迟创建弹窗（第一次点击时）
-      if (typeof window._ensureOverlayCreated === 'function') {
-        window._ensureOverlayCreated();
-      }
-      const { videoOverlay, overlayPlayer } = window._getOverlayElements();
+    const oldYT = document.querySelector('#overlay-youtube');
+    if (oldYT) {
+      const oldP = YT.get(oldYT.id);
+      if (oldP && typeof oldP.destroy === 'function') oldP.destroy();
+      oldYT.remove();
+    }
 
-      if (!overlayPlayer || !videoOverlay) return;
-
+    if (videoSource === 'YouTube') {
+    const videoId = getYouTubeVideoId(videoUrl);
+    if (!videoId) return;
+    overlayPlayer.style.display = 'none';
+    const ytDiv = document.createElement('div');
+    ytDiv.id = 'overlay-youtube';
+    ytDiv.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%;';
+    const overlayContainer = videoOverlay.querySelector('.overlay-container');
+    overlayContainer.appendChild(ytDiv);
+    new YT.Player(ytDiv, {
+        videoId: videoId,
+        playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
+        events: {
+            onReady: (e) => {
+                e.target.playVideo();
+                // 添加透明遮罩，防止跳转
+                const existingOverlay = ytDiv.querySelector('.yt-modal-overlay');
+                if (!existingOverlay) {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'yt-modal-overlay';
+                    overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:transparent;pointer-events:all;';
+                    ytDiv.appendChild(overlay);
+                }
+            },
+            onError: () => {
+                // 出错时回退到 video 标签
+                const ytEl = document.querySelector('#overlay-youtube');
+                if (ytEl) ytEl.remove();
+                overlayPlayer.style.display = '';
+            }
+        }
+    });
+} else {
+      overlayPlayer.style.display = '';
       overlayPlayer.src = videoUrl;
       overlayPlayer.play().catch(() => {});
+    }
+
+    if (player && player.tagName === 'VIDEO') {
       player.pause();
-
-      if (window.innerWidth <= 767 && window.innerWidth > window.innerHeight) {
-        videoOverlay.style.width = '100%';
-        videoOverlay.style.height = '100%';
-        videoOverlay.style.maxHeight = '100vh';
-        videoOverlay.style.borderRadius = '0';
-        videoOverlay.style.bottom = '0';
-        videoOverlay.style.right = '0';
-      } else {
-        videoOverlay.style.width = '';
-        videoOverlay.style.height = '';
-        videoOverlay.style.maxHeight = '';
-        videoOverlay.style.borderRadius = '';
-        videoOverlay.style.bottom = '';
-        videoOverlay.style.right = '';
-      }
-      videoOverlay.classList.add('active');
-
-      const startTime = Date.now();
-      const timer = setInterval(() => {
-        if (overlayPlayer.paused || overlayPlayer.ended || !videoOverlay.classList.contains('active')) {
-          clearInterval(timer);
-          return;
-        }
-        if (Date.now() - startTime >= 30000) {
-          fetch('https://vid.taropai.com/api/stats/play', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ videoId: videoId, duration: Date.now() - startTime })
-          }).catch(() => {});
-          clearInterval(timer);
-        }
-      }, 5000);
-    });
+    } else if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+      ytPlayer.pauseVideo();
+    }
+    videoOverlay.classList.add('active');
   });
+});
 }
 
 // ==================== 登录/注册 ====================
