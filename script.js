@@ -1744,63 +1744,85 @@ function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
   grid.innerHTML = html;
 
   grid.querySelectorAll('.video-card').forEach(card => {
-  card.addEventListener('click', () => {
-    const videoUrl = card.dataset.url;
-    const videoSource = card.dataset.source;
-    const { videoOverlay, overlayPlayer } = window._getOverlayElements();
+    card.addEventListener('click', async () => {
+        const videoUrl = card.dataset.url;
+        const videoSource = card.dataset.source;
+        const { videoOverlay, overlayPlayer } = window._getOverlayElements();
 
-    const oldYT = document.querySelector('#overlay-youtube');
-    if (oldYT) {
-      const oldP = YT.get(oldYT.id);
-      if (oldP && typeof oldP.destroy === 'function') oldP.destroy();
-      oldYT.remove();
-    }
-
-    if (videoSource === 'YouTube') {
-    const videoId = getYouTubeVideoId(videoUrl);
-    if (!videoId) return;
-    overlayPlayer.style.display = 'none';
-    const ytDiv = document.createElement('div');
-    ytDiv.id = 'overlay-youtube';
-    ytDiv.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%;';
-    const overlayContainer = videoOverlay.querySelector('.overlay-container');
-    overlayContainer.appendChild(ytDiv);
-    new YT.Player(ytDiv, {
-        videoId: videoId,
-        playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0 },
-        events: {
-            onReady: (e) => {
-                e.target.playVideo();
-                // 添加透明遮罩，防止跳转
-                const existingOverlay = ytDiv.querySelector('.yt-modal-overlay');
-                if (!existingOverlay) {
-                    const overlay = document.createElement('div');
-                    overlay.className = 'yt-modal-overlay';
-                    overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:transparent;pointer-events:all;';
-                    ytDiv.appendChild(overlay);
-                }
-            },
-            onError: () => {
-                // 出错时回退到 video 标签
-                const ytEl = document.querySelector('#overlay-youtube');
-                if (ytEl) ytEl.remove();
-                overlayPlayer.style.display = '';
-            }
+        // 暂停顶部播放器（原生或 YouTube）
+        if (player && player.tagName === 'VIDEO' && !player.paused) {
+            player.pause();
+        } else if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+            ytPlayer.pauseVideo();
         }
-    });
-} else {
-      overlayPlayer.style.display = '';
-      overlayPlayer.src = videoUrl;
-      overlayPlayer.play().catch(() => {});
-    }
 
-    if (player && player.tagName === 'VIDEO') {
-      player.pause();
-    } else if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-      ytPlayer.pauseVideo();
-    }
-    videoOverlay.classList.add('active');
-  });
+        // 清理旧的弹窗 YouTube
+        const oldYT = document.querySelector('#overlay-youtube');
+        if (oldYT) {
+            const oldP = YT.get(oldYT.id);
+            if (oldP && typeof oldP.destroy === 'function') oldP.destroy();
+            oldYT.remove();
+        }
+
+        if (videoSource === 'YouTube') {
+            const videoId = getYouTubeVideoId(videoUrl);
+            if (!videoId) return;
+            overlayPlayer.style.display = 'none';
+            const ytDiv = document.createElement('div');
+            ytDiv.id = 'overlay-youtube';
+            ytDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
+            const overlayContainer = videoOverlay.querySelector('.overlay-container');
+            overlayContainer.appendChild(ytDiv);
+
+            await window.ytApiReady;
+            new YT.Player(ytDiv, {
+                videoId: videoId,
+                playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    modestbranding: 1,
+                    rel: 0,
+                    playsinline: 1,
+                },
+                events: {
+                    onReady: (e) => {
+                        e.target.playVideo();
+                        // 弹窗内同样叠加透明遮罩
+                        const existingOverlay = ytDiv.querySelector('.yt-modal-overlay');
+                        if (!existingOverlay) {
+                            const overlay = document.createElement('div');
+                            overlay.className = 'yt-modal-overlay';
+                            overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:transparent;pointer-events:all;';
+                            ytDiv.appendChild(overlay);
+                        }
+                        const iframe = ytDiv.querySelector('iframe');
+                        if (iframe) {
+                            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;';
+                        }
+                    },
+                    onError: () => {
+                        const ytEl = document.querySelector('#overlay-youtube');
+                        if (ytEl) ytEl.remove();
+                        overlayPlayer.style.display = '';
+                    }
+                }
+            });
+        } else {
+            overlayPlayer.style.display = 'block';
+            overlayPlayer.src = videoUrl;
+            overlayPlayer.play().catch(() => {});
+        }
+
+        // 显示弹窗（横屏/竖屏自适应）
+        videoOverlay.style.display = 'flex';
+        const isLandscape = window.innerWidth > window.innerHeight;
+        if (isLandscape) {
+            videoOverlay.querySelector('.overlay-container').style.maxWidth = '90vw';
+        } else {
+            videoOverlay.querySelector('.overlay-container').style.maxWidth = '100%';
+        }
+        videoOverlay.classList.add('active');
+    });
 });
 }
 
