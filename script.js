@@ -1372,7 +1372,23 @@ if (!window.YT) {
     tag.src = 'https://www.youtube.com/iframe_api';
     document.head.appendChild(tag);
 }
-window.onYouTubeIframeAPIReady = () => {};
+
+  // 确保 YT API 就绪的 Promise
+let ytApiReady = window.ytApiReady;
+if (!ytApiReady) {
+    ytApiReady = new Promise((resolve) => {
+        if (window.YT && window.YT.Player) {
+            resolve();
+        } else {
+            const orig = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = () => {
+                if (orig) orig();
+                resolve();
+            };
+        }
+    });
+    window.ytApiReady = ytApiReady;
+}
 
 // 全局 YouTube 变量
 let ytPlayer = null;
