@@ -1359,8 +1359,7 @@ if (qaLimitNote && userData) {
 }
 }
 
-// ==================== 热门视频页（双播放器+双视频源） ====================
-// 从 YouTube URL 提取 videoId（全局）
+// ==================== 视频页面初始化（双播放器解耦 + 无跳转） ====================
 function getYouTubeVideoId(url) {
     const match = url.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/);
     return match ? match[1] : null;
@@ -1374,7 +1373,7 @@ async function initVideoPage() {
         document.head.appendChild(tag);
     }
 
-    // 确保 YT API 就绪的 Promise
+    // 等待 YT 就绪
     let ytApiReady = window.ytApiReady;
     if (!ytApiReady) {
         ytApiReady = new Promise((resolve) => {
@@ -1391,12 +1390,11 @@ async function initVideoPage() {
         window.ytApiReady = ytApiReady;
     }
 
-    // 全局 YouTube 变量
+    // 顶部轮播 YouTube 控制变量
     let ytPlayer = null;
     let ytContainer = null;
     let ytOverlay = null;
 
-    // 创建透明遮罩（覆盖 YouTube 播放器，阻止跳转）
     function addTransparentOverlay(container) {
         if (ytOverlay) ytOverlay.remove();
         const overlay = document.createElement('div');
@@ -1406,20 +1404,11 @@ async function initVideoPage() {
         ytOverlay = overlay;
     }
 
-    // 清理 YouTube 播放器和遮罩
     function destroyCurrentYTPlayer() {
-        if (ytPlayer && typeof ytPlayer.destroy === 'function') {
-            ytPlayer.destroy();
-        }
+        if (ytPlayer && typeof ytPlayer.destroy === 'function') ytPlayer.destroy();
         ytPlayer = null;
-        if (ytContainer) {
-            ytContainer.remove();
-            ytContainer = null;
-        }
-        if (ytOverlay) {
-            ytOverlay.remove();
-            ytOverlay = null;
-        }
+        if (ytContainer) { ytContainer.remove(); ytContainer = null; }
+        if (ytOverlay) { ytOverlay.remove(); ytOverlay = null; }
     }
 
     const grid = document.getElementById('videoGrid');
@@ -1442,69 +1431,132 @@ async function initVideoPage() {
     let overlayPlayer = null;
     let allVideos = [];
 
-    // ★ 确保弹窗 DOM 尽早创建
+    // ========== 弹窗初始化（仅创建 DOM，事件绑定一次） ==========
+    function ensureOverlayCreated() {
+        if (document.getElementById('videoOverlayContainer')) {
+            videoOverlay = document.getElementById('videoOverlayContainer');
+            overlayPlayer = document.getElementById('overlayVideoPlayer');
+            return;
+        }
+        videoOverlay = document.createElement('div');
+        videoOverlay.id = 'videoOverlayContainer';
+        videoOverlay.className = 'video-player-overlay';
+        videoOverlay.innerHTML = `
+            <div class="overlay-container" style="position:relative;width:100%;max-width:900px;aspect-ratio:16/9;max-height:90vh;">
+                <div class="overlay-close" id="videoOverlayClose">✕</div>
+                <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;"></video>
+            </div>
+        `;
+        document.body.appendChild(videoOverlay);
+        overlayPlayer = document.getElementById('overlayVideoPlayer');
+
+        document.getElementById('videoOverlayClose').addEventListener('click', () => {
+            overlayPlayer.pause();
+            videoOverlay.classList.remove('active');
+            // 清理弹窗内 YouTube 播放器
+            const overlayYT = document.querySelector('#overlay-youtube');
+            if (overlayYT) {
+                const ytP = YT.get(overlayYT.id);
+                if (ytP && typeof ytP.destroy === 'function') ytP.destroy();
+                overlayYT.remove();
+            }
+            // 恢复顶部轮播
+            playVideoAtIndex(currentIndex);
+        });
+    }
     ensureOverlayCreated();
 
-    // 立即从缓存渲染（消除延迟）
-    if (videoPageCache.videos && videoPageCache.videos.length > 0) {
-        allVideos = videoPageCache.videos;
-        const sorted = dynamicSort(allVideos);
-        renderVideoGrid(sorted, player, titleEl, sourceEl, safeT);
-        if (videoPageCache.playlist && videoPageCache.playlist.length > 0) {
-            currentPlaylist = videoPageCache.playlist;
-            playVideoAtIndex(0);
-        }
+    // 暴露给外部使用
+    window._getOverlayElements = () => ({ videoOverlay, overlayPlayer });
+
+    // ========== 顶部播放器位置修正：寻找/创建专属包装容器 ==========
+    function getPlayerWrapper() {
+        // 优先使用已有的 .video-wrapper，否则在 player 外层创建一个
+        const existing = player.closest('.video-wrapper');
+        if (existing) return existing;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'video-wrapper';
+        wrapper.style.cssText = 'position:relative;width:100%;height:0;padding-bottom:56.25%;'; // 16:9 比例
+        player.parentNode.insertBefore(wrapper, player);
+        wrapper.appendChild(player);
+        // 调整 player 样式以适应容器
+        player.style.position = 'absolute';
+        player.style.top = '0';
+        player.style.left = '0';
+        player.style.width = '100%';
+        player.style.height = '100%';
+        return wrapper;
     }
 
-    // 网络更新缓存（静默）
-    try {
-        const res = await fetch('https://vid.taropai.com/api/videos');
-        const data = await res.json();
-        if (data.list && data.list.length > 0) {
-            allVideos = data.list;
-            videoPageCache.videos = data.list;
-            videoPageCache.version = data.version || 0;
-            videoPageCache.timestamp = Date.now();
+    // ========== 播放指定索引视频（顶部轮播） ==========
+    async function playVideoAtIndex(index) {
+        if (!currentPlaylist.length) return;
+        const v = currentPlaylist[index];
+        titleEl.textContent = v.title;
+        const src = v.source || 'Original';
+        sourceEl.textContent = src === 'Original' ? safeT('original', 'Original') : safeT('fromSource', 'From') + ' ' + src;
 
-            const promoted = data.list.filter(v => v.promoted);
-            if (promoted.length > 0) {
-                videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
-            } else {
-                videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
+        // 清除旧播放器
+        destroyCurrentYTPlayer();
+
+        if (src === 'YouTube') {
+            // 隐藏原生 video（保留占位）
+            player.style.display = 'none';
+
+            // 精准插入到视频专属容器内
+            const wrapper = getPlayerWrapper();
+            ytContainer = document.createElement('div');
+            ytContainer.id = 'top-youtube-container';
+            ytContainer.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
+            wrapper.appendChild(ytContainer);
+
+            const videoId = getYouTubeVideoId(v.url);
+            if (!videoId) {
+                player.style.display = '';
+                destroyCurrentYTPlayer();
+                return;
             }
-            currentPlaylist = videoPageCache.playlist;
 
-            renderVideoGrid(dynamicSort(data.list), player, titleEl, sourceEl, safeT);
-            playVideoAtIndex(0);
-        }
-    } catch (err) {
-        console.error('[视频] 加载失败:', err);
-        if (!allVideos || allVideos.length === 0) {
-            if (grid) grid.innerHTML = '<p style="text-align:center;color:#ef4444;">Failed to load videos</p>';
-        }
-        return;
-    }
-
-    // 轮询（2分钟，仅更新缓存）
-    clearInterval(videoPollingTimer);
-    videoPollingTimer = setInterval(async () => {
-        try {
-            const res = await fetch('https://vid.taropai.com/api/videos');
-            const data = await res.json();
-            if (data.list && data.version !== videoPageCache.version) {
-                videoPageCache.videos = data.list;
-                videoPageCache.version = data.version;
-                videoPageCache.timestamp = Date.now();
-                const promoted = data.list.filter(v => v.promoted);
-                if (promoted.length > 0) {
-                    videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
-                } else {
-                    videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
+            await window.ytApiReady;
+            ytPlayer = new YT.Player(ytContainer, {
+                videoId: videoId,
+                playerVars: {
+                    autoplay: 1, mute: 1, controls: 0, modestbranding: 1,
+                    rel: 0, playsinline: 1, loop: 1, playlist: videoId,
+                    disablekb: 1, enablejsapi: 1,
+                    origin: window.location.origin, widget_referrer: window.location.origin
+                },
+                events: {
+                    onReady: (e) => {
+                        e.target.playVideo();
+                        addTransparentOverlay(ytContainer);
+                        // iframe 自身也阻止点击
+                        const iframe = ytContainer.querySelector('iframe');
+                        if (iframe) iframe.style.pointerEvents = 'none';
+                    },
+                    onError: () => {
+                        player.style.display = '';
+                        destroyCurrentYTPlayer();
+                    }
                 }
-            }
-        } catch (e) {}
-    }, 120000);
+            });
+        } else {
+            // 原创视频
+            player.style.display = '';
+            player.src = v.url;
+            player.muted = true;
+            player.playsInline = true;
+            player.play().catch(() => {});
+        }
 
+        currentIndex = index;
+        updateTimeline(index, currentPlaylist.length);
+        clearTimeout(slideTimer);
+        slideTimer = setTimeout(() => playVideoAtIndex((currentIndex + 1) % currentPlaylist.length), SLIDE_DURATION * 1000);
+    }
+
+    // ========== 时间轴构建与更新 ==========
     function buildTimeline() {
         if (!timelineTrack) return;
         timelineTrack.innerHTML = '';
@@ -1547,88 +1599,65 @@ async function initVideoPage() {
         });
     }
 
-    async function playVideoAtIndex(index) {
-    if (!currentPlaylist.length) return;
-    const v = currentPlaylist[index];
-    titleEl.textContent = v.title;
-    const src = v.source || 'Original';
-    sourceEl.textContent = src === 'Original' ? safeT('original', 'Original') : safeT('fromSource', 'From') + ' ' + src;
-
-    // 清除上一次的播放器残留
-    destroyCurrentYTPlayer();
-
-    if (src === 'YouTube') {
-        // 隐藏原生 video，保留占位（避免白屏）
-        player.style.visibility = 'hidden';
-        player.style.display = 'block'; // 保留占位，避免布局塌陷
-
-        // 创建 YouTube 容器，复用原生 video 容器样式
-        ytContainer = document.createElement('div');
-        ytContainer.id = 'top-youtube-container';
-        ytContainer.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
-        player.parentNode.appendChild(ytContainer);
-
-        const videoId = getYouTubeVideoId(v.url);
-        if (!videoId) {
-            player.style.visibility = '';
-            destroyCurrentYTPlayer();
-            return;
+    // ========== 缓存优先渲染 ==========
+    if (videoPageCache.videos && videoPageCache.videos.length > 0) {
+        allVideos = videoPageCache.videos;
+        renderVideoGrid(dynamicSort(allVideos), player, titleEl, sourceEl, safeT);
+        if (videoPageCache.playlist && videoPageCache.playlist.length > 0) {
+            currentPlaylist = videoPageCache.playlist;
+            playVideoAtIndex(0);
         }
+    }
 
-        await window.ytApiReady;
-        ytPlayer = new YT.Player(ytContainer, {
-            videoId: videoId,
-            playerVars: {
-                autoplay: 1,
-                mute: 1,
-                controls: 0,
-                modestbranding: 1,
-                rel: 0,
-                playsinline: 1,
-                loop: 1,
-                playlist: videoId,
-                disablekb: 1,
-                enablejsapi: 1,
-                origin: window.location.origin,
-                widget_referrer: window.location.origin,
-            },
-            events: {
-                onReady: (e) => {
-                    e.target.playVideo();
-                    // 叠加透明遮罩，完全阻止点击跳转
-                    addTransparentOverlay(ytContainer);
-                    // 确保播放器占据整个区域，适配原始 video 样式
-                    const iframe = ytContainer.querySelector('iframe');
-                    if (iframe) {
-                        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;';
-                    }
-                },
-                onError: () => {
-                    player.style.visibility = '';
-                    destroyCurrentYTPlayer();
+    try {
+        const res = await fetch('https://vid.taropai.com/api/videos');
+        const data = await res.json();
+        if (data.list && data.list.length > 0) {
+            allVideos = data.list;
+            videoPageCache.videos = data.list;
+            videoPageCache.version = data.version || 0;
+            videoPageCache.timestamp = Date.now();
+
+            const promoted = data.list.filter(v => v.promoted);
+            if (promoted.length > 0) {
+                videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+            } else {
+                videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
+            }
+            currentPlaylist = videoPageCache.playlist;
+
+            renderVideoGrid(dynamicSort(data.list), player, titleEl, sourceEl, safeT);
+            playVideoAtIndex(0);
+        }
+    } catch (err) {
+        console.error('[视频] 加载失败:', err);
+        if (!allVideos || allVideos.length === 0) {
+            if (grid) grid.innerHTML = '<p style="text-align:center;color:#ef4444;">Failed to load videos</p>';
+        }
+        return;
+    }
+
+    // 轮询（2分钟）
+    clearInterval(videoPollingTimer);
+    videoPollingTimer = setInterval(async () => {
+        try {
+            const res = await fetch('https://vid.taropai.com/api/videos');
+            const data = await res.json();
+            if (data.list && data.version !== videoPageCache.version) {
+                videoPageCache.videos = data.list;
+                videoPageCache.version = data.version;
+                videoPageCache.timestamp = Date.now();
+                const promoted = data.list.filter(v => v.promoted);
+                if (promoted.length > 0) {
+                    videoPageCache.playlist = promoted.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+                } else {
+                    videoPageCache.playlist = data.list.sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 20);
                 }
             }
-        });
-    } else {
-        // 原创视频：恢复原生 video 显示
-        player.style.visibility = '';
-        player.src = v.url;
-        player.muted = true;
-        player.playsInline = true;
-        player.play().catch(() => {});
-    }
+        } catch (e) {}
+    }, 120000);
 
-    currentIndex = index;
-    updateTimeline(index, currentPlaylist.length);
-    clearTimeout(slideTimer);
-    slideTimer = setTimeout(() => playVideoAtIndex((currentIndex + 1) % currentPlaylist.length), SLIDE_DURATION * 1000);
-}
-
-    if (currentPlaylist.length) {
-        playVideoAtIndex(0);
-    }
-
-    // 轮播线交互
+    // ========== 时间轴交互 ==========
     if (timelineContainer) {
         timelineContainer.addEventListener('click', (e) => {
             const rect = timelineTrack.getBoundingClientRect();
@@ -1653,7 +1682,7 @@ async function initVideoPage() {
         });
     }
 
-    // ★ 修复播放器区域左右滑动（触摸事件）
+    // 播放器区域左右滑动切换
     const playerSection = document.querySelector('.video-player-section');
     if (playerSection) {
         let playerTouchStartX = 0;
@@ -1690,184 +1719,10 @@ async function initVideoPage() {
         };
     });
 
-    function ensureOverlayCreated() {
-    if (document.getElementById('videoOverlayContainer')) {
-        videoOverlay = document.getElementById('videoOverlayContainer');
-        overlayPlayer = document.getElementById('overlayVideoPlayer');
-        return;
+    // 如果初始有播放列表，立即开始（缓存或网络加载后）
+    if (currentPlaylist.length) {
+        playVideoAtIndex(0);
     }
-    videoOverlay = document.createElement('div');
-    videoOverlay.id = 'videoOverlayContainer';
-    videoOverlay.className = 'video-player-overlay';
-    videoOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;display:none;align-items:center;justify-content:center;';
-    videoOverlay.innerHTML = `
-        <div class="overlay-container" style="position:relative;width:100%;max-width:900px;aspect-ratio:16/9;max-height:90vh;">
-            <div class="overlay-close" id="videoOverlayClose" style="position:absolute;top:-30px;right:0;z-index:10;color:#fff;font-size:24px;cursor:pointer;">✕</div>
-            <video class="overlay-video" id="overlayVideoPlayer" controls playsinline controlsList="nodownload nofullscreen" oncontextmenu="return false;" style="width:100%;height:100%;display:none;"></video>
-        </div>
-    `;
-    document.body.appendChild(videoOverlay);
-    overlayPlayer = document.getElementById('overlayVideoPlayer');
-
-    const overlayClose = document.getElementById('videoOverlayClose');
-    overlayClose.addEventListener('click', () => {
-        overlayPlayer.pause();
-        videoOverlay.style.display = 'none';
-        videoOverlay.classList.remove('active', 'fullscreen');
-        // 清理弹窗 YouTube
-        const overlayYT = document.querySelector('#overlay-youtube');
-        if (overlayYT) {
-            const ytPlayer = YT.get(overlayYT.id);
-            if (ytPlayer && typeof ytPlayer.destroy === 'function') ytPlayer.destroy();
-            overlayYT.remove();
-        }
-        // 恢复顶部轮播
-        playVideoAtIndex(currentIndex);
-    });
-}
-
-    window._ensureOverlayCreated = ensureOverlayCreated;
-    window._getOverlayElements = () => ({
-        videoOverlay,
-        overlayPlayer
-    });
-}
-
-// 动态排序（确保函数存在）
-function dynamicSort(videos) {
-    if (!videos || videos.length === 0) return videos;
-    const promoted = videos.filter(v => v.promoted).sort((a, b) => (b.weight || 0) - (a.weight || 0));
-    const normal = videos.filter(v => !v.promoted).sort((a, b) => {
-        const scoreA = (a.weight || 0) * 1000 + (a.stats?.views || 0) + Math.random() * 100;
-        const scoreB = (b.weight || 0) * 1000 + (b.stats?.views || 0) + Math.random() * 100;
-        return scoreB - scoreA;
-    });
-    return [...promoted, ...normal].slice(0, 48);
-}
-
-// ==================== 渲染视频网格 ====================
-function renderVideoGrid(videos, player, titleEl, sourceEl, safeT) {
-  const grid = document.getElementById('videoGrid');
-  if (!grid) return;
-
-  grid.innerHTML = '';
-  grid.style.minHeight = '200px';
-
-  if (!videos || videos.length === 0) {
-    grid.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px 0;">' +
-      (safeT ? safeT('noVideo', 'No videos available') : 'No videos available') + '</p>';
-    return;
-  }
-
-  let html = '';
-  for (const v of videos) {
-    const title = v.title || 'Untitled';
-    const source = v.source || 'Original';
-    const url = v.url || '';
-    const cover = v.cover || '';
-    const author = v.author || '';
-    const views = (v.stats && v.stats.views) ? v.stats.views.toLocaleString() : '';
-    const sourceLabel = source === 'Original'
-      ? (safeT('original', 'Original'))
-      : (safeT('fromSource', 'From') + ' ' + source);
-
-    const metaParts = [];
-    metaParts.push('<span>' + sourceLabel + '</span>');
-    if (author) metaParts.push('<span>' + author + '</span>');
-    if (views) metaParts.push('<span>🔥 ' + views + '</span>');
-    const metaHTML = metaParts.join('');
-
-    html += '<div class="video-card" data-url="' + url + '" data-id="' + v.id + '" data-title="' + title + '" data-source="' + source + '">' +
-      '<img class="video-card-img" src="' + cover + '" alt="' + title + '" loading="lazy" onerror="this.style.display=\'none\'">' +
-      '<div class="video-card-info">' +
-        '<div class="video-card-title">' + title + '</div>' +
-        '<div class="video-card-meta">' + metaHTML + '</div>' +
-      '</div>' +
-    '</div>';
-  }
-  grid.innerHTML = html;
-
-  grid.querySelectorAll('.video-card').forEach(card => {
-    card.addEventListener('click', async () => {
-        const videoUrl = card.dataset.url;
-        const videoSource = card.dataset.source;
-        const { videoOverlay, overlayPlayer } = window._getOverlayElements();
-
-        // 暂停顶部播放器（原生或 YouTube）
-        if (player && player.tagName === 'VIDEO' && !player.paused) {
-            player.pause();
-        } else if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-            ytPlayer.pauseVideo();
-        }
-
-        // 清理旧的弹窗 YouTube
-        const oldYT = document.querySelector('#overlay-youtube');
-        if (oldYT) {
-            const oldP = YT.get(oldYT.id);
-            if (oldP && typeof oldP.destroy === 'function') oldP.destroy();
-            oldYT.remove();
-        }
-
-        if (videoSource === 'YouTube') {
-            const videoId = getYouTubeVideoId(videoUrl);
-            if (!videoId) return;
-            overlayPlayer.style.display = 'none';
-            const ytDiv = document.createElement('div');
-            ytDiv.id = 'overlay-youtube';
-            ytDiv.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;';
-            const overlayContainer = videoOverlay.querySelector('.overlay-container');
-            overlayContainer.appendChild(ytDiv);
-
-            await window.ytApiReady;
-            new YT.Player(ytDiv, {
-                videoId: videoId,
-                playerVars: {
-                    autoplay: 1,
-                    controls: 0,
-                    modestbranding: 1,
-                    rel: 0,
-                    playsinline: 1,
-                },
-                events: {
-                    onReady: (e) => {
-                        e.target.playVideo();
-                        // 弹窗内同样叠加透明遮罩
-                        const existingOverlay = ytDiv.querySelector('.yt-modal-overlay');
-                        if (!existingOverlay) {
-                            const overlay = document.createElement('div');
-                            overlay.className = 'yt-modal-overlay';
-                            overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;background:transparent;pointer-events:all;';
-                            ytDiv.appendChild(overlay);
-                        }
-                        const iframe = ytDiv.querySelector('iframe');
-                        if (iframe) {
-                            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;';
-                        }
-                    },
-                    onError: () => {
-                        const ytEl = document.querySelector('#overlay-youtube');
-                        if (ytEl) ytEl.remove();
-                        overlayPlayer.style.display = '';
-                    }
-                }
-            });
-        } else {
-            overlayPlayer.style.display = 'block';
-            overlayPlayer.src = videoUrl;
-            overlayPlayer.play().catch(() => {});
-        }
-
-        // 显示弹窗（横屏/竖屏自适应）
-        videoOverlay.style.display = 'flex';
-        const isLandscape = window.innerWidth > window.innerHeight;
-        if (isLandscape) {
-            videoOverlay.querySelector('.overlay-container').style.maxWidth = '90vw';
-        } else {
-            videoOverlay.querySelector('.overlay-container').style.maxWidth = '100%';
-        }
-        videoOverlay.classList.add('active');
-    });
-});
 }
 
 // ==================== 登录/注册 ====================
