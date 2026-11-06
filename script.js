@@ -1,6 +1,6 @@
 // ==================== 全局配置 ====================
-const DEEPSEEK_API = "https://api.taropai.com/v1/chat/completions";
-const BACKEND_URL = "https://auth.taropai.com";
+const AI_API = "https://api.botorr.com/v1/chat/completions";
+const BACKEND_URL = "https://auth.botorr.com";
 const LANGS = ['en', 'es', 'fr', 'de', 'it', 'pt', 'zh-CN'];
 function getCurrentLang() {
   const stored = localStorage.getItem('aiChefLang');
@@ -93,7 +93,7 @@ let videoPollingTimer = null;
 
 async function prefetchVideosForCache() {
     try {
-        const res = await fetch('https://vid.taropai.com/api/videos');
+        const res = await fetch('https://vid.botorr.com/api/videos');
         const data = await res.json();
         if (data.list && data.list.length > 0) {
             videoPageCache.videos = data.list;
@@ -945,10 +945,10 @@ CRITICAL: You MUST translate ALL section headings (e.g. "Ingredients", "Instruct
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
-    const response = await fetch(DEEPSEEK_API, {
+    const response = await fetch(AI_API, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'deepseek-v4-flash', temperature: 0.9, max_tokens: 1000,
+        model: 'agnes-2.5-flash', temperature: 0.9, max_tokens: 1000,
         messages: [
           { role: 'system', content: systemPrompt },
         { role: 'user', content: `生成${cuisine} ${dish} 食谱，请提供一种不同的做法。随机种子：${Date.now()}_${Math.random().toString(36)}` }
@@ -1218,11 +1218,11 @@ async function askQuestion(containerOverride) {
         }
         messages.push({ role: 'user', content: question });
 
-        const response = await fetch(DEEPSEEK_API, {
+        const response = await fetch(AI_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: 'deepseek-v4-flash',
+                model: 'agnes-2.5-flash',
                 temperature: 0.3,
                 max_tokens: 300,
                 messages: messages,
@@ -1731,7 +1731,7 @@ async function initVideoPage() {
     }
 
     try {
-        const res = await fetch('https://vid.taropai.com/api/videos');
+        const res = await fetch('https://vid.botorr.com/api/videos');
         const data = await res.json();
         if (data.list && data.list.length > 0) {
             allVideos = data.list;
@@ -1762,7 +1762,7 @@ async function initVideoPage() {
     clearInterval(videoPollingTimer);
     videoPollingTimer = setInterval(async () => {
         try {
-            const res = await fetch('https://vid.taropai.com/api/videos');
+            const res = await fetch('https://vid.botorr.com/api/videos');
             const data = await res.json();
             if (data.list && data.version !== videoPageCache.version) {
                 videoPageCache.videos = data.list;
@@ -1830,7 +1830,7 @@ async function initVideoPage() {
             btn.classList.add('active');
             const cat = btn.dataset.cat;
             try {
-                const res = await fetch(`https://vid.taropai.com/api/videos?category=${encodeURIComponent(cat)}`);
+                const res = await fetch(`https://vid.botorr.com/api/videos?category=${encodeURIComponent(cat)}`);
                 const data = await res.json();
                 allVideos = data.list || [];
                 renderVideoGrid(allVideos, player, titleEl, sourceEl, safeT);
@@ -1923,7 +1923,7 @@ async function sendVerificationCode() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
   const btn = document.getElementById('sendCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
   try {
-    const res = await fetch("https://auth.taropai.com/api/send-verification-code", {
+    const res = await fetch("https://auth.botorr.com/api/send-verification-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, lang: getCurrentLang() })
@@ -1939,7 +1939,7 @@ async function sendResetCode() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Invalid email'); return; }
   const btn = document.getElementById('sendResetCodeBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerText = t('sending');
   try {
-    const res = await fetch("https://auth.taropai.com/api/send-reset-code", {
+    const res = await fetch("https://auth.botorr.com/api/send-reset-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, lang: getCurrentLang() })
@@ -1959,7 +1959,7 @@ async function sendEmailChangeCode() {
   btn.disabled = true; btn.innerText = t('sending');
   try {
     if (!userToken) throw new Error('Not logged in');
-    const res = await fetch("https://auth.taropai.com/api/send-email-change-code", {
+    const res = await fetch("https://auth.botorr.com/api/send-email-change-code", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -2053,9 +2053,9 @@ function renderPayPal() {
           const token = localStorage.getItem('authToken'), bindCode = localStorage.getItem('tempBindCode');
           if (!token && !bindCode) { alert('Please refresh and try again.'); return; }
           if (!token) {
-            const resp = await fetch(`https://paypal.taropai.com/generate-bind-code?plan=${c.planType}`);
+            const resp = await fetch(`https://paypal.botorr.com/generate-bind-code?plan=${c.planType}`);
             const data = await resp.json(); localStorage.setItem('tempBindCode', data.bindCode);
-            window.location.href = `https://paypal.taropai.com/?plan=${c.planType}&bindCode=${data.bindCode}`; return;
+            window.location.href = `https://paypal.botorr.com/?plan=${c.planType}&bindCode=${data.bindCode}`; return;
           }
           await apiCall('/api/subscription/verify', { method: 'POST', body: JSON.stringify({ subscriptionId: data.subscriptionID, planType: c.planType, deviceId }) });
           userData = await loadUserData(); showToast(t('paymentSuccess')); showPage('page-profile'); renderProfile(); updateLimitInfo(); updateNavButton();
@@ -2436,7 +2436,7 @@ async function handleUrlParams() {
   if (action === 'verify-email') {
     if (token) {
       try {
-        const res = await fetch(`https://auth.taropai.com/api/verify-email?token=${token}`);
+        const res = await fetch(`https://auth.botorr.com/api/verify-email?token=${token}`);
         const data = await res.json();
         if (data.success) {
           alert('Email verified successfully! You can now log in.');
@@ -2466,7 +2466,7 @@ async function handleUrlParams() {
   if (action === 'change-email-verify') {
     if (token) {
       try {
-        const res = await fetch(`https://auth.taropai.com/api/change-email-verify?token=${token}`);
+        const res = await fetch(`https://auth.botorr.com/api/change-email-verify?token=${token}`);
         const data = await res.json();
         if (data.success) {
           alert('Email changed successfully! Please log in with your new email.');
@@ -3165,7 +3165,7 @@ renderLanguage = function() {
         return;
       }
       if (provider === 'google' || provider === 'facebook') {
-        window.location.href = `/api/auth/${provider}`;
+        window.location.href = `https://api.botorr.com/auth/${provider}`;
         return;
       }
       alert('This login method is coming soon.');
