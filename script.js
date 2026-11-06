@@ -3165,7 +3165,7 @@ renderLanguage = function() {
         return;
       }
       if (provider === 'google' || provider === 'facebook') {
-        window.location.href = `https://api.botorr.com/auth/${provider}`;
+        window.location.href = `https://auth.botorr.com/api/auth/${provider}`;
         return;
       }
       alert('This login method is coming soon.');
