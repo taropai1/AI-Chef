@@ -24,7 +24,7 @@
       document.getElementById('loader').style.display = 'none';
       document.getElementById('status').innerHTML = '<span class="error">Invalid verification link.</span>';
     } else {
-      fetch(`https://auth.taropai.com/api/verify-email-token?token=${token}`)
+      fetch(`https://auth.botorr.com/api/verify-email-token?token=${token}`)
         .then(res => res.json())
         .then(data => {
           document.getElementById('loader').style.display = 'none';
